@@ -97,7 +97,14 @@ $ vim roles/kubernetes-bootstrap/tasks/configure_firewalld.yml
   when: "'node' in ansible_hostname"
 ```
 
-If your master nodes doesn't contain `master` and nodes doesn't have `node` as part of hostname, update the file to reflect your naming pattern
+If your master nodes doesn't contain `master` and nodes doesn't have `node` as part of hostname, update the file to reflect your naming pattern. My nodes are named like below:
+
+```
+k8smaster01
+k8snode01
+k8snode02
+k8snode03
+```
 
 Playbook executed as root user - with ssh key:
 
