@@ -4,6 +4,11 @@
 
 It only helps you automate the standard Kubernetes bootstrapping pre-reqs.
 
+## Supported OS
+
+- CentOS 7
+- CentOS 8 -- Still uses CentOS 7 repository ( will be updated when repo for 8 is available)
+
 ## Tasks in the role
 
 This role contains tasks to:
