@@ -1,0 +1,54 @@
+---
+- name: Install firewalld
+  package:
+    name: firewalld
+    state: present
+
+- name: Start and enable firewalld
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+
+- name: Configure firewalld on master nodes
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    state: enabled
+  with_items: '{{ k8s_master_ports }}'
+  when: "'master' in ansible_hostname"
+
+- name: Configure firewalld on worker nodes
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    state: enabled
+  with_items: '{{ k8s_worker_ports }}'
+  when: "'node' in ansible_hostname"
+
+- name: Open flannel ports on the firewall
+  firewalld:
+    port: "{{ item }}/udp"
+    permanent: yes
+    state: enabled
+  with_items: "{{ flannel_udp_ports }}"
+  when: k8s_cni == "flannel"
+
+- name: Open calico UDP ports on the firewall
+  firewalld:
+    port: "{{ item }}/udp"
+    permanent: yes
+    state: enabled
+  with_items: "{{ calico_udp_ports }}"
+  when: k8s_cni == "calico"
+
+- name: Open calico TCP ports on the firewall
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    state: enabled
+  with_items: "{{ calico_tcp_ports }}"
+  when: k8s_cni == "calico"
+
+- name: Reload firewalld
+  shell: firewall-cmd --reload

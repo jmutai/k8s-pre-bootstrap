@@ -1,0 +1,31 @@
+---
+- name: Load required modules
+  modprobe:
+    name: [overlay,br_netfilter]
+    state: present
+
+- name: Setup required sysctl params
+  sysctl:
+    name: '{{ item.key }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_items:
+    - {key: net.bridge.bridge-nf-call-ip6tables, value: 1}
+    - {key: net.bridge.bridge-nf-call-iptables,  value: 1}
+    - {key: net.ipv4.ip_forward,  value: 1}
+
+- name: Install CRIO repository
+  shell: yum-config-manager --add-repo=https://cbs.centos.org/repos/paas7-crio-115-release/x86_64/os/
+
+- name: Install cri-o
+  yum:
+    name: cri-o
+    state: present
+
+- name: Start and enable crio service
+  service:
+    name: crio
+    state: present
+

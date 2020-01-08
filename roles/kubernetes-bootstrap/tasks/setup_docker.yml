@@ -1,0 +1,42 @@
+---
+- name: Add docker repository
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docer-ce.repo
+
+- name: Install supported version of docker
+  package:
+    name: [docker-ce]
+    state: present
+
+- name: Create other directories required
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /etc/docker
+    - /etc/systemd/system/docker.service.d
+
+- name: Set cgroup driver as systemd
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+
+- name: Start and enable docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+- name: Setup Docker Proxy
+  template:
+    src: docker-proxy.j2
+    dest: /etc/systemd/system/docker.service.d/http-proxy.conf
+  when: setup_proxy
+
+- name: Restart docker service
+  systemd:
+    name: docker
+    state: restarted
+    daemon_reload: yes

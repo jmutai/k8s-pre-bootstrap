@@ -1,0 +1,22 @@
+---
+- name: Pre-reqs setup task
+  include: pre-setup.yaml
+
+- name: Install and configure docker
+  include: setup_docker.yml
+  when: container_runtime == "docker"
+
+- name: Install and configure cri-o container runtime
+  include: setup_crio.yml
+  when: container_runtime == "cri-o"
+
+- name: Install and configure containerd container runtime
+  include: setup_crio.yml
+  when: container_runtime == "containerd"
+
+- name: Install k8s packages
+  include: install_k8s_packages.yml
+
+- name: Configure firewalld
+  include: configure_firewalld.yml
+  when: configure_firewalld
