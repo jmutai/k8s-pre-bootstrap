@@ -7,7 +7,7 @@ It only helps you automate the standard Kubernetes bootstrapping pre-reqs.
 ## Supported OS
 
 - CentOS 7
-- CentOS 8 -- Still uses CentOS 7 repository ( will be updated when repo for 8 is available)
+- CentOS 8 -- Still uses CentOS 7 repository ( will be updated when k8s repos for 8 is available)
 
 ## Tasks in the role
 
@@ -27,7 +27,7 @@ This role contains tasks to:
 $ git clone https://github.com/jmutai/k8s-pre-bootstrap.git
 ```
 
-- Update your inventory:
+- Update your inventory, e.g:
 
 ```
 $ vim hosts
@@ -68,3 +68,33 @@ become_method: sudo
 ```
 
 To enable proxy, set the value of `setup_proxy` to `true` and provide proxy details.
+
+## Running Playbook
+
+Once all values are updated, you can then run the playbook against your nodes.
+
+**NOTE**: For firewall configuration to open relevant ports for master and worker nodes, a pattern in hostname is required.
+
+Check file:
+
+```
+$ vim roles/kubernetes-bootstrap/tasks/configure_firewalld.yml
+....
+- name: Configure firewalld on master nodes
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    state: enabled
+  with_items: '{{ k8s_master_ports }}'
+  when: "'master' in ansible_hostname"
+
+- name: Configure firewalld on worker nodes
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    state: enabled
+  with_items: '{{ k8s_worker_ports }}'
+  when: "'node' in ansible_hostname"
+```
+
+If your master nodes doesn't contain `master` and nodes doesn't have `node` as part of hostname, update the file to reflect your naming pattern
