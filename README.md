@@ -98,3 +98,27 @@ $ vim roles/kubernetes-bootstrap/tasks/configure_firewalld.yml
 ```
 
 If your master nodes doesn't contain `master` and nodes doesn't have `node` as part of hostname, update the file to reflect your naming pattern
+
+Playbook executed as root user - with ssh key:
+
+```
+$ ansible-playbook -i hosts k8s-prep.yml
+```
+
+Playbook executed as root user - with password:
+
+```
+$ ansible-playbook -i hosts k8s-prep.yml --ask-pass
+```
+
+Playbook executed as sudo user - with password:
+
+```
+$ ansible-playbook -i hosts k8s-prep.yml --ask-pass --ask-become-pass
+```
+
+Playbook executed as sudo user - with ssh key:
+
+```
+$ ansible-playbook -i hosts k8s-prep.yml --ask-become-pass
+```
