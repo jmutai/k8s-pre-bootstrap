@@ -1,0 +1,17 @@
+---
+- name: Setup Proxy
+  hosts: k8s-nodes
+  remote_user: root
+  #become: yes
+  #become_method: sudo
+  #gather_facts: no
+  vars:
+    k8s_cni: calico                                      # calico, flannel
+    container_runtime: docker                            # docker, cri-o, containerd 
+    configure_firewalld: true                            # true / false
+    # Docker registry
+    setup_proxy: false                                   # Set to true to configure proxy
+    proxy_server: "proxy.example.com:8080"               # Proxy server address and port
+    docker_proxy_exclude: "localhost,127.0.0.1"          # Adresses to exclude from proxy
+  roles:
+    - kubernetes-bootstrap
