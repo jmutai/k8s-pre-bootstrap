@@ -1,7 +1,7 @@
 ---
 - name: Setup Proxy
   hosts: k8s-nodes
-  remote_user: root 
+  remote_user: netadmin
   become: yes
   become_method: sudo
   #gather_facts: no
