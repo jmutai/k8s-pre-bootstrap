@@ -45,8 +45,8 @@ $ vim k8s-prep.yml
 - name: Setup Proxy
   hosts: k8s-nodes
   remote_user: root
-  #become: yes
-  #become_method: sudo
+  become: yes
+  become_method: sudo
   #gather_facts: no
   vars:
     k8s_cni: calico                                      # calico, flannel
