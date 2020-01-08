@@ -1,7 +1,6 @@
 ## Role info
 
 > This playbook is not for fully setting up a Kubernetes Cluster.
-{.is-info}
 
 It only helps you automate the standard Kubernetes bootstrapping pre-reqs.
 
