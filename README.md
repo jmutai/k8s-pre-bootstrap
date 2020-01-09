@@ -134,3 +134,17 @@ Playbook executed as sudo user - with ssh key and passwordless sudo:
 ```
 $ ansible-playbook -i hosts k8s-prep.yml --ask-become-pass
 ```
+
+Execution should be successful without errors:
+
+```
+TASK [kubernetes-bootstrap : Reload firewalld] *********************************************************************************************************
+changed: [k8smaster01]
+changed: [k8snode01]
+changed: [k8snode02]
+
+PLAY RECAP *********************************************************************************************************************************************
+k8smaster01                : ok=23   changed=3    unreachable=0    failed=0    skipped=11   rescued=0    ignored=0
+k8snode01                  : ok=23   changed=3    unreachable=0    failed=0    skipped=11   rescued=0    ignored=0
+k8snode02                  : ok=23   changed=3    unreachable=0    failed=0    skipped=11   rescued=0    ignored=0
+```
