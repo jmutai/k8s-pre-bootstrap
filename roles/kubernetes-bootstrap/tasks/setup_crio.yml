@@ -1,9 +1,4 @@
 ---
-- name: Load required modules
-  modprobe:
-    name: [overlay,br_netfilter]
-    state: present
-
 - name: Setup required sysctl params
   sysctl:
     name: '{{ item.key }}'
