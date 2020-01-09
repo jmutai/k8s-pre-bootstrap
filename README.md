@@ -123,7 +123,13 @@ Playbook executed as sudo user - with password:
 $ ansible-playbook -i hosts k8s-prep.yml --ask-pass --ask-become-pass
 ```
 
-Playbook executed as sudo user - with ssh key:
+Playbook executed as sudo user - with ssh key and sudo password:
+
+```
+$ ansible-playbook -i hosts k8s-prep.yml --ask-become-pass
+```
+
+Playbook executed as sudo user - with ssh key and passwordless sudo:
 
 ```
 $ ansible-playbook -i hosts k8s-prep.yml --ask-become-pass
