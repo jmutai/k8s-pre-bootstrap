@@ -13,6 +13,7 @@
   package:
     name: [vim,bash-completion,wget,curl,firewalld,python-firewall,yum-utils,lvm2,device-mapper-persistent-data]
     state: present
+  ignore_errors: True
 
 - name: Disable SWAP since kubernetes can't work with swap enabled (1/2)
   shell: |
@@ -24,6 +25,12 @@
     regexp: '^([^#].*?\sswap\s+.*)$'
     replace: '# \1'
 
+- name: Load required modules
+  modprobe:
+    name: [overlay,br_netfilter]
+    state: present
+
+
 - name: Modify sysctl entries
   sysctl:
     name: '{{ item.key }}'
@@ -31,6 +38,7 @@
     sysctl_set: yes
     state: present
     reload: yes
+  ignore_errors: True
   with_items:
     - {key: net.bridge.bridge-nf-call-ip6tables, value: 1}
     - {key: net.bridge.bridge-nf-call-iptables,  value: 1}
