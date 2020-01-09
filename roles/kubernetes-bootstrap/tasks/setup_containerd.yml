@@ -1,9 +1,4 @@
 ---
-- name: Load required modules
-  modprobe:
-    name: [overlay,br_netfilter]
-    state: present
-
 - name: Add docker repository
   get_url:
     url: https://download.docker.com/linux/centos/docker-ce.repo
