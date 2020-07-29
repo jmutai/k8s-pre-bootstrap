@@ -4,6 +4,12 @@
     policy: targeted
     state: permissive
 
+- name: Configure firewalld
+  package:
+    name: firewalld
+    state: absent
+  when: remove_firewalld
+  
 - name: Update system
   package:
     name: "*"
@@ -11,9 +17,16 @@
 
 - name: Install common packages
   package:
-    name: [vim,bash-completion,wget,curl,firewalld,python-firewall,yum-utils,lvm2,device-mapper-persistent-data]
+    name: [vim,nano,bash-completion,wget,curl,firewalld,python-firewall,yum-utils,lvm2,device-mapper-persistent-data]
     state: present
   ignore_errors: True
+  
+- name: Install firewalld
+  package:
+    name: [firewalld,python-firewall]
+    state: present
+  ignore_errors: True
+  when: not remove_firewalld
 
 - name: Disable SWAP since kubernetes can't work with swap enabled (1/2)
   shell: |

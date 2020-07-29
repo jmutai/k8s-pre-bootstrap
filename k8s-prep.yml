@@ -1,14 +1,13 @@
 ---
 - name: Setup Proxy
   hosts: k8s-nodes
-  remote_user: root
   become: yes
-  become_method: sudo
   #gather_facts: no
   vars:
     k8s_cni: calico                                      # calico, flannel
     container_runtime: docker                            # docker, cri-o, containerd 
-    configure_firewalld: true                            # true / false
+    configure_firewalld: false                            # true / false
+    remove_firewalld: true                               # Set to true to remove firewalld    
     # Docker proxy support
     setup_proxy: false                                   # Set to true to configure proxy
     proxy_server: "proxy.example.com:8080"               # Proxy server address and port

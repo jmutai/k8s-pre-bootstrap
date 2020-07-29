@@ -1,8 +1,6 @@
-## Role info
+## Main info
 
-> This playbook is not for fully setting up a Kubernetes Cluster.
-
-It only helps you automate the standard Kubernetes bootstrapping pre-reqs.
+This playbook helps you setting up a Kubernetes Cluster on VM or .
 
 ## Supported OS
 
@@ -18,25 +16,55 @@ This role contains tasks to:
 - Install the Kubernetes packages - kubelet, kubeadm and kubectl
 - Configure Firewalld on Kubernetes Master and Worker nodes
 
-## How to use this role
+## Additional playbooks
+
+- check_uniq.yml - Verify the MAC address and product_uuid are unique for every node (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address)
+- send_public_key.yml - Deploy the public key to remote hosts
+- create_cluster.yml - Creating a single control-plane cluster with kubeadm (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
+
+## How to use
+
+- Install ansible (better on the master)
+
+```
+sudo yum install -y epel-release
+sudo yum install -y ansible
+ansible --version (where config)
+```
+
+- Deploy the public key to remote hosts
+
+-- Generate keys
+```
+ssh-keygen -t rsa
+```
+-- Edit send_public_key.yml, insert in ```line:``` line with public key from /home/<user>/.ssh/id_rsa.pub
+-- Deploy key
+```
+ansible-playbook send_public_key.yml -b --ask-pass
+```
 
 - Clone the Project:
 
 ```
-$ git clone https://github.com/jmutai/k8s-pre-bootstrap.git
+$ https://github.com/MinistrBob/k8s-pre-bootstrap.git
 ```
 
 - Update your inventory, e.g:
 
 ```
-$ vim hosts
-[k8s-nodes]
-172.21.200.10
-172.21.200.11
-172.21.200.12
+$ nano hosts
+[master]
+172.26.12.130
+
+[workers]
+172.26.12.131
+172.26.12.132
+172.26.12.133
+
 ```
 
-- Update variables in playbook file
+- Update variables in playbook file (presented variant when firewalld is completely removed)
 
 ```
 $ vim k8s-prep.yml
@@ -50,7 +78,8 @@ $ vim k8s-prep.yml
   vars:
     k8s_cni: calico                                      # calico, flannel
     container_runtime: docker                            # docker, cri-o, containerd
-    configure_firewalld: true                            # true / false
+    configure_firewalld: false                            # true / false
+    remove_firewalld: true                               # Set to true to remove firewalld	
     # Docker registry
     setup_proxy: false                                   # Set to true to configure proxy
     proxy_server: "proxy.example.com:8080"               # Proxy server address and port
@@ -104,6 +133,8 @@ k8snode01
 k8snode02
 k8snode03
 ```
+
+## Running Playbook
 
 Playbook executed as root user - with ssh key:
 

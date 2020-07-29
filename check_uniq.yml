@@ -1,0 +1,19 @@
+- hosts: all
+  become: yes
+  tasks:
+   # - name: ip link
+     # command: ip link
+     # register: output
+
+   - name: PRINT OUT THE OUTPUT VARIABLE
+     debug:
+       # var: output.stdout_lines[0][3]
+       msg="{{ hostvars[inventory_hostname].ansible_default_ipv4.macaddress }}"
+
+   - name: product_uuid
+     command: cat /sys/class/dmi/id/product_uuid
+     register: output
+
+   - name: PRINT OUT THE OUTPUT VARIABLE
+     debug:
+       var: output.stdout

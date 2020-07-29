@@ -6,7 +6,7 @@
 
 - name: Install supported version of docker
   package:
-    name: [docker-ce]
+    name: [containerd.io-1.2.13,docker-ce-19.03.11,docker-ce-cli-19.03.11]
     state: present
 
 - name: Create other directories required

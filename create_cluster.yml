@@ -1,0 +1,39 @@
+- hosts: master
+  become: yes
+  tasks:
+    - name: initialize the cluster
+      # shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
+      shell: kubeadm init >> /home/worker/ansible/cluster_initialized.txt
+      args:
+        chdir: $HOME
+        creates: cluster_initialized.txt
+
+    - name: create .kube directory
+      become: yes
+      become_user: worker
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: 0755
+
+    - name: copy admin.conf to user's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/worker/.kube/config
+        remote_src: yes
+        owner: worker
+
+    - name: Install prerequisites 4
+      command: curl https://docs.projectcalico.org/manifests/calico-etcd.yaml -o /home/worker/ansible/calico.yaml
+      
+    - stat: path=/home/worker/ansible/calico.yaml
+      register: p
+
+    - name: install Pod network
+      become: yes
+      become_user: worker
+      shell: kubectl apply -f /home/worker/ansible/calico.yaml >> /home/worker/ansible/pod_network_setup.txt
+      args:
+        chdir: $HOME
+        creates: pod_network_setup.txt
+      when: p.stat.exists
