@@ -25,17 +25,16 @@ This role contains tasks to:
 ## Creating cluster
 
 - Clone the Git Project:
-
 ```
 $ git clone https://github.com/MinistrBob/k8s-pre-bootstrap.git
 ```
 
 - Verify the MAC address and product_uuid are unique for every node. 
 Playbook show MAC addresses and UUID. You must visually verify that everything is unique :)  
+```
 ansible-playbook check_uniq.yml
-
+```
 - Install ansible (better on the master)
-
 ```
 sudo yum install -y epel-release
 sudo yum install -y ansible
@@ -43,7 +42,6 @@ ansible --version (where config)
 ```
 
 - Deploy the public key to remote hosts
-
 -- Generate keys
 ```
 ssh-keygen -t rsa
@@ -55,7 +53,6 @@ ansible-playbook send_public_key.yml -b --ask-pass
 ```
 
 - Update your inventory, e.g:
-
 ```
 $ nano hosts
 [master]
@@ -69,9 +66,8 @@ $ nano hosts
 ```
 
 - Update variables in playbook file (presented variant when firewalld is completely removed)
-
 ```
-$ vim k8s-prep.yml
+$ nano k8s-prep.yml
 ---
 - name: Setup Proxy
   hosts: k8s-nodes
@@ -93,7 +89,6 @@ $ vim k8s-prep.yml
 ```
 
 If you are using non root remote user, then set username and enable sudo:
-
 ```
 become: yes
 become_method: sudo
@@ -108,9 +103,8 @@ Once all values are updated, you can then run the playbook against your nodes.
 **NOTE**: For firewall configuration to open relevant ports for master and worker nodes, a pattern in hostname is required.
 
 Check file:
-
 ```
-$ vim roles/kubernetes-bootstrap/tasks/configure_firewalld.yml
+$ nano roles/kubernetes-bootstrap/tasks/configure_firewalld.yml
 ....
 - name: Configure firewalld on master nodes
   firewalld:
@@ -130,7 +124,6 @@ $ vim roles/kubernetes-bootstrap/tasks/configure_firewalld.yml
 ```
 
 If your master nodes doesn't contain `master` and nodes doesn't have `node` as part of hostname, update the file to reflect your naming pattern. My nodes are named like below:
-
 ```
 k8smaster01
 k8snode01
@@ -141,45 +134,28 @@ k8snode03
 ## Running Playbook
 
 Playbook executed as root user - with ssh key:
-
 ```
 $ ansible-playbook -i hosts k8s-prep.yml
 ```
 
 Playbook executed as root user - with password:
-
 ```
 $ ansible-playbook -i hosts k8s-prep.yml --ask-pass
 ```
 
 Playbook executed as sudo user - with password:
-
 ```
 $ ansible-playbook -i hosts k8s-prep.yml --ask-pass --ask-become-pass
 ```
 
 Playbook executed as sudo user - with ssh key and sudo password:
-
 ```
 $ ansible-playbook -i hosts k8s-prep.yml --ask-become-pass
 ```
 
 Playbook executed as sudo user - with ssh key and passwordless sudo:
-
 ```
 $ ansible-playbook -i hosts k8s-prep.yml --ask-become-pass
 ```
 
-Execution should be successful without errors:
-
-```
-TASK [kubernetes-bootstrap : Reload firewalld] *********************************************************************************************************
-changed: [k8smaster01]
-changed: [k8snode01]
-changed: [k8snode02]
-
-PLAY RECAP *********************************************************************************************************************************************
-k8smaster01                : ok=23   changed=3    unreachable=0    failed=0    skipped=11   rescued=0    ignored=0
-k8snode01                  : ok=23   changed=3    unreachable=0    failed=0    skipped=11   rescued=0    ignored=0
-k8snode02                  : ok=23   changed=3    unreachable=0    failed=0    skipped=11   rescued=0    ignored=0
-```
+Execution should be successful without errors.
