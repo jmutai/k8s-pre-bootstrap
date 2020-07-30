@@ -43,14 +43,14 @@ ansible --version (where config)
 
 * Deploy the public key to remote hosts
     - Generate keys
-```
-ssh-keygen -t rsa
-```
+    ```
+    ssh-keygen -t rsa
+    ```
     - Edit send_public_key.yml, insert in ```line:``` line with public key from /home/<user>/.ssh/id_rsa.pub
     - Deploy key with ansible
-```
-ansible-playbook send_public_key.yml -b --ask-pass
-```
+    ```
+    ansible-playbook send_public_key.yml -b --ask-pass
+    ```
 
 - Update your inventory, e.g:
 ```
