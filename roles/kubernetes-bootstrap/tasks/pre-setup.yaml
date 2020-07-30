@@ -17,7 +17,7 @@
 
 - name: Install common packages
   package:
-    name: [vim,nano,bash-completion,wget,curl,firewalld,python-firewall,yum-utils,lvm2,device-mapper-persistent-data]
+    name: [vim,nano,bash-completion,wget,curl,yum-utils,lvm2,device-mapper-persistent-data]
     state: present
   ignore_errors: True
   
