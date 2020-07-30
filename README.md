@@ -22,7 +22,17 @@ This role contains tasks to:
 - send_public_key.yml - Deploy the public key to remote hosts
 - create_cluster.yml - Creating a single control-plane cluster with kubeadm (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
 
-## How to use
+## Creating cluster
+
+- Clone the Git Project:
+
+```
+$ git clone https://github.com/MinistrBob/k8s-pre-bootstrap.git
+```
+
+- Verify the MAC address and product_uuid are unique for every node. 
+Playbook show MAC addresses and UUID. You must visually verify that everything is unique :)  
+ansible-playbook check_uniq.yml
 
 - Install ansible (better on the master)
 
@@ -42,12 +52,6 @@ ssh-keygen -t rsa
 -- Deploy key
 ```
 ansible-playbook send_public_key.yml -b --ask-pass
-```
-
-- Clone the Project:
-
-```
-$ https://github.com/MinistrBob/k8s-pre-bootstrap.git
 ```
 
 - Update your inventory, e.g:
