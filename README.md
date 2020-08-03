@@ -1,6 +1,7 @@
 ## Main info
 
-This playbook helps you setting up a Kubernetes Cluster on VM or .
+This playbook helps you setting up a Kubernetes Cluster on VM or bare-metal servers.
+The entire installation is performed under root account (sudo su -). If you have a different account is used in all commands sudo (sudo some command).
 
 ## Supported OS
 
@@ -21,6 +22,26 @@ This role contains tasks to:
 - check_uniq.yml - Verify the MAC address and product_uuid are unique for every node (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address)
 - send_public_key.yml - Deploy the public key to remote hosts
 - create_cluster.yml - Creating a single control-plane cluster with kubeadm (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
+
+## Preliminary preparation
+
+- Install git and ansible on the control computer
+```
+sudo yum install -y epel-release
+sudo yum install -y ansible
+sudo yum install -y git
+sudo yum install -y platform-python
+```
+
+- Setting up ansible
+```
+sudo nano /etc/ansible/ansible.cfg
+```
+
+```
+inventory = /root/ansible/hosts
+host_key_checking = False
+```
 
 ## Creating cluster
 

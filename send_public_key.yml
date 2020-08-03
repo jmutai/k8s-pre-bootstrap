@@ -12,4 +12,4 @@
   - name: put pubkey
     lineinfile:
       path: "/home/worker/.ssh/authorized_keys"
-      line: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCy2MuOawJ99ALU8Gi20+wE4ersssrgQUES5zH8iOIxbN3MiRz1tXxQkBsDMeSJl4SXJRY+yLfrYzfGCZDo3JNicSqn6p0r6qiWeNVvQz+UDzqGP4VIN2JOHPrpv1rtOjufE2lXIDVMnd5LrS3emaH8rHL+DzQSyhqdpoAXyCpzrQds5zOHVsv82sKod3yo8bf0PNL1DfUSutOfYexIwAWvrvmHVhzW97q5gbR4Qxkg6wYAc06R7i/ZIqTsXJ9qdyVajnTC98NLcbNGBoomWG/FRunubbMQBFnYyCOEO0re3gHsJXeABU426qgeYZBMpkdVrx6ZrO0VD8s7kgostUW1uvDVRD1T39KvETMWFohLy7nEov2DEu9McBovTxjYN7xtVKh3fJATS7eFFGxVCTzOB1+umgvmQlsCwRzJLzc7OTfx9EuV+TjTTYM9rAb10tuBhD5xK3l2NhLTEDskFxfYvldzvrTm0vvBdB+UHA0cp5DU2wOBCC82xyEHtue+cjFof2i2SI3DrcPnhNO3XmxHEX6ZB80J289sE+rCInCB65Lp9V3y8iqQYDgNjdEnKl0GXJnwCJedRADogcgs2GhwlB3wFIhZfgzvRjPlC8IYQLOez+p9Y0PB6me3nNWS0BKSi0VuF0QXjxhvNkcNrs7/ShO8b/4EWNkbn+B7QHVIRQ== user@server-502.dc1.local"
+      line: "foo"
