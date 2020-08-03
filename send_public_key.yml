@@ -3,13 +3,13 @@
   tasks:
   - name: make direcotry
     file:
-      path: "/root/.ssh"
+      path: "/home/<user>/.ssh"
       state: directory
   - name: create empty file
     file:
-      path: "/root/.ssh/authorized_keys"
+      path: "/home/<user>/.ssh/authorized_keys"
       state: touch
   - name: put pubkey
     lineinfile:
-      path: "/root/.ssh/authorized_keys"
+      path: "/home/<user>/.ssh/authorized_keys"
       line: "foo"
