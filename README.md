@@ -1,29 +1,25 @@
 ## Main info
 
 This playbook helps you setting up a Kubernetes Cluster on VM or bare-metal servers.
-The entire installation is performed under root account (sudo su -). If you have a different account is used in all commands sudo (sudo some command).
+The entire installation is performed under sudo user account.
 
 ## Supported OS
 
 - CentOS 7
 
-## Tasks in the role
+## Documentation
 
-This role contains tasks to:
-
-- Install basic packages required
-- Setup standard system requirements - Disable Swap, Modify sysctl, Disable SELinux
-- Install and configure a container runtime of your Choice - cri-o, Docker, Containerd
-- Install the Kubernetes packages - kubelet, kubeadm and kubectl
-- Configure Firewalld on Kubernetes Master and Worker nodes
+https://kubernetes.io/docs/setup/production-environment/
 
 ## Additional playbooks
 
+- net_config_copy.yml - Copy /etc/host and /etc/resolv.conf to another servers.
+- prepare_os.yml - Prepare OS.
 - check_uniq.yml - Verify the MAC address and product_uuid are unique for every node (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address)
-- send_public_key.yml - Deploy the public key to remote hosts
+- send_public_key.yml - Deploy the public key to remote hosts (for ssh)
 - create_cluster.yml - Creating a single control-plane cluster with kubeadm (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
 
-## Preliminary preparation
+## Preliminary preparation of the master server
 
 - Install git and ansible on the control computer
 ```
@@ -33,69 +29,67 @@ sudo yum install -y git
 sudo yum install -y platform-python
 ```
 
+- Clone the Git Project to folder /root/ansible:
+```
+cd ~
+mkdir ansible
+cd ansible
+git clone https://github.com/MinistrBob/k8s-pre-bootstrap.git .
+cp hosts_example hosts
+```
+
 - Setting up ansible
 ```
+ansible --version (you can see where config)
 sudo nano /etc/ansible/ansible.cfg
 ```
 
+such settings
 ```
-inventory = /root/ansible/hosts
+inventory = /home/<user>/ansible/hosts
 host_key_checking = False
 ```
 
-## Creating cluster
+- Edit file hosts (list of servers)
+```nano hosts```
 
-- Clone the Git Project:
-```
-$ git clone https://github.com/MinistrBob/k8s-pre-bootstrap.git
-```
+# Deploy the public key to remote hosts (setup passwordless authentication)
 
-- Verify the MAC address and product_uuid are unique for every node. 
-Playbook show MAC addresses and UUID. You must visually verify that everything is unique :)  
+- Generate keys
 ```
-ansible-playbook check_uniq.yml
-```
-- Install ansible (better on the master)
-```
-sudo yum install -y epel-release
-sudo yum install -y ansible
-ansible --version (where config)
+ssh-keygen -t rsa
 ```
 
-* Deploy the public key to remote hosts
-    - Generate keys
-    ```
-    ssh-keygen -t rsa
-    ```
-    - Edit send_public_key.yml, insert in ```line:``` line with public key from /home/<user>/.ssh/id_rsa.pub
-    - Deploy key with ansible
-    ```
-    ansible-playbook send_public_key.yml -b --ask-pass
-    ```
+- Edit send_public_key.yml, insert in ```line:``` line with public key from /home/<user>/.ssh/id_rsa.pub. You can see key ```cat /home/<user>/.ssh/id_rsa.pub```
 
-- Update your inventory, e.g:
+- Edit send_public_key.yml, insert user name (user under whom the installation is performed) instead of <user>
+
+- Deploy key with ansible
 ```
-$ nano hosts
-[master]
-172.26.12.130
+ansible-playbook send_public_key.yml -b --ask-pass
+```
+## Preliminary preparation infrastructure
 
-[workers]
-172.26.12.131
-172.26.12.132
-172.26.12.133
+- It is desirable that all servers distinguish each other by name. To do this, either you need to have a configured DNS or prepare files /etc/host and /etc/resolv.conf on the master and copy them to other servers using net_config_copy.yml.
+```ansible-playbook net_config_copy.yml```
+- All servers must have time synchronization configured (using install_chrony.yml).
+```ansible-playbook install_chrony.yml```
+
+## !!! Prepare OS !!!
+- To do this! (using prepare_os.yml). Disable SELinux, Install common packages, Disable SWAP, Load required modules, Modify sysctl entries, Update OS if it need, Reboot OS.
+```ansible-playbook prepare_os.yml```
+
+## Update variables in playbook file k8s-prep.yml (presented variant when firewalld is completely removed)
 
 ```
-
-- Update variables in playbook file (presented variant when firewalld is completely removed)
-```
-$ nano k8s-prep.yml
+nano k8s-prep.yml
 ---
 - name: Setup Proxy
   hosts: k8s-nodes
-  remote_user: root
+  # remote_user: <user>
   become: yes
   become_method: sudo
-  #gather_facts: no
+  # gather_facts: no
   vars:
     k8s_cni: calico                                      # calico, flannel
     container_runtime: docker                            # docker, cri-o, containerd
@@ -117,42 +111,16 @@ become_method: sudo
 
 To enable proxy, set the value of `setup_proxy` to `true` and provide proxy details.
 
-## Running Playbook
+## Verify the MAC address and product_uuid are unique for every node
 
-Once all values are updated, you can then run the playbook against your nodes.
-
-**NOTE**: For firewall configuration to open relevant ports for master and worker nodes, a pattern in hostname is required.
-
-Check file:
+Playbook show MAC addresses and UUID. If VMs were cloned, then they may have not uniqu MAC and UUID. **You must visually verify that everything is unique**.  
 ```
-$ nano roles/kubernetes-bootstrap/tasks/configure_firewalld.yml
-....
-- name: Configure firewalld on master nodes
-  firewalld:
-    port: "{{ item }}/tcp"
-    permanent: yes
-    state: enabled
-  with_items: '{{ k8s_master_ports }}'
-  when: "'master' in ansible_hostname"
-
-- name: Configure firewalld on worker nodes
-  firewalld:
-    port: "{{ item }}/tcp"
-    permanent: yes
-    state: enabled
-  with_items: '{{ k8s_worker_ports }}'
-  when: "'node' in ansible_hostname"
+ansible-playbook check_uniq.yml
 ```
 
-If your master nodes doesn't contain `master` and nodes doesn't have `node` as part of hostname, update the file to reflect your naming pattern. My nodes are named like below:
-```
-k8smaster01
-k8snode01
-k8snode02
-k8snode03
-```
+## Running Playbook with role kubernetes-bootstrap
 
-## Running Playbook
+This playbook installed all needed software on all servers without creating the cluster itself.  
 
 Playbook executed as root user - with ssh key:
 ```
@@ -180,3 +148,8 @@ $ ansible-playbook -i hosts k8s-prep.yml --ask-become-pass
 ```
 
 Execution should be successful without errors.
+
+## Running Playbook
+
+Once all values are updated, you can then run the playbook against your nodes.
+
