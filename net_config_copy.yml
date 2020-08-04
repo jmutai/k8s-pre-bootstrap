@@ -1,0 +1,15 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: copy /etc/resolv.conf to remote host
+      copy:
+        src: /etc/resolv.conf
+        dest: /etc/
+
+    - name: copy /etc/hosts to remote host
+      copy:
+        src: /etc/hosts
+        dest: /etc/
+                
