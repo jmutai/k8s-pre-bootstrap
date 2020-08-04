@@ -4,13 +4,13 @@
   become_method: sudo
   gather_facts: no
   tasks:
-	- name: 'Install Chrony'
-	  package:
-		name: 'chrony'
-		state: 'present'
+    - name: 'Install Chrony'
+      package:
+        name: 'chrony'
+        state: 'present'
 
-	- name: stop service cron on debian, if running
-	  systemd:
-		name: chronyd
-		enabled: yes
-		state: started
+    - name: stop service cron on debian, if running
+      systemd:
+        name: chronyd
+        enabled: yes
+        state: started
