@@ -2,10 +2,10 @@
 - name: Setup Proxy
   hosts: all
   become: yes
-  remote_user: <user>
+  # remote_user: <user>
   become: yes
   become_method: sudo
-  #gather_facts: no
+  # gather_facts: no
   vars:
     k8s_cni: calico                                      # calico, flannel
     container_runtime: docker                            # docker, cri-o, containerd 

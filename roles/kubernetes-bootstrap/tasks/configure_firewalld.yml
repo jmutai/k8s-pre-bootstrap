@@ -16,7 +16,7 @@
     permanent: yes
     state: enabled
   with_items: '{{ k8s_master_ports }}'
-  when: "'master' in ansible_hostname"
+  when: inventory_hostname in groups['master']
 
 - name: Configure firewalld on worker nodes
   firewalld:
@@ -24,7 +24,7 @@
     permanent: yes
     state: enabled
   with_items: '{{ k8s_worker_ports }}'
-  when: "'node' in ansible_hostname"
+  when: inventory_hostname in groups['workers']
 
 - name: Open flannel ports on the firewall
   firewalld:
