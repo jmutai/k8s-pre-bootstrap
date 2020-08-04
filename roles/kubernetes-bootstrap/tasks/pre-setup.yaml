@@ -1,8 +1,8 @@
 ---
-- name: Put SELinux in permissive mode
+- name: Put SELinux in disabled mode
   selinux:
     policy: targeted
-    state: permissive
+    state: disabled
 
 - name: Configure firewalld
   package:
@@ -10,10 +10,10 @@
     state: absent
   when: remove_firewalld
   
-- name: Update system
-  package:
-    name: "*"
-    state: latest
+# - name: Update system
+  # package:
+    # name: "*"
+    # state: latest
 
 - name: Install common packages
   package:
