@@ -1,5 +1,8 @@
 ---
 - hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: no
   tasks:
   - name: make direcotry
     file:
