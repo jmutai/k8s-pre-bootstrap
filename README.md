@@ -13,11 +13,11 @@ https://kubernetes.io/docs/setup/production-environment/
 
 ## Additional playbooks
 
-- net_config_copy.yml - Copy /etc/host and /etc/resolv.conf to another servers.
-- prepare_os.yml - Prepare OS.
-- check_uniq.yml - Verify the MAC address and product_uuid are unique for every node (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address)
-- send_public_key.yml - Deploy the public key to remote hosts (for ssh)
-- create_cluster.yml - Creating a single control-plane cluster with kubeadm (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
+- **net_config_copy.yml** - Copy /etc/host and /etc/resolv.conf to another servers.
+- **prepare_os.yml** - Prepare OS.
+- **check_uniq.yml** - Verify the MAC address and product_uuid are unique for every node (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address)
+- **send_public_key.yml** - Deploy the public key to remote hosts (for ssh)
+- **create_cluster.yml** - Creating a single control-plane cluster with kubeadm (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
 
 ## Preliminary preparation of the master server
 
@@ -50,8 +50,10 @@ inventory = /home/<user>/ansible/hosts
 host_key_checking = False
 ```
 
-- Edit file hosts (list of servers)
-```nano hosts```
+- Edit file hosts (list of servers). Example in hosts_example.
+```
+nano hosts
+```
 
 # Deploy the public key to remote hosts (setup passwordless authentication)
 
@@ -60,9 +62,9 @@ host_key_checking = False
 ssh-keygen -t rsa
 ```
 
-- Edit send_public_key.yml, insert in ```line:``` line with public key from /home/<user>/.ssh/id_rsa.pub. You can see key ```cat /home/<user>/.ssh/id_rsa.pub```
+- Edit **send_public_key.yml**, insert in ```line:``` line with public key from ```/home/<user>/.ssh/id_rsa.pub```. You can see key ```cat /home/<user>/.ssh/id_rsa.pub```
 
-- Edit send_public_key.yml, insert user name (user under whom the installation is performed) instead of <user>
+- Edit **send_public_key.yml**, insert user name (user under whom the installation is performed) instead of ```<user>```
 
 - Deploy key with ansible
 ```
@@ -70,14 +72,20 @@ ansible-playbook send_public_key.yml -b --ask-pass
 ```
 ## Preliminary preparation infrastructure
 
-- It is desirable that all servers distinguish each other by name. To do this, either you need to have a configured DNS or prepare files /etc/host and /etc/resolv.conf on the master and copy them to other servers using net_config_copy.yml.
-```ansible-playbook net_config_copy.yml```
-- All servers must have time synchronization configured (using install_chrony.yml).
-```ansible-playbook install_chrony.yml```
+- It is desirable that all servers distinguish each other by name. To do this, either you need to have a configured DNS or prepare files ```/etc/host``` and ```/etc/resolv.conf``` on the master and copy them to other servers using **net_config_copy.yml**.
+```
+ansible-playbook net_config_copy.yml
+```
+- All servers must have time synchronization configured (using **install_chrony.yml**).
+```
+ansible-playbook install_chrony.yml
+```
 
 ## !!! Prepare OS !!!
-- To do this! (using prepare_os.yml). Disable SELinux, Install common packages, Disable SWAP, Load required modules, Modify sysctl entries, Update OS if it need, Reboot OS.
-```ansible-playbook prepare_os.yml```
+- To do this! (using prepare_os.yml). Disable SELinux, Install common packages, Disable SWAP, Load required modules, Modify sysctl entries, Update OS if it need, Reboot OS (using **prepare_os.yml**).
+```
+ansible-playbook prepare_os.yml
+```
 
 ## Update variables in playbook file k8s-prep.yml (presented variant when firewalld is completely removed)
 
@@ -110,10 +118,12 @@ become_method: sudo
 ```
 
 To enable proxy, set the value of `setup_proxy` to `true` and provide proxy details.
+To remove Firewalld, set the value of `remove_firewalld` to `true` and `configure_firewalld` to `false`.
+To install and configure Firewalld, set the value of `remove_firewalld` to `false` and `configure_firewalld` to `true`.
 
 ## Verify the MAC address and product_uuid are unique for every node
 
-Playbook show MAC addresses and UUID. If VMs were cloned, then they may have not uniqu MAC and UUID. **You must visually verify that everything is unique**.  
+Playbook **check_uniq.yml** show MAC addresses and UUID. If VMs were cloned, then they may have not uniqu MAC and UUID. **You must visually verify that everything is unique**.  
 ```
 ansible-playbook check_uniq.yml
 ```
@@ -121,6 +131,8 @@ ansible-playbook check_uniq.yml
 ## Running Playbook with role kubernetes-bootstrap
 
 This playbook installed all needed software on all servers without creating the cluster itself.  
+
+These are different options for launching a playbook.  
 
 Playbook executed as root user - with ssh key:
 ```
