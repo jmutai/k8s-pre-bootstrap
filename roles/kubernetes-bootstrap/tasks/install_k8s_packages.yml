@@ -7,9 +7,11 @@
 - name: Install kubernetes packages
   yum:
     name: [kubelet,kubeadm,kubectl]
+    state: latest
     disable_excludes: kubernetes
 
 - name: Enable kubelet service
-  service:
+  systemd:
     name: kubelet
     enabled: yes
+    state: started

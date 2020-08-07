@@ -94,6 +94,10 @@ ansible-playbook prepare_os.yml -e target=workers
 
 ## Update variables in playbook file k8s-prep.yml (presented variant when firewalld is completely removed)
 
+In file **setup_docker.yml** specific versions of packages are indicated (taken from the documentation - https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker).  
+You need to check which version of the packages is currently indicated in the documentation and, if necessary, fix it.
+
+
 ```
 nano k8s-prep.yml
 ---

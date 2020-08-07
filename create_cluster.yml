@@ -1,5 +1,7 @@
 - hosts: master
-  become: yes
+  # become: yes
+  # become_method: sudo
+  gather_facts: no
   tasks:
     - name: initialize the cluster
       # shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
@@ -9,8 +11,6 @@
         creates: cluster_initialized.txt
 
     - name: create .kube directory
-      become: yes
-      become_user: worker
       file:
         path: $HOME/.kube
         state: directory
@@ -30,8 +30,6 @@
       register: p
 
     - name: install Pod network
-      become: yes
-      become_user: worker
       shell: kubectl apply -f ~/ansible/calico.yaml >> ~/ansible/pod_network_setup.txt
       args:
         chdir: $HOME
