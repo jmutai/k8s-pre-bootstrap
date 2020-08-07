@@ -140,7 +140,9 @@ This playbook installed all needed software on all servers without creating the 
 ansible-playbook k8s-prep.yml
 ```
 
-## Running Playbook
+## Init Cluster on Master 
 
-Once all values are updated, you can then run the playbook against your nodes.
+```
+ansible-playbook create_cluster.yml
+```
 
