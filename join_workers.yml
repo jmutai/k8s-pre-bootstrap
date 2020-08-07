@@ -1,4 +1,4 @@
-- hosts: master
+- hosts: workers
   become: yes
   become_method: sudo
   gather_facts: no
