@@ -162,3 +162,6 @@ Copy command for join workers from /root/cluster_initialized.txt to join_workers
 ansible-playbook join_workers.yml
 ```
 
+## Clean up
+
+See https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down
