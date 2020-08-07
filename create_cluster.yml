@@ -17,11 +17,14 @@
         mode: 0755
 
     - name: copy admin.conf to user's kube config
+      become: yes
+      become_method: sudo
       copy:
         src: /etc/kubernetes/admin.conf
-        dest: /home/worker/.kube/config
+        dest: ~/.kube/config
         remote_src: yes
         owner: worker
+        group: 
 
     - name: Install prerequisites 4
       command: curl https://docs.projectcalico.org/manifests/calico-etcd.yaml -o ~/ansible/calico.yaml
