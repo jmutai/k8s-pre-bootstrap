@@ -150,3 +150,15 @@ ansible-playbook k8s-prep.yml
 ansible-playbook create_cluster.yml
 ```
 
+In folder /root created two files:
+- cluster_initialized.txt - Cluster creation log and command for join workers.
+- pod_network_setup.txt - Pod network installation log. 
+
+## Join workers
+
+Copy command for join workers from /root/cluster_initialized.txt to join_workers.yml
+
+```
+ansible-playbook join_workers.yml
+```
+
