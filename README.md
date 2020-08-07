@@ -2,6 +2,7 @@
 
 This playbook helps you setting up a Kubernetes Cluster on VM or bare-metal servers.
 The entire installation is performed under sudo user account.
+Forked from jmutai/k8s-pre-bootstrap, thanks to him.
 
 ## Supported OS
 
@@ -126,9 +127,9 @@ become: yes
 become_method: sudo
 ```
 
-To enable proxy, set the value of `setup_proxy` to `true` and provide proxy details.
-To remove Firewalld, set the value of `remove_firewalld` to `true` and `configure_firewalld` to `false`.
-To install and configure Firewalld, set the value of `remove_firewalld` to `false` and `configure_firewalld` to `true`.
+To enable proxy, set the value of `setup_proxy` to `true` and provide proxy details.  
+To remove Firewalld, set the value of `remove_firewalld` to `true` and `configure_firewalld` to `false`.  
+To install and configure Firewalld, set the value of `remove_firewalld` to `false` and `configure_firewalld` to `true`.  
 
 ## Verify the MAC address and product_uuid are unique for every node
 
@@ -144,24 +145,30 @@ This playbook installed all needed software on all servers without creating the 
 ansible-playbook k8s-prep.yml
 ```
 
+---
 ## Init Cluster on Master 
 
 ```
 ansible-playbook create_cluster.yml
 ```
 
-In folder /root created two files:
-- cluster_initialized.txt - Cluster creation log and command for join workers.
-- pod_network_setup.txt - Pod network installation log. 
+In folder `/root` will be created two files:
+- `cluster_initialized.txt` - Cluster creation log and command for join workers.
+- `pod_network_setup.txt` - Pod network installation log. 
 
 ## Join workers
 
-Copy command for join workers from /root/cluster_initialized.txt to join_workers.yml
+Join all workers servers to cluster. Copy command for join workers from `/root/cluster_initialized.txt` to `join_workers.yml`.
 
 ```
 ansible-playbook join_workers.yml
 ```
 
-## Clean up
+You can check on the master server
+```
+kubectl get nodes
+```
+
+## Clean up (if something went wrong while creating the cluster)
 
 See https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down
