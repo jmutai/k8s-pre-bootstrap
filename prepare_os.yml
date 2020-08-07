@@ -1,11 +1,10 @@
-- hosts: all
+- hosts: "{{ target }}"
   become: yes
   become_method: sudo
   gather_facts: no
   tasks:
     - name: Put SELinux in disabled mode
       selinux:
-        policy: targeted
         state: disabled
 
     - name: Install common packages

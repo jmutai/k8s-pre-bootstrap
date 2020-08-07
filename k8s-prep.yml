@@ -1,7 +1,6 @@
 ---
 - name: Setup Proxy
   hosts: all
-  become: yes
   # remote_user: <user>
   become: yes
   become_method: sudo

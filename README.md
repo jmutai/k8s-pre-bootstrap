@@ -82,9 +82,14 @@ ansible-playbook install_chrony.yml
 ```
 
 ## !!! Prepare OS !!!
-- To do this! (using prepare_os.yml). Disable SELinux, Install common packages, Disable SWAP, Load required modules, Modify sysctl entries, Update OS if it need, Reboot OS (using **prepare_os.yml**).
+- To do this! (using prepare_os.yml). Disable SELinux, Install common packages, Disable SWAP, Load required modules, Modify sysctl entries, Update OS if it need, Reboot OS (using **prepare_os.yml**).  
+First execute this on the master.  
 ```
-ansible-playbook prepare_os.yml
+ansible-playbook prepare_os.yml -e target=master
+```
+Then execute on the workers.  
+```
+ansible-playbook prepare_os.yml -e target=workers
 ```
 
 ## Update variables in playbook file k8s-prep.yml (presented variant when firewalld is completely removed)
@@ -131,35 +136,9 @@ ansible-playbook check_uniq.yml
 ## Running Playbook with role kubernetes-bootstrap
 
 This playbook installed all needed software on all servers without creating the cluster itself.  
-
-These are different options for launching a playbook.  
-
-Playbook executed as root user - with ssh key:
 ```
-$ ansible-playbook -i hosts k8s-prep.yml
+ansible-playbook k8s-prep.yml
 ```
-
-Playbook executed as root user - with password:
-```
-$ ansible-playbook -i hosts k8s-prep.yml --ask-pass
-```
-
-Playbook executed as sudo user - with password:
-```
-$ ansible-playbook -i hosts k8s-prep.yml --ask-pass --ask-become-pass
-```
-
-Playbook executed as sudo user - with ssh key and sudo password:
-```
-$ ansible-playbook -i hosts k8s-prep.yml --ask-become-pass
-```
-
-Playbook executed as sudo user - with ssh key and passwordless sudo:
-```
-$ ansible-playbook -i hosts k8s-prep.yml --ask-become-pass
-```
-
-Execution should be successful without errors.
 
 ## Running Playbook
 
