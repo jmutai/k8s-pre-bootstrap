@@ -71,6 +71,14 @@ ssh-keygen -t rsa
 ```
 ansible-playbook send_public_key.yml -b --ask-pass
 ```
+
+## Verify the MAC address and product_uuid are unique for every node
+
+Playbook **check_uniq.yml** show MAC addresses and UUID. If VMs were cloned, then they may have not uniqu MAC and UUID. **You must visually verify that everything is unique**.  
+```
+ansible-playbook check_uniq.yml
+```
+
 ## Preliminary preparation infrastructure
 
 - It is desirable that all servers distinguish each other by name. To do this, either you need to have a configured DNS or prepare files ```/etc/host``` and ```/etc/resolv.conf``` on the master and copy them to other servers using **net_config_copy.yml**.
@@ -130,13 +138,6 @@ become_method: sudo
 To enable proxy, set the value of `setup_proxy` to `true` and provide proxy details.  
 To remove Firewalld, set the value of `remove_firewalld` to `true` and `configure_firewalld` to `false`.  
 To install and configure Firewalld, set the value of `remove_firewalld` to `false` and `configure_firewalld` to `true`.  
-
-## Verify the MAC address and product_uuid are unique for every node
-
-Playbook **check_uniq.yml** show MAC addresses and UUID. If VMs were cloned, then they may have not uniqu MAC and UUID. **You must visually verify that everything is unique**.  
-```
-ansible-playbook check_uniq.yml
-```
 
 ## Running Playbook with role kubernetes-bootstrap
 
