@@ -28,6 +28,7 @@ sudo yum install -y epel-release
 sudo yum install -y ansible
 sudo yum install -y git
 sudo yum install -y platform-python
+sudo yum install -y nano
 ```
 
 - Clone the Git Project to folder /root/ansible:
