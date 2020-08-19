@@ -4,7 +4,7 @@
   become_method: sudo
   gather_facts: no
   tasks:
-  - name: make direcotry
+  - name: make directory
     file:
       path: "/home/<user>/.ssh"
       state: directory
