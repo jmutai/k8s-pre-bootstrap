@@ -86,7 +86,7 @@ ansible-playbook check_uniq.yml
 ```
 ansible-playbook net_config_copy.yml
 ```
-- All servers must have time synchronization configured (using **install_chrony.yml**).
+- All servers must have time synchronization configured (using **install_chrony.yml**). If time synchronization is already set and working, do not perform this step. If you want to use another time synchronization program, install it manually or by editing **install_chrony.yml**.  
 ```
 ansible-playbook install_chrony.yml
 ```
