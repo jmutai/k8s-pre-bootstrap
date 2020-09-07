@@ -2,7 +2,7 @@
 
 ## Main info
 
-This playbook helps you setting up a Kubernetes Cluster on VM or bare-metal servers.
+This playbook helps you setting up a Kubernetes Cluster on VMs or bare-metal servers.
 The entire installation is performed under sudo user account.
 Forked from jmutai/k8s-pre-bootstrap, thanks to him.
 
@@ -17,7 +17,9 @@ https://kubernetes.io/docs/setup/production-environment/
 ## Additional playbooks
 
 - **net_config_copy.yml** - Copy /etc/host and /etc/resolv.conf to another servers.
+- **proxy_settings_copy.yml** - Copy /etc/environment and /etc/yum.conf to another servers.  
 - **prepare_os.yml** - Prepare OS.
+- **prepare_os_others.yml** - Prepare OS on other servers not included in the cluster (for example, rdbms and etc.)
 - **check_uniq.yml** - Verify the MAC address and product_uuid are unique for every node (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address)
 - **send_public_key.yml** - Deploy the public key to remote hosts (for ssh)
 - **create_cluster.yml** - Creating a single control-plane cluster with kubeadm (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
@@ -59,7 +61,7 @@ host_key_checking = False
 nano hosts
 ```
 
-# Deploy the public key to remote hosts (setup passwordless authentication)
+# Deploy the public key to remote hosts (setup passwordless authentication) and visudo current user
 
 - Generate keys
 ```
@@ -74,6 +76,11 @@ ssh-keygen -t rsa
 ```
 ansible-playbook send_public_key.yml -b --ask-pass
 ```
+If you get the error "missing sudo password", try this
+```
+ansible-playbook send_public_key.yml -b --ask-pass -kK
+```
+
 
 ## Verify the MAC address and product_uuid are unique for every node
 
@@ -87,6 +94,10 @@ ansible-playbook check_uniq.yml
 - It is desirable that all servers distinguish each other by name. To do this, either you need to have a configured DNS or prepare files ```/etc/host``` and ```/etc/resolv.conf``` on the master and copy them to other servers using **net_config_copy.yml**.
 ```
 ansible-playbook net_config_copy.yml
+```
+- If Internet works through a proxy, then you need configure /etc/environment and /etc/yum.conf files and run command that copy this files to another servers.
+```
+ansible-playbook proxy_settings_copy.yml
 ```
 - All servers must have time synchronization configured (using **install_chrony.yml**). If time synchronization is already set and working, do not perform this step. If you want to use another time synchronization program, install it manually or by editing **install_chrony.yml**.  
 ```
@@ -138,9 +149,9 @@ become: yes
 become_method: sudo
 ```
 
-To enable proxy, set the value of `setup_proxy` to `true` and provide proxy details.  
-To remove Firewalld, set the value of `remove_firewalld` to `true` and `configure_firewalld` to `false`.  
-To install and configure Firewalld, set the value of `remove_firewalld` to `false` and `configure_firewalld` to `true`.  
+To **enable proxy**, set the value of `setup_proxy` to `true` and provide proxy details in **vars**: `proxy_server` and `docker_proxy_exclude`.  
+To **remove Firewalld**, set the value of `remove_firewalld` to `true` and `configure_firewalld` to `false`.  
+To **install and configure Firewalld**, set the value of `remove_firewalld` to `false` and `configure_firewalld` to `true`.  
 
 ## Running Playbook with role kubernetes-bootstrap
 
