@@ -9,7 +9,7 @@
         name: 'chrony'
         state: 'present'
 
-    - name: stop service cron on debian, if running
+    - name: Start service chronyd
       systemd:
         name: chronyd
         enabled: yes
