@@ -1,0 +1,15 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: copy /etc/environment to remote host
+      copy:
+        src: /etc/environment
+        dest: /etc/
+
+    - name: copy /etc/yum.conf to remote host
+      copy:
+        src: /etc/yum.conf
+        dest: /etc/
