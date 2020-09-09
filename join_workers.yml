@@ -4,7 +4,7 @@
   gather_facts: no
   tasks:
     - name: join worker
-      shell: kubeadm join 10.137.0.17:6443 --token XXX --discovery-token-ca-cert-hash sha256:XXX >> ~/join_worker.txt
+      shell: <kubeadm join 10.137.0.17:6443 --token XXX --discovery-token-ca-cert-hash sha256:XXX> >> ~/join_worker.txt
       args:
         chdir: $HOME
         creates: join_worker.txt
