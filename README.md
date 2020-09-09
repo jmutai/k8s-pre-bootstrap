@@ -22,7 +22,7 @@ https://kubernetes.io/docs/setup/production-environment/
 - **prepare_os_others.yml** - Prepare OS on other servers not included in the cluster (for example, rdbms and etc.)
 - **check_uniq.yml** - Verify the MAC address and product_uuid are unique for every node (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address)
 - **send_public_key.yml** - Deploy the public key to remote hosts (for ssh)
-- **create_cluster.yml** - Creating a single control-plane cluster with kubeadm (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
+- **init_cluster.yml** - Creating a single control-plane cluster with kubeadm (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
 
 ## Preliminary preparation of the master server
 
@@ -164,7 +164,7 @@ ansible-playbook k8s-prep.yml
 ## Init Cluster on Master 
 
 ```
-ansible-playbook create_cluster.yml
+ansible-playbook init_cluster.yml
 ```
 
 In folder `/root` will be created two files:
