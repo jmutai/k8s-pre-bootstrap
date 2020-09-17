@@ -3,7 +3,7 @@
 ## Main info
 
 This playbook helps you setting up a Kubernetes Cluster on VMs or bare-metal servers.
-The entire installation is performed under sudo user account.
+The entire installation is performed under regular user account (but which is sudo user).
 Forked from jmutai/k8s-pre-bootstrap, thanks to him.
 
 ## Supported OS
@@ -28,14 +28,10 @@ https://kubernetes.io/docs/setup/production-environment/
 
 - Install git and ansible on the control computer
 ```
-sudo yum install -y epel-release
-sudo yum install -y ansible
-sudo yum install -y git
-sudo yum install -y platform-python
-sudo yum install -y nano
+sudo yum install -y epel-release ansible git platform-python nano
 ```
 
-- Clone the Git Project to folder /root/ansible:
+- Clone the Git Project to folder ~/ansible:
 ```
 cd ~
 mkdir ansible
@@ -90,15 +86,94 @@ ansible-playbook check_uniq.yml
 ```
 
 ## Preliminary preparation infrastructure
-
+WARNING: Executed only for workers. You prepare configuration files on the Master, and then using ansible they are copied to the Workers.  
 - It is desirable that all servers distinguish each other by name. To do this, either you need to have a configured DNS or prepare files ```/etc/host``` and ```/etc/resolv.conf``` on the master and copy them to other servers using **net_config_copy.yml**.
+- WARNING: If you use Network Manager (in the CentOS 7 by default it that) to change the DNS settings, changing file ```/etc/resolv.conf``` is not enough, you need to change the network settings, for example in ```/etc/sysconfig/network-scripts/ifcfg-ens192```, otherwise the Network Manager will overwrite file ```/etc/resolv.conf``` when the OS reboots
 ```
 ansible-playbook net_config_copy.yml
 ```
-- If Internet works through a proxy, then you need configure /etc/environment and /etc/yum.conf files and run command that copy this files to another servers.
+WARNING: Executed only for workers. You prepare configuration files on the Master, and then using ansible they are copied to the Workers.  
+- If Internet works through a proxy, then you need configure `/etc/environment` and `/etc/yum.conf` files, and create `/etc/systemd/system/docker.service.d/http-proxy.conf` file, and run command that copy this files to another servers.
+
 ```
 ansible-playbook proxy_settings_copy.yml
 ```
+This is example files:  
+```
+# nano /etc/environment
+
+
+https_proxy=http://10.1.113.15:1010/
+http_proxy=http://10.1.113.15:1010/
+no_proxy=localhost,127.0.0.0/8,::1,10.128.0.0/16,10.147.245.11,10.147.245.12,10.147.245.13,10.147.245.14,10.147.245.15,10.147.245.16,10.147.245.17,10.147.245.18,10.147.245.19,10.147.245.20,10.147.245.21,10.147.245.22,10.147.245.23,10.147.245.24,10.147.245.25,10.147.245.26,10.147.245.27,10.147.245.28,10.147.245.29,10.147.245.30,10.147.245.31,10.147.245.32,10.147.245.33,10.147.245.34,10.147.245.35,10.147.245.36,10.147.245.37,10.147.245.38,10.147.245.39
+all_proxy=socks://10.1.113.15:1010/
+ftp_proxy=http://10.1.113.15:1010/
+HTTP_PROXY=http://10.1.113.15:1010/
+FTP_PROXY=http://10.1.113.15:1010/
+ALL_PROXY=socks://10.1.113.15:1010/
+NO_PROXY=localhost,127.0.0.0/8,::1,10.128.0.0/16,10.147.245.11,10.147.245.12,10.147.245.13,10.147.245.14,10.147.245.15,10.147.245.16,10.147.245.17,10.147.245.18,10.147.245.19,10.147.245.20,10.147.245.21,10.147.245.22,10.147.245.23,10.147.245.24,10.147.245.25,10.147.245.26,10.147.245.27,10.147.245.28,10.147.245.29,10.147.245.30,10.147.245.31,10.147.245.32,10.147.245.33,10.147.245.34,10.147.245.35,10.147.245.36,10.147.245.37,10.147.245.38,10.147.245.39
+HTTPS_PROXY=http://10.1.113.15:1010/
+```
+```
+# sudo chmod +x /etc/profile.d/http_proxy.sh
+# nano /etc/profile.d/http_proxy.sh
+
+
+https_proxy=http://10.1.113.15:1010/
+http_proxy=http://10.1.113.15:1010/
+no_proxy=localhost,127.0.0.0/8,::1,10.128.0.0/16,10.147.245.11,10.147.245.12,10.147.245.13,10.147.245.14,10.147.245.15,10.147.245.16,10.147.245.17,10.147.245.18,10.147.245.19,10.147.245.20,10.147.245.21,10.147.245.22,10.147.245.23,10.147.245.24,10.147.245.25,10.147.245.26,10.147.245.27,10.147.245.28,10.147.245.29,10.147.245.30,10.147.245.31,10.147.245.32,10.147.245.33,10.147.245.34,10.147.245.35,10.147.245.36,10.147.245.37,10.147.245.38,10.147.245.39
+all_proxy=socks://10.1.113.15:1010/
+ftp_proxy=http://10.1.113.15:1010/
+HTTP_PROXY=http://10.1.113.15:1010/
+FTP_PROXY=http://10.1.113.15:1010/
+ALL_PROXY=socks://10.1.113.15:1010/
+NO_PROXY=localhost,127.0.0.0/8,::1,10.128.0.0/16,10.147.245.11,10.147.245.12,10.147.245.13,10.147.245.14,10.147.245.15,10.147.245.16,10.147.245.17,10.147.245.18,10.147.245.19,10.147.245.20,10.147.245.21,10.147.245.22,10.147.245.23,10.147.245.24,10.147.245.25,10.147.245.26,10.147.245.27,10.147.245.28,10.147.245.29,10.147.245.30,10.147.245.31,10.147.245.32,10.147.245.33,10.147.245.34,10.147.245.35,10.147.245.36,10.147.245.37,10.147.245.38,10.147.245.39
+HTTPS_PROXY=http://10.1.113.15:1010/
+```
+```
+# mkdir -p /etc/systemd/system/docker.service.d/
+# nano /etc/systemd/system/docker.service.d/http-proxy.conf
+
+
+[Service]
+Environment="HTTP_PROXY=http://10.1.113.15:1010"
+Environment="HTTPS_PROXY=http://10.1.113.15:1010"
+Environment="NO_PROXY=localhost,127.0.0.0/8,::1,10.128.0.0/16,10.147.245.11,10.147.245.12,10.147.245.13,10.147.245.14,10.147.245.15,10.147.245.16,10.147.245.17,10.147.245.18,10.147.245.19,10.147.245.20,10.147.245.21,10.147.245.22,10.147.245.23,10.147.245.24,10.147.245.25,10.147.245.26,10.147.245.27,10.147.245.28,10.147.245.29,10.147.245.30,10.147.245.31,10.147.245.32,10.147.245.33,10.147.245.34,10.147.245.35,10.147.245.36,10.147.245.37,10.147.245.38,10.147.245.39"
+```
+```
+# add one string at the end of file
+# nano /etc/yum.conf
+
+
+[main]
+cachedir=/var/cache/yum/$basearch/$releasever
+keepcache=0
+debuglevel=2
+logfile=/var/log/yum.log
+exactarch=1
+obsoletes=1
+gpgcheck=1
+plugins=1
+installonly_limit=5
+bugtracker_url=http://bugs.centos.org/set_project.php?project_id=23&ref=http://bugs.centos.org/bug_report_page.php?category=yum
+distroverpkg=centos-release
+
+
+#  This is the default, if you make this bigger yum won't see if the metadata
+# is newer on the remote and so you'll "gain" the bandwidth of not having to
+# download the new metadata and "pay" for it by yum not having correct
+# information.
+#  It is esp. important, to have correct metadata, for distributions like
+# Fedora which don't keep old packages around. If you don't like this checking
+# interupting your command line usage, it's much better to have something
+# manually check the metadata once an hour (yum-updatesd will do this).
+# metadata_expire=90m
+
+# PUT YOUR REPOS HERE OR IN separate files named file.repo
+# in /etc/yum.repos.d
+proxy=http://10.1.113.15:1010
+```
+
 - All servers must have time synchronization configured (using **install_chrony.yml**). If time synchronization is already set and working, do not perform this step. If you want to use another time synchronization program, install it manually or by editing **install_chrony.yml**.  
 ```
 ansible-playbook install_chrony.yml
