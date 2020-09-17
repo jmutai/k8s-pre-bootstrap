@@ -86,15 +86,16 @@ ansible-playbook check_uniq.yml
 ```
 
 ## Preliminary preparation infrastructure
-WARNING: Executed only for workers. You prepare configuration files on the Master, and then using ansible they are copied to the Workers.  
+  
 - It is desirable that all servers distinguish each other by name. To do this, either you need to have a configured DNS or prepare files ```/etc/host``` and ```/etc/resolv.conf``` on the master and copy them to other servers using **net_config_copy.yml**.
+- WARNING: Executed only for workers. You prepare configuration files on the Master, and then using ansible they are copied to the Workers.  
 - WARNING: If you use Network Manager (in the CentOS 7 by default it that) to change the DNS settings, changing file ```/etc/resolv.conf``` is not enough, you need to change the network settings, for example in ```/etc/sysconfig/network-scripts/ifcfg-ens192```, otherwise the Network Manager will overwrite file ```/etc/resolv.conf``` when the OS reboots
 ```
 ansible-playbook net_config_copy.yml
 ```
-WARNING: Executed only for workers. You prepare configuration files on the Master, and then using ansible they are copied to the Workers.  
-- If Internet works through a proxy, then you need configure `/etc/environment` and `/etc/yum.conf` files, and create `/etc/systemd/system/docker.service.d/http-proxy.conf` file, and run command that copy this files to another servers.
 
+- If Internet works through a proxy, then you need configure `/etc/environment` and `/etc/yum.conf` files, and create `/etc/systemd/system/docker.service.d/http-proxy.conf` file, and run command that copy this files to another servers.
+- WARNING: Executed only for workers. You prepare configuration files on the Master, and then using ansible they are copied to the Workers.  
 ```
 ansible-playbook proxy_settings_copy.yml
 ```
@@ -115,7 +116,7 @@ NO_PROXY=localhost,127.0.0.0/8,::1,10.128.0.0/16,10.147.245.11,10.147.245.12,10.
 HTTPS_PROXY=http://10.1.113.15:1010/
 ```
 ```
-# sudo chmod +x /etc/profile.d/http_proxy.sh
+# sudo chmod 755 /etc/profile.d/http_proxy.sh
 # nano /etc/profile.d/http_proxy.sh
 
 
@@ -129,16 +130,6 @@ FTP_PROXY=http://10.1.113.15:1010/
 ALL_PROXY=socks://10.1.113.15:1010/
 NO_PROXY=localhost,127.0.0.0/8,::1,10.128.0.0/16,10.147.245.11,10.147.245.12,10.147.245.13,10.147.245.14,10.147.245.15,10.147.245.16,10.147.245.17,10.147.245.18,10.147.245.19,10.147.245.20,10.147.245.21,10.147.245.22,10.147.245.23,10.147.245.24,10.147.245.25,10.147.245.26,10.147.245.27,10.147.245.28,10.147.245.29,10.147.245.30,10.147.245.31,10.147.245.32,10.147.245.33,10.147.245.34,10.147.245.35,10.147.245.36,10.147.245.37,10.147.245.38,10.147.245.39
 HTTPS_PROXY=http://10.1.113.15:1010/
-```
-```
-# mkdir -p /etc/systemd/system/docker.service.d/
-# nano /etc/systemd/system/docker.service.d/http-proxy.conf
-
-
-[Service]
-Environment="HTTP_PROXY=http://10.1.113.15:1010"
-Environment="HTTPS_PROXY=http://10.1.113.15:1010"
-Environment="NO_PROXY=localhost,127.0.0.0/8,::1,10.128.0.0/16,10.147.245.11,10.147.245.12,10.147.245.13,10.147.245.14,10.147.245.15,10.147.245.16,10.147.245.17,10.147.245.18,10.147.245.19,10.147.245.20,10.147.245.21,10.147.245.22,10.147.245.23,10.147.245.24,10.147.245.25,10.147.245.26,10.147.245.27,10.147.245.28,10.147.245.29,10.147.245.30,10.147.245.31,10.147.245.32,10.147.245.33,10.147.245.34,10.147.245.35,10.147.245.36,10.147.245.37,10.147.245.38,10.147.245.39"
 ```
 ```
 # add one string at the end of file

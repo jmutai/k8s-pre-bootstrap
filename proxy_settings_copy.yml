@@ -19,8 +19,3 @@
       copy:
         src: /etc/yum.conf
         dest: /etc/
-
-    - name: copy docker proxy (http-proxy.conf) to remote host
-      copy:
-        src: /etc/systemd/system/docker.service.d/http-proxy.conf
-        dest: /etc/systemd/system/docker.service.d/
