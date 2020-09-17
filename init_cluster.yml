@@ -22,8 +22,8 @@
         dest: ~/.kube/config
         remote_src: yes
 
-    - name: Install prerequisites 4
-      command: curl https://docs.projectcalico.org/manifests/calico-etcd.yaml -o ~/calico.yaml
+    - name: Deploy calico
+      command: curl https://docs.projectcalico.org/manifests/calico.yaml -o ~/calico.yaml
       
     - stat: path=~/calico.yaml
       register: p
