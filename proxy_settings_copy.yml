@@ -9,6 +9,11 @@
         src: /etc/environment
         dest: /etc/
 
+    - name: copy /etc/profile.d/http_proxy.sh to remote host
+      copy:
+        src: /etc/profile.d/http_proxy.sh
+        dest: /etc/profile.d/       
+
     - name: copy /etc/yum.conf to remote host
       copy:
         src: /etc/yum.conf
