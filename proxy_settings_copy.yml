@@ -12,7 +12,8 @@
     - name: copy /etc/profile.d/http_proxy.sh to remote host
       copy:
         src: /etc/profile.d/http_proxy.sh
-        dest: /etc/profile.d/       
+        dest: /etc/profile.d/
+        mode: 755
 
     - name: copy /etc/yum.conf to remote host
       copy:
