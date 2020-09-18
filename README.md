@@ -237,6 +237,24 @@ In folder `/root` will be created two files:
 - `cluster_initialized.txt` - Cluster creation log and command for join workers.
 - `pod_network_setup.txt` - Pod network installation log. 
 
+To check the cluster you can execute (this is as example):
+```
+# kubectl get nodes -o wide
+NAME              STATUS   ROLES    AGE   VERSION   INTERNAL-IP     EXTERNAL-IP   OS-IMAGE                KERNEL-VERSION                CONTAINER-RUNTIME
+rtz-ppd-mk8s-01   Ready    master   39m   v1.19.2   10.147.245.25   <none>        CentOS Linux 7 (Core)   3.10.0-1127.19.1.el7.x86_64   docker://19.3.11
+# kubectl -n kube-system get pod
+NAME                                      READY   STATUS    RESTARTS   AGE
+calico-kube-controllers-c9784d67d-98dx8   1/1     Running   0          39m
+calico-node-ml9gv                         1/1     Running   0          39m
+coredns-f9fd979d6-jwdnc                   1/1     Running   0          39m
+coredns-f9fd979d6-wgrqh                   1/1     Running   0          39m
+etcd-rtz-ppd-mk8s-01                      1/1     Running   0          39m
+kube-apiserver-rtz-ppd-mk8s-01            1/1     Running   0          39m
+kube-controller-manager-rtz-ppd-mk8s-01   1/1     Running   0          39m
+kube-proxy-z4qvt                          1/1     Running   0          39m
+kube-scheduler-rtz-ppd-mk8s-01            1/1     Running   0          39m
+```
+
 ## Join workers
 
 Join all workers servers to cluster. Copy command for join workers from `/root/cluster_initialized.txt` to `join_workers.yml`.
