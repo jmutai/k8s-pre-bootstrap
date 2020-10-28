@@ -3,18 +3,26 @@
   become: yes
   become_method: sudo
   gather_facts: no
+  vars:
+    user_name: <username>
+    sshkey: <sshkey>
   tasks:
   - name: make directory
     file:
-      path: "/home/<user>/.ssh"
+      path: "/home/{{ user_name }}/.ssh"
       state: directory
   - name: put pubkey
     lineinfile:
-      path: "/home/<user>/.ssh/authorized_keys"
-      line: "foo"
+      path: "/home/{{ user_name }}/.ssh/authorized_keys"
+      line: "{{ sshkey }}"
       create: yes
   - name: visudo
     lineinfile:
-      path: "/etc/sudoers.d/<user>"
-      line: "<user> ALL=(ALL) NOPASSWD:ALL"
+      path: "/etc/sudoers.d/{{ user_name }}"
+      line: "{{ user_name }} ALL=(ALL) NOPASSWD:ALL"
       create: yes
+      owner: root 
+      group: root 
+      mode: "0440"
+      state: present
+      validate: 'visudo -c -f %s'

@@ -28,7 +28,8 @@ https://kubernetes.io/docs/setup/production-environment/
 
 - Install git and ansible on the control computer
 ```
-sudo yum install -y epel-release ansible git platform-python nano
+sudo yum install -y epel-release 
+sudo yum install -y ansible git platform-python nano
 ```
 
 - Clone the Git Project to folder ~/ansible:
@@ -94,7 +95,7 @@ ansible-playbook check_uniq.yml
 ansible-playbook net_config_copy.yml
 ```
 
-- If Internet works through a proxy, then you need configure `/etc/environment` and `/etc/yum.conf` files, and create `/etc/systemd/system/docker.service.d/http-proxy.conf` file, and run command that copy this files to another servers.
+- If Internet works through a proxy, then you need configure `/etc/environment`, `/etc/yum.conf`, `/etc/profile.d/http_proxy.sh` files, and run command that copy this files to another servers.
 - WARNING: Executed only for workers. You prepare configuration files on the Master, and then using ansible they are copied to the Workers.  
 ```
 ansible-playbook proxy_settings_copy.yml
