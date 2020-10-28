@@ -65,9 +65,9 @@ nano hosts
 ssh-keygen -t rsa
 ```
 
-- Edit **send_public_key.yml**, insert in ```line:``` line with public key from ```/home/<user>/.ssh/id_rsa.pub```. You can see key ```cat /home/<user>/.ssh/id_rsa.pub```
+- Edit **send_public_key.yml**, insert instead of ```<sshkey>``` line with public key from ```/home/<user>/.ssh/id_rsa.pub```. You can see key ```cat /home/<user>/.ssh/id_rsa.pub```.
 
-- Edit **send_public_key.yml**, insert user name (user under whom the installation is performed) instead of ```<user>```
+- Edit **send_public_key.yml**, insert instead of ```<username>``` user name (user under whom the installation is performed). 
 
 - Deploy key with ansible
 ```
@@ -88,7 +88,7 @@ ansible-playbook check_uniq.yml
 
 ## Preliminary preparation infrastructure
   
-- It is desirable that all servers distinguish each other by name. To do this, either you need to have a configured DNS or prepare files ```/etc/host``` and ```/etc/resolv.conf``` on the master and copy them to other servers using **net_config_copy.yml**.
+- It is desirable that all servers distinguish each other by name. To do this, either you need to have a configured DNS or prepare files ```/etc/hosts``` and ```/etc/resolv.conf``` on the master and copy them to other servers using **net_config_copy.yml**.
 - WARNING: Executed only for workers. You prepare configuration files on the Master, and then using ansible they are copied to the Workers.  
 - WARNING: If you use Network Manager (in the CentOS 7 by default it that) to change the DNS settings, changing file ```/etc/resolv.conf``` is not enough, you need to change the network settings, for example in ```/etc/sysconfig/network-scripts/ifcfg-ens192```, otherwise the Network Manager will overwrite file ```/etc/resolv.conf``` when the OS reboots
 ```

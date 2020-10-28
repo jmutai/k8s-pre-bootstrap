@@ -72,9 +72,6 @@
           yum:
             name: "*"
             state: latest
-        - name: install yum-utils
-          package:
-            name: yum-utils
         - name: check if reboot is required
           shell: needs-restarting -r
           failed_when: false
