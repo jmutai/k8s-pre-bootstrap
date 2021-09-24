@@ -6,6 +6,7 @@
   become_method: sudo
   #gather_facts: no
   vars:
+    k8s_version: 1.20                                    # Kubernetes version to be installed
     k8s_cni: calico                                      # calico, flannel
     container_runtime: docker                            # docker, cri-o, containerd 
     configure_firewalld: true                            # true / false
