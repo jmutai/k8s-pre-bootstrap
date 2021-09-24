@@ -1,14 +1,16 @@
 ---
 - name: Setup Proxy
-  hosts: k8s-nodes
+  hosts: k8snodes
   remote_user: root
   become: yes
   become_method: sudo
   #gather_facts: no
   vars:
-    k8s_version: 1.20                                    # Kubernetes version to be installed
+    k8s_version: "1.20"                                  # Kubernetes version to be installed
+    selinux_state: permissive                            # SELinux state to be set on k8s nodes                 
+    timezone: "Africa/Nairobi"                           # Timezone to set on all nodes
     k8s_cni: calico                                      # calico, flannel
-    container_runtime: docker                            # docker, cri-o, containerd 
+    container_runtime: cri-o                             # docker, cri-o, containerd 
     configure_firewalld: true                            # true / false
     # Docker proxy support
     setup_proxy: false                                   # Set to true to configure proxy
