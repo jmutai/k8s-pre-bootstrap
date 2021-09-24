@@ -7,6 +7,8 @@ It only helps you automate the standard Kubernetes bootstrapping pre-reqs.
 ## Supported OS
 
 - CentOS 7
+- CentOS 8
+- Rocky Linux 8
 
 ## Tasks in the role
 
@@ -26,32 +28,51 @@ This role contains tasks to:
 $ git clone https://github.com/jmutai/k8s-pre-bootstrap.git
 ```
 
-- Update your inventory, e.g:
+- Configure `/etc/hosts` file in your bastion or workstation with all nodes and ip addresses. Example:
+
+```
+192.168.200.10 k8s-master-01.example.com k8s-master-01
+192.168.200.11 k8s-master-02.example.com k8s-master-02
+192.168.200.12 k8s-master-03.example.com k8s-master-03
+
+192.168.200.13 k8s-worker-01.example.com k8s-worker-01
+192.168.200.14 k8s-worker-02.example.com k8s-worker-02
+192.168.200.15 k8s-worker-03.example.com k8s-worker-03
+192.168.200.16 k8s-worker-04.example.com k8s-worker-04
+```
+
+- Update your inventory, for example:
 
 ```
 $ vim hosts
-[k8s-nodes]
-172.21.200.10
-172.21.200.11
-172.21.200.12
+[k8snodes]
+k8s-master-01
+k8s-master-02
+k8s-master-03
+k8s-worker-01
+k8s-worker-02
+k8s-worker-03
+k8s-worker-04
 ```
 
 - Update variables in playbook file
 
 ```
 $ vim k8s-prep.yml
----
 - name: Setup Proxy
-  hosts: k8s-nodes
+  hosts: k8snodes
   remote_user: root
   become: yes
   become_method: sudo
   #gather_facts: no
   vars:
+    k8s_version: "1.20"                                  # Kubernetes version to be installed
+    selinux_state: permissive                            # SELinux state to be set on k8s nodes
+    timezone: "Africa/Nairobi"                           # Timezone to set on all nodes
     k8s_cni: calico                                      # calico, flannel
-    container_runtime: docker                            # docker, cri-o, containerd
+    container_runtime: cri-o                             # docker, cri-o, containerd
     configure_firewalld: true                            # true / false
-    # Docker registry
+    # Docker proxy support
     setup_proxy: false                                   # Set to true to configure proxy
     proxy_server: "proxy.example.com:8080"               # Proxy server address and port
     docker_proxy_exclude: "localhost,127.0.0.1"          # Adresses to exclude from proxy
@@ -80,7 +101,7 @@ Check file:
 $ vim roles/kubernetes-bootstrap/tasks/configure_firewalld.yml
 ....
 - name: Configure firewalld on master nodes
-  firewalld:
+  ansible.posix.firewalld:
     port: "{{ item }}/tcp"
     permanent: yes
     state: enabled
@@ -88,21 +109,30 @@ $ vim roles/kubernetes-bootstrap/tasks/configure_firewalld.yml
   when: "'master' in ansible_hostname"
 
 - name: Configure firewalld on worker nodes
-  firewalld:
+  ansible.posix.firewalld:
     port: "{{ item }}/tcp"
     permanent: yes
     state: enabled
   with_items: '{{ k8s_worker_ports }}'
-  when: "'node' in ansible_hostname"
-```
-
-If your master nodes doesn't contain `master` and nodes doesn't have `node` as part of hostname, update the file to reflect your naming pattern. My nodes are named like below:
+  when: ("'node' in ansible_hostname" or "'worker' in ansible_hostname")
 
 ```
-k8smaster01
-k8snode01
-k8snode02
-k8snode03
+
+If your master nodes doesn't contain `master` and nodes doesn't have `node or worker` as part of its hostname, update the file to reflect your naming pattern. My nodes are named like below:
+
+```
+k8s-master-01
+k8s-master-02
+k8s-worker-01
+....
+```
+
+Check playbook syntax to ensure no errors:
+
+```
+$ ansible-playbook --syntax-check k8s-prep.yml -i hosts
+
+playbook: k8s-prep.yml
 ```
 
 Playbook executed as root user - with ssh key:
