@@ -1,6 +1,11 @@
 ---
+- name: Configure Cri-o YUM repository
+  ansible.builtin.template:
+    src: crio.repo.j2
+    dest: /etc/yum.repos.d/crio.repo
+
 - name: Setup required sysctl params
-  sysctl:
+  ansible.posix.sysctl:
     name: '{{ item.key }}'
     value: '{{ item.value }}'
     sysctl_set: yes
@@ -11,16 +16,15 @@
     - {key: net.bridge.bridge-nf-call-iptables,  value: 1}
     - {key: net.ipv4.ip_forward,  value: 1}
 
-- name: Install CRIO repository
-  shell: yum-config-manager --add-repo=https://cbs.centos.org/repos/paas7-crio-115-release/x86_64/os/
-
 - name: Install cri-o
   yum:
     name: cri-o
     state: present
+    update_cache: yes
 
 - name: Start and enable crio service
-  service:
-    name: crio
-    state: present
+  ansible.builtin.service:
+    name: cri-o
+    state: started
+    enabled: yes
 

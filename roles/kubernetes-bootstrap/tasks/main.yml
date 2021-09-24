@@ -1,22 +1,40 @@
 ---
-- name: Pre-reqs setup task
-  include: pre-setup.yaml
+- name: Add the OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_os_family }}{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_os_family }}.yml"
 
-- name: Install and configure docker
+- name: Include Pre-reqs setup task
+  include: pre_setup.yml
+
+- name: Include task to disable swap
+  include: disable_swap.yml
+
+- name: Include task to configure timezone and ntp
+  include: configure_timezone_ntp.yml
+
+- name: Include task to load required kernel modules and sysctl configs
+  include: load_kernel_modules_sysctl.yml
+
+- name: Include task to configure /etc/hosts file on each node
+  include: configure_etc_host_file.yml
+
+- name: Include task to configure docker
   include: setup_docker.yml
   when: container_runtime == "docker"
 
-- name: Install and configure cri-o container runtime
+- name: Include task to configure cri-o container runtime
   include: setup_crio.yml
   when: container_runtime == "cri-o"
 
-- name: Install and configure containerd container runtime
+- name: Include task to configure containerd container runtime
   include: setup_crio.yml
   when: container_runtime == "containerd"
 
-- name: Install k8s packages
+- name: Include task to install  k8s packages
   include: install_k8s_packages.yml
 
-- name: Configure firewalld
+- name: Include task to configure firewalld
   include: configure_firewalld.yml
   when: configure_firewalld

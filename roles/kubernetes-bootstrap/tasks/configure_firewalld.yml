@@ -1,17 +1,17 @@
 ---
 - name: Install firewalld
-  package:
+  ansible.builtin.package:
     name: firewalld
     state: present
 
 - name: Start and enable firewalld
-  service:
+  ansible.builtin.service:
     name: firewalld
     state: started
     enabled: yes
 
 - name: Configure firewalld on master nodes
-  firewalld:
+  ansible.posix.firewalld:
     port: "{{ item }}/tcp"
     permanent: yes
     state: enabled
@@ -19,15 +19,15 @@
   when: "'master' in ansible_hostname"
 
 - name: Configure firewalld on worker nodes
-  firewalld:
+  ansible.posix.firewalld:
     port: "{{ item }}/tcp"
     permanent: yes
     state: enabled
   with_items: '{{ k8s_worker_ports }}'
-  when: "'node' in ansible_hostname"
+  when: ("'node' in ansible_hostname" or "'worker' in ansible_hostname")
 
 - name: Open flannel ports on the firewall
-  firewalld:
+  ansible.posix.firewalld:
     port: "{{ item }}/udp"
     permanent: yes
     state: enabled
@@ -35,7 +35,7 @@
   when: k8s_cni == "flannel"
 
 - name: Open calico UDP ports on the firewall
-  firewalld:
+  ansible.posix.firewalld:
     port: "{{ item }}/udp"
     permanent: yes
     state: enabled
@@ -43,7 +43,7 @@
   when: k8s_cni == "calico"
 
 - name: Open calico TCP ports on the firewall
-  firewalld:
+  ansible.posix.firewalld:
     port: "{{ item }}/tcp"
     permanent: yes
     state: enabled
