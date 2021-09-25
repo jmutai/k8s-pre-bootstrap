@@ -19,12 +19,12 @@
 - name: Install cri-o
   yum:
     name: cri-o
-    state: present
+    state: latest
     update_cache: yes
 
 - name: Start and enable crio service
   ansible.builtin.service:
-    name: cri-o
-    state: started
+    name: crio
+    state: restarted
     enabled: yes
 
