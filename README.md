@@ -9,6 +9,7 @@ It only helps you automate the standard Kubernetes bootstrapping pre-reqs.
 - CentOS 7
 - CentOS 8
 - Rocky Linux 8
+- AlmaLinux 8
 
 ## Tasks in the role
 
