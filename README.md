@@ -19,7 +19,7 @@ This role contains tasks to:
 - Setup standard system requirements - Disable Swap, Modify sysctl, Disable SELinux
 - Install and configure a container runtime of your Choice - cri-o, Docker, Containerd
 - Install the Kubernetes packages - kubelet, kubeadm and kubectl
-- Configure Firewalld on Kubernetes Master and Worker nodes
+- Configure Firewalld on Kubernetes Master and Worker nodes (Only Kubernetes <1.19 version)
 
 ## How to use this role
 
@@ -72,7 +72,7 @@ $ vim k8s-prep.yml
     timezone: "Africa/Nairobi"                           # Timezone to set on all nodes
     k8s_cni: calico                                      # calico, flannel
     container_runtime: cri-o                             # docker, cri-o, containerd
-    configure_firewalld: true                            # true / false
+    configure_firewalld: false                           # true / false (keep it false, true will fail for k8s>1.19)
     # Docker proxy support
     setup_proxy: false                                   # Set to true to configure proxy
     proxy_server: "proxy.example.com:8080"               # Proxy server address and port
@@ -94,7 +94,7 @@ To enable proxy, set the value of `setup_proxy` to `true` and provide proxy deta
 
 Once all values are updated, you can then run the playbook against your nodes.
 
-**NOTE**: For firewall configuration to open relevant ports for master and worker nodes, a pattern in hostname is required.
+**NOTE**: Recommended to disable. if you must enable, a pattern in hostname is required for master and worker nodes:
 
 Check file:
 
