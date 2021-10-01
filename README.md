@@ -72,7 +72,7 @@ $ vim k8s-prep.yml
     timezone: "Africa/Nairobi"                           # Timezone to set on all nodes
     k8s_cni: calico                                      # calico, flannel
     container_runtime: cri-o                             # docker, cri-o, containerd
-    configure_firewalld: false                           # true / false (keep it false, true will fail for k8s>1.19)
+    configure_firewalld: false                           # true / false (keep it false, k8s>1.19 have issues with firewalld)
     # Docker proxy support
     setup_proxy: false                                   # Set to true to configure proxy
     proxy_server: "proxy.example.com:8080"               # Proxy server address and port
