@@ -1,8 +1,4 @@
 [k8snodes]
-k8s-master-01
-k8s-master-02
-k8s-master-03
-k8s-worker-01
-k8s-worker-02
-k8s-worker-03
-k8s-worker-04
+k8smaster01
+k8snode01
+k8snode02
