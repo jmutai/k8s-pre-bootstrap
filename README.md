@@ -32,14 +32,14 @@ $ git clone https://github.com/jmutai/k8s-pre-bootstrap.git
 - Configure `/etc/hosts` file in your bastion or workstation with all nodes and ip addresses. Example:
 
 ```
-192.168.200.10 k8s-master-01.example.com k8s-master-01
-192.168.200.11 k8s-master-02.example.com k8s-master-02
-192.168.200.12 k8s-master-03.example.com k8s-master-03
+192.168.200.10 k8smaster01.example.com k8smaster01
+192.168.200.11 k8smaster02.example.com k8smaster02
+192.168.200.12 k8smaster03.example.com k8smaster03
 
-192.168.200.13 k8s-worker-01.example.com k8s-worker-01
-192.168.200.14 k8s-worker-02.example.com k8s-worker-02
-192.168.200.15 k8s-worker-03.example.com k8s-worker-03
-192.168.200.16 k8s-worker-04.example.com k8s-worker-04
+192.168.200.13 k8snode01.example.com k8snode01
+192.168.200.14 k8snode02.example.com k8snode02
+192.168.200.15 k8snode03.example.com k8snode03
+192.168.200.16 k8snode04.example.com k8snode04
 ```
 
 - Update your inventory, for example:
@@ -47,13 +47,13 @@ $ git clone https://github.com/jmutai/k8s-pre-bootstrap.git
 ```
 $ vim hosts
 [k8snodes]
-k8s-master-01
-k8s-master-02
-k8s-master-03
-k8s-worker-01
-k8s-worker-02
-k8s-worker-03
-k8s-worker-04
+k8smaster01
+k8smaster02
+k8smaster03
+k8snode01
+k8snode02
+k8snode03
+k8snode04
 ```
 
 - Update variables in playbook file
@@ -122,9 +122,9 @@ $ vim roles/kubernetes-bootstrap/tasks/configure_firewalld.yml
 If your master nodes doesn't contain `master` and nodes doesn't have `node or worker` as part of its hostname, update the file to reflect your naming pattern. My nodes are named like below:
 
 ```
-k8s-master-01
-k8s-master-02
-k8s-worker-01
+k8smaster01
+k8smaster02
+k8sworker01
 ....
 ```
 
