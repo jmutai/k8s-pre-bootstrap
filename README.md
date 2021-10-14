@@ -11,6 +11,9 @@ It only helps you automate the standard Kubernetes bootstrapping pre-reqs.
 - Rocky Linux 8
 - AlmaLinux 8
 
+## Required Ansible
+Ansible version required `2.10+`
+
 ## Tasks in the role
 
 This role contains tasks to:
