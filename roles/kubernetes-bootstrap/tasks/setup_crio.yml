@@ -23,9 +23,10 @@
     update_cache: yes
 
 - name: Configure cri-o subnet
-  ansible.builtin.template:
-    src: 10-crio-bridge.conf.j2
-    dest: /etc/cni/net.d/10-crio-bridge.conf
+  ansible.builtin.replace:
+    path: /etc/cni/net.d/10-crio-bridge.conf
+    regexp: '10\.85\.0\.0\/16'
+    replace: '{{ pod_network_cidr }}'
 
 - name: Start and enable crio service
   ansible.builtin.service:
