@@ -29,7 +29,7 @@
   when: container_runtime == "cri-o"
 
 - name: Include task to configure containerd container runtime
-  include: setup_crio.yml
+  include: setup_containerd.yml
   when: container_runtime == "containerd"
 
 - name: Include task to install  k8s packages
