@@ -16,7 +16,7 @@
     permanent: yes
     state: enabled
   with_items: '{{ k8s_master_ports }}'
-  when: "'master' in ansible_hostname"
+  when: "'pkcp' in ansible_hostname"
 
 - name: Configure firewalld on worker nodes
   ansible.posix.firewalld:
@@ -24,7 +24,7 @@
     permanent: yes
     state: enabled
   with_items: '{{ k8s_worker_ports }}'
-  when: ("'node' in ansible_hostname" or "'worker' in ansible_hostname")
+  when: ("'pknd' in ansible_hostname" or "'node' in ansible_hostname")
 
 - name: Open flannel ports on the firewall
   ansible.posix.firewalld:
