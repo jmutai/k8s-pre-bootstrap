@@ -175,7 +175,7 @@ ansible-playbook install_chrony.yml
 - To do this! (using prepare_os.yml). Disable SELinux, Install common packages, Disable SWAP, Load required modules, Modify sysctl entries, Update OS if it need, Reboot OS (using **prepare_os.yml**).  
 First execute this on the master.  
 ```
-ansible-playbook prepare_os.yml -e target=master
+ansible-playbook prepare_os.yml -e target=masters
 ```
 Then execute on the workers.  
 ```

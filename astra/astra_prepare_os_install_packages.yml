@@ -1,0 +1,10 @@
+- hosts: kube
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: Install common packages
+      package:
+        name: [docker.io,apt-transport-https,ca-certificates,curl,vim,nano,mc,bash-completion,wget,lvm2]
+        state: present
+      ignore_errors: True

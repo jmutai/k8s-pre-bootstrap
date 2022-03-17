@@ -16,7 +16,7 @@
     permanent: yes
     state: enabled
   with_items: '{{ k8s_master_ports }}'
-  when: inventory_hostname in groups['master']
+  when: inventory_hostname in groups['masters']
 
 - name: Configure firewalld on worker nodes
   firewalld:

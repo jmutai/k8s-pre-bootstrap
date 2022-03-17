@@ -1,0 +1,38 @@
+- hosts: kube
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: "Copy kubernetes.list"
+      copy:
+        src: /home/rosstat/k8s-pre-bootstrap/files/kubernetes.list
+        dest: /etc/apt/sources.list.d/kubernetes.list
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Create keyrings directory
+      file: path=/usr/share/keyrings state=directory mode=0755
+
+    - name: "Copy kubernetes-archive-keyring.gpg"
+      copy:
+        src: /home/rosstat/k8s-pre-bootstrap/files/kubernetes-archive-keyring.gpg
+        dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Run the equivalent of "apt-get update" as a separate step
+      apt:
+        update_cache: yes
+
+    - name: Install k8s packages
+      apt:
+        name: [kubelet,kubeadm,kubectl]
+        state: present
+
+    - name: Enable kubelet service
+      systemd:
+        name: kubelet
+        enabled: yes
+        state: started
