@@ -4,13 +4,13 @@
   gather_facts: yes
   tasks:
     - name: Install HA packages
-      apt:
+      yum:
         name: [keepalived,haproxy,psmisc]  # killall in psmisc
         state: present
 
     - name: "Copy etc-keepalived-keepalived.master.conf"
       copy:
-        src: /home/username/k8s-pre-bootstrap/files/etc-keepalived-keepalived.master.conf
+        src: /home/username/k8s-pre-bootstrap/HA/etc-keepalived-keepalived.master.conf
         dest: /etc/keepalived/keepalived.conf
         owner: root
         group: root
@@ -19,7 +19,7 @@
 
     - name: "Copy etc-keepalived-keepalived.backup.conf"
       copy:
-        src: /home/username/k8s-pre-bootstrap/files/etc-keepalived-keepalived.backup.conf
+        src: /home/username/k8s-pre-bootstrap/HA/etc-keepalived-keepalived.backup.conf
         dest: /etc/keepalived/keepalived.conf
         owner: root
         group: root
@@ -28,7 +28,7 @@
 
     - name: "Copy etc-haproxy-haproxy.cfg"
       copy:
-        src: /home/username/k8s-pre-bootstrap/files/etc-haproxy-haproxy.cfg
+        src: /home/username/k8s-pre-bootstrap/HA/etc-haproxy-haproxy.cfg
         dest: /etc/haproxy/haproxy.cfg
         owner: root
         group: root

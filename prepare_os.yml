@@ -2,6 +2,10 @@
   become: yes
   become_method: sudo
   gather_facts: no
+  vars:
+    calicotext: |
+      [keyfile]
+      unmanaged-devices=interface-name:cali*;interface-name:tunl*;interface-name:vxlan.calico;interface-name:wireguard.cali
   tasks:
     - name: Put SELinux in disabled mode
       selinux:
@@ -9,7 +13,7 @@
 
     - name: Install common packages
       package:
-        name: [vim,nano,mc,bash-completion,wget,curl,yum-utils,lvm2,device-mapper-persistent-data]
+        name: [vim,nano,mc,bash-completion,wget,curl,yum-utils,lvm2,device-mapper-persistent-data,tcpdump]
         state: present
       ignore_errors: True
 
@@ -23,20 +27,17 @@
         regexp: '^([^#].*?\sswap\s+.*)$'
         replace: '# \1'
 
-    - name: Load required modules
-      modprobe:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - br_netfilter
-        - overlay
-        - ip_vs
-        - ip_vs_rr
-        - ip_vs_wrr
-        - ip_vs_sh
-        - nf_conntrack_ipv4
+    - name: modprobe br_netfilter
+      command: modprobe br_netfilter
 
-    - name: Modify sysctl entries
+    - name: Add br_netfilter config
+      lineinfile:
+        path: /etc/modules-load.d/k8s.conf
+        line: 'br_netfilter'
+        state: present
+        create: yes
+
+    - name: Modify sysctl entries (/etc/sysctl.conf)
       sysctl:
         name: '{{ item.key }}'
         value: '{{ item.value }}'
@@ -47,7 +48,12 @@
       with_items:
         - {key: net.bridge.bridge-nf-call-ip6tables, value: 1}
         - {key: net.bridge.bridge-nf-call-iptables,  value: 1}
-        - {key: net.ipv4.ip_forward,  value: 1}
+#        - {key: net.ipv4.ip_forward,  value: 1}
+
+    - name: Configure NetworkManager before attempting to use Calico networking
+      copy:
+        dest: /etc/NetworkManager/conf.d/calico.conf
+        content: "{{ calicotext }}"
 
 # - name: Update system
   # package:

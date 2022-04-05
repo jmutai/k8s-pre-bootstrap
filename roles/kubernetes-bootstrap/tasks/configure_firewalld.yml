@@ -24,7 +24,7 @@
     permanent: yes
     state: enabled
   with_items: '{{ k8s_worker_ports }}'
-  when: inventory_hostname in groups['workers']
+  when: inventory_hostname in groups['nomaster']
 
 - name: Open flannel ports on the firewall
   firewalld:

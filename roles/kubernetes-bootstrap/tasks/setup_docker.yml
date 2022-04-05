@@ -1,12 +1,16 @@
 ---
-- name: Add docker repository
-  get_url:
-    url: https://download.docker.com/linux/centos/docker-ce.repo
-    dest: /etc/yum.repos.d/docer-ce.repo
+- name: Add docker-ce-stable repo
+  yum_repository:
+    name: docker-ce
+    description: docker-ce stable repo
+    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+    gpgkey: https://download.docker.com/linux/centos/gpg
+    gpgcheck: yes
 
 - name: Install supported version of docker
   package:
-    name: [containerd.io-1.2.13,docker-ce-19.03.11,docker-ce-cli-19.03.11]
+    name: [containerd.io,docker-ce,docker-ce-cli]
+#    name: [containerd.io-1.2.13,docker-ce-19.03.11,docker-ce-cli-19.03.11]
     state: present
 
 - name: Create other directories required

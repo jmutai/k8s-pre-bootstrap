@@ -10,7 +10,7 @@
 
     - name: "Copy docker config"
       copy:
-        src: /home/rosstat/k8s-pre-bootstrap/files/daemon.json
+        src: /home/username/k8s-pre-bootstrap/files/daemon.json
         dest: /etc/docker/daemon.json
         owner: root
         group: root

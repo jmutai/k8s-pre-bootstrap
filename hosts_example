@@ -1,9 +1,37 @@
+[ansible]
+rts1-k8master1
+
 [masters]
-172.16.174.[15:17]
+rts1-k8master[1:3]
+
+[masters-active]
+rts1-k8master1
+
+[masters-passive]
+rts1-k8master[2:3]
+
+[nomaster]  # everyone except masters
+rts1-k8cdn
+rts1-k8ceph[1:3]
+rts1-k8work[1:3]
 
 [workers]
-172.16.174.[18:27]
+rts1-k8work[1:3]
+
+[postgres]
+rts1-postgres
+
+[click]
+rts1-clickhouse
+
+[mongo]
+rts1-mongo[1:3]
 
 [kube:children]
 masters
-workers
+nomaster
+
+[others:children]
+postgres
+click
+mongo

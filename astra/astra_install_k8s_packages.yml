@@ -5,7 +5,7 @@
   tasks:
     - name: "Copy kubernetes.list"
       copy:
-        src: /home/rosstat/k8s-pre-bootstrap/files/kubernetes.list
+        src: /home/username/k8s-pre-bootstrap/files/kubernetes.list
         dest: /etc/apt/sources.list.d/kubernetes.list
         owner: root
         group: root
@@ -16,7 +16,7 @@
 
     - name: "Copy kubernetes-archive-keyring.gpg"
       copy:
-        src: /home/rosstat/k8s-pre-bootstrap/files/kubernetes-archive-keyring.gpg
+        src: /home/username/k8s-pre-bootstrap/files/kubernetes-archive-keyring.gpg
         dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
         owner: root
         group: root

@@ -1,5 +1,5 @@
 ---
-- hosts: workers
+- hosts: kube
   become: yes
   become_method: sudo
   gather_facts: no

@@ -1,4 +1,4 @@
-# !!!!!!!!  UNDER CONSTRACTION  !!!!!!!
+# !!!!!!!!  still under development...  !!!!!!!
 
 ## Main info
 
@@ -6,9 +6,10 @@ This playbook helps you setting up a Kubernetes Cluster on VMs or bare-metal ser
 The entire installation is performed under regular user account (but which is sudo user).
 Forked from jmutai/k8s-pre-bootstrap, thanks to him.
 
-## Supported OS
+## OS on which it was used
 
 - CentOS 7
+- Astra Linux 1.7
 
 ## Documentation
 
@@ -28,16 +29,14 @@ https://kubernetes.io/docs/setup/production-environment/
 
 - Install git and ansible on the control computer
 ```
-sudo yum install -y epel-release 
-sudo yum install -y ansible git platform-python nano
+sudo yum install -y epel-release ansible git platform-python nano
 ```
 
 - Clone the Git Project to folder ~/ansible:
 ```
 cd ~
-mkdir ansible
-cd ansible
 git clone https://github.com/MinistrBob/k8s-pre-bootstrap.git .
+cd k8s-pre-bootstrap
 cp hosts_example hosts
 ```
 
@@ -65,7 +64,7 @@ nano hosts
 ssh-keygen -t rsa
 ```
 
-- Edit **send_public_key.yml**, insert instead of ```<sshkey>``` line with public key from ```/home/<user>/.ssh/id_rsa.pub```. You can see key ```cat /home/<user>/.ssh/id_rsa.pub```.
+- Edit **send_public_key.yml**, insert instead of ```<sshkey>``` line with public key from ```/home/<user>/.ssh/id_rsa.pub```. You can see key ```cat /home/$USER/.ssh/id_rsa.pub```.
 
 - Edit **send_public_key.yml**, insert instead of ```<username>``` user name (user under whom the installation is performed). 
 
@@ -173,13 +172,37 @@ ansible-playbook install_chrony.yml
 
 ## !!! Prepare OS !!!
 - To do this! (using prepare_os.yml). Disable SELinux, Install common packages, Disable SWAP, Load required modules, Modify sysctl entries, Update OS if it need, Reboot OS (using **prepare_os.yml**).  
-First execute this on the master.  
+To understand the example see `hosts_example` file. Ansible installed on first master.  
+First execute this on the host with ansible. In this example it is first K8S master. This is just an OS update.
 ```
-ansible-playbook prepare_os.yml -e target=masters
+ansible-playbook prepare_os.yml -e target=ansible
 ```
-Then execute on the workers.  
+Then execute on the all other hosts K8S.  
 ```
-ansible-playbook prepare_os.yml -e target=workers
+ansible-playbook prepare_os.yml -e target='kube:!ansible'
+```
+If you need prepare OS on other servers not included in the cluster (for example, rdbms and etc.). This is just an OS update.
+```
+ansible-playbook prepare_os_others.yml -e target=others
+```
+
+Сheck settings 
+```
+ansible kube -m shell -a 'lsmod | grep br_netfilter' -b
+ansible kube -m shell -a 'cat /etc/modules-load.d/k8s.conf'
+ansible kube -m shell -a 'cat /etc/sysctl.conf'
+```
+
+#### Install specific version packages
+If you need install specific version docker or kubernetes, you neet edit these yml files  
+```
+nano ~/ansible/roles/kubernetes-bootstrap/tasks/install_k8s_packages.yml
+nano ~/ansible/roles/kubernetes-bootstrap/tasks/setup_docker.yml
+```
+Example changes  
+```
+[containerd.io-1.2.13,docker-ce-19.03.11,docker-ce-cli-19.03.11]
+[kubelet-1.21.3,kubeadm-1.21.3,kubectl-1.21.3]
 ```
 
 ## Update variables in playbook file k8s-prep.yml (presented variant when firewalld is completely removed)
@@ -227,7 +250,33 @@ This playbook installed all needed software on all servers without creating the 
 ansible-playbook k8s-prep.yml
 ```
 
+## Additional options and checks after installation  
+- Check versions  
+```
+sudo docker --version
+sudo kubelet --version
+# until the host is added to the cluster, the kubectl will generate an error
+sudo kubectl version
+sudo kubeadm version
+ansible kube -m shell -a "docker --version && sudo kubelet --version && sudo kubeadm version" -b
+```
+- You can add any user to the `docker` group so that this user can run `docker` even without root\sudo permissions. After add you need relogin.  
+```
+sudo usermod -aG docker $USER
+ansible kube -m shell -a "usermod -aG docker USERNAME" -b
+```
+- You can prevent update specific packages (only example for docker) during system update  
+```
+# CentOS
+sudo yum update --exclude=docker
+# Debiam\Ubunta
+sudo apt-mark hold docker && sudo apt-get upgrade
+sudo apt-mark unhold docker
+```
+
 ---
+## Kubernetes Cluster
+You can init 
 ## Init Cluster on Master 
 
 ```
@@ -272,3 +321,7 @@ kubectl get nodes
 ## Clean up (if something went wrong while creating the cluster)
 
 See https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down
+```
+# Undo controlplane init on master
+sudo kubeadm reset
+```
