@@ -1,7 +1,9 @@
 ---
 # Master nodes firewall ports
 k8s_master_ports:
+    - 443
     - 6443
+    - 8443
     - 2379-2380
     - 10250
     - 10251
@@ -18,7 +20,6 @@ calico_udp_ports:
 calico_tcp_ports:
   - 5473
   - 179
-  - 5473
 
 # Flannel CNI firewall ports
 flannel_udp_ports:
