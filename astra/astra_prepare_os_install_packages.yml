@@ -5,6 +5,6 @@
   tasks:
     - name: Install common packages
       package:
-        name: [docker.io,apt-transport-https,ca-certificates,curl,vim,nano,mc,bash-completion,wget,lvm2]
+        name: [apt-transport-https,ca-certificates,curl,vim,nano,mc,bash-completion,wget,lvm2]
         state: present
       ignore_errors: True
