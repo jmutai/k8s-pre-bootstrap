@@ -10,8 +10,8 @@
 
     - name: "Copy etc-keepalived-keepalived.master.conf"
       copy:
-        src: /home/username/k8s-pre-bootstrap/HA/etc-keepalived-keepalived.master.conf
-        dest: /etc/keepalived/keepalived.conf
+        src: "{{ playbook_dir }}/HA/etc-keepalived-keepalived.master.conf"
+        dest: "/etc/keepalived/keepalived.conf"
         owner: root
         group: root
         mode: 0644
@@ -19,8 +19,8 @@
 
     - name: "Copy etc-keepalived-keepalived.backup.conf"
       copy:
-        src: /home/username/k8s-pre-bootstrap/HA/etc-keepalived-keepalived.backup.conf
-        dest: /etc/keepalived/keepalived.conf
+        src: "{{ playbook_dir }}/HA/etc-keepalived-keepalived.backup.conf"
+        dest: "/etc/keepalived/keepalived.conf"
         owner: root
         group: root
         mode: 0644
@@ -28,8 +28,8 @@
 
     - name: "Copy etc-haproxy-haproxy.cfg"
       copy:
-        src: /home/username/k8s-pre-bootstrap/HA/etc-haproxy-haproxy.cfg
-        dest: /etc/haproxy/haproxy.cfg
+        src: "{{ playbook_dir }}/HA/etc-haproxy-haproxy.cfg"
+        dest: "/etc/haproxy/haproxy.cfg"
         owner: root
         group: root
         mode: 0644
