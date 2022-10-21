@@ -1,3 +1,4 @@
+# Installation from the vanilla repository. On 1.7.2, there is a problem during installation, so it's better to install from packages from the Astra repository (astra_k8s_install_packages1.yml).
 - hosts: kube
   become: yes
   become_method: sudo
@@ -5,7 +6,7 @@
   tasks:
     - name: "Copy kubernetes.list"
       copy:
-        src: /home/username/k8s-pre-bootstrap/files/kubernetes.list
+        src: "{{ playbook_dir }}/files/kubernetes.list"
         dest: /etc/apt/sources.list.d/kubernetes.list
         owner: root
         group: root
@@ -16,7 +17,7 @@
 
     - name: "Copy kubernetes-archive-keyring.gpg"
       copy:
-        src: /home/username/k8s-pre-bootstrap/files/kubernetes-archive-keyring.gpg
+        src: "{{ playbook_dir }}/files/kubernetes-archive-keyring.gpg"
         dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
         owner: root
         group: root
@@ -28,8 +29,12 @@
 
     - name: Install k8s packages
       apt:
-        name: [kubelet,kubeadm,kubectl]
+        # name: [kubelet,kubeadm,kubectl]
+        name: [kubelet=1.23.4-00,kubeadm=1.23.4-00,kubectl=1.23.4-00]
         state: present
+
+    - name: Hold packages
+      shell: "apt-mark hold kubelet kubeadm kubectl"
 
     - name: Enable kubelet service
       systemd:

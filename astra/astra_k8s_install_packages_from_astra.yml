@@ -1,0 +1,43 @@
+# Installation from the Astra repository. On 1.7.2, there is a problem during installation vanilla repository, so it's better to install from packages from the Astra repository (astra_k8s_install_packages1.yml).
+
+# On all install kubelet.
+- hosts: kube
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: Run the equivalent of "apt-get update" as a separate step
+      apt:
+        update_cache: yes
+
+    - name: Install k8s packages
+      apt:
+        name: [kubernetes-node]
+        state: present
+
+    - name: Hold packages
+      shell: "apt-mark hold kubernetes-node"
+
+    - name: Enable kubelet service
+      systemd:
+        name: kubelet
+        enabled: yes
+        state: started
+
+# On masters install kubeamd, kubectl and so on.
+- hosts: masters
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: Run the equivalent of "apt-get update" as a separate step
+      apt:
+        update_cache: yes
+
+    - name: Install k8s packages
+      apt:
+        name: [kubernetes-master, kubernetes-admin, kubernetes-client]
+        state: present
+
+    - name: Hold packages
+      shell: "apt-mark hold kubernetes-master kubernetes-admin kubernetes-client"
