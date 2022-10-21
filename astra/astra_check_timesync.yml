@@ -1,0 +1,9 @@
+- hosts: "{{ target }}"
+  #become: yes
+  #become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: Check timesync
+      shell: 'timedatectl status | grep "System clock synchronized"'
+      register: script_res
+      changed_when: "'changed' in script_res.stdout"
