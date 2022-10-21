@@ -10,8 +10,8 @@
 
     - name: "Copy docker config"
       copy:
-        src: /home/username/k8s-pre-bootstrap/files/daemon.json
-        dest: /etc/docker/daemon.json
+        src: "{{ playbook_dir }}/files/daemon.json"
+        dest: "/etc/docker/daemon.json"
         owner: root
         group: root
         mode: 0644
