@@ -4,7 +4,7 @@
   gather_facts: yes
   tasks:
     - name: Install HA packages
-      yum:
+      package:
         name: [keepalived,haproxy,psmisc]  # killall in psmisc
         state: present
 
