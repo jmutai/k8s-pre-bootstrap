@@ -10,7 +10,7 @@
         state: present
     - name: "Copy etc-keepalived-keepalived.master.conf"
       template:
-        src: "{{ playbook_dir }}/HA/etc-keepalived-keepalived.master.j2"
+        src: "{{ playbook_dir }}/HA/etc-keepalived-keepalived.master.conf.j2"
         dest: "/etc/keepalived/keepalived.conf"
         owner: root
         group: root
@@ -19,7 +19,7 @@
 
     - name: "Copy etc-keepalived-keepalived.backup.conf"
       template:
-        src: "{{ playbook_dir }}/HA/etc-keepalived-keepalived.backup.j2"
+        src: "{{ playbook_dir }}/HA/etc-keepalived-keepalived.backup.conf.j2"
         dest: "/etc/keepalived/keepalived.conf"
         owner: root
         group: root
@@ -28,7 +28,7 @@
 
     - name: "Copy etc-haproxy-haproxy.cfg"
       template:
-        src: "{{ playbook_dir }}/HA/etc-haproxy-haproxy.j2"
+        src: "{{ playbook_dir }}/HA/etc-haproxy-haproxy.cfg.j2"
         dest: "/etc/haproxy/haproxy.cfg"
         owner: root
         group: root
