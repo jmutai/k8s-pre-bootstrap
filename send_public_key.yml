@@ -3,10 +3,8 @@
   become: yes
   become_method: sudo
   gather_facts: no
-  vars:
-    user_name: <username>
-    sshkey: <sshkey>
   tasks:
+  - include_vars: secret.yml
   - name: make directory
     file:
       path: "/home/{{ user_name }}/.ssh"
