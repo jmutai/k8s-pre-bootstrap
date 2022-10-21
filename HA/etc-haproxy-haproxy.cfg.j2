@@ -49,6 +49,6 @@ backend apiserver
     balance     roundrobin
     timeout server 60s
     timeout connect 15s
-    server apiserver01 pp-mk8s-01:6443 check
-    server apiserver02 pp-mk8s-02:6443 check
-    server apiserver03 pp-mk8s-03:6443 check
+    server apiserver01 {{ groups['masters'][0] }}:6443 check
+    server apiserver02 {{ groups['masters'][1] }}:6443 check
+    server apiserver03 {{ groups['masters'][2] }}:6443 check

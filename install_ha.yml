@@ -3,14 +3,14 @@
   become_method: sudo
   gather_facts: yes
   tasks:
+    - include_vars: "secret.yml"
     - name: Install HA packages
       package:
         name: [keepalived,haproxy,psmisc]  # killall in psmisc
         state: present
-
     - name: "Copy etc-keepalived-keepalived.master.conf"
-      copy:
-        src: "{{ playbook_dir }}/HA/etc-keepalived-keepalived.master.conf"
+      template:
+        src: "{{ playbook_dir }}/HA/etc-keepalived-keepalived.master.j2"
         dest: "/etc/keepalived/keepalived.conf"
         owner: root
         group: root
@@ -18,8 +18,8 @@
       when: inventory_hostname in groups["masters-active"]
 
     - name: "Copy etc-keepalived-keepalived.backup.conf"
-      copy:
-        src: "{{ playbook_dir }}/HA/etc-keepalived-keepalived.backup.conf"
+      template:
+        src: "{{ playbook_dir }}/HA/etc-keepalived-keepalived.backup.j2"
         dest: "/etc/keepalived/keepalived.conf"
         owner: root
         group: root
@@ -27,8 +27,8 @@
       when: inventory_hostname in groups["masters-passive"]
 
     - name: "Copy etc-haproxy-haproxy.cfg"
-      copy:
-        src: "{{ playbook_dir }}/HA/etc-haproxy-haproxy.cfg"
+      template:
+        src: "{{ playbook_dir }}/HA/etc-haproxy-haproxy.j2"
         dest: "/etc/haproxy/haproxy.cfg"
         owner: root
         group: root
