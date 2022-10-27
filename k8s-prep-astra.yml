@@ -1,0 +1,200 @@
+---
+- name: Prepare OS. Install packages.
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  hosts: kube
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Install common packages
+      package:
+        name: [apt-transport-https,ca-certificates,curl,vim,nano,mc,bash-completion,wget,lvm2]
+        state: present
+      ignore_errors: True
+
+- name: Prepare OS. Disable swap.
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  hosts: kube
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Disable SWAP since kubernetes can't work with swap enabled (1/2)
+      shell: |
+        swapoff -a
+    - name: Disable SWAP in fstab since kubernetes can't work with swap enabled (2/2)
+      replace:
+        path: /etc/fstab
+        regexp: '^([^#].*?\sswap\s+.*)$'
+        replace: '# \1'
+
+- name: Prepare OS. Set sysctl.
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  hosts: kube
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Load required modules
+      modprobe:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - br_netfilter
+        - overlay
+        - ip_vs
+        - ip_vs_rr
+        - ip_vs_wrr
+        - ip_vs_sh
+        - nf_conntrack
+        #- nf_conntrack_ipv4
+    - name: Modify sysctl entries
+      sysctl:
+        name: '{{ item.key }}'
+        value: '{{ item.value }}'
+        sysctl_set: yes
+        state: present
+        reload: yes
+      ignore_errors: True
+      with_items:
+        - {key: net.bridge.bridge-nf-call-ip6tables, value: 1}
+        - {key: net.bridge.bridge-nf-call-iptables,  value: 1}
+        - {key: net.ipv4.ip_forward,  value: 1}
+
+- name: Prepare OS. Upgrade OS.
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  hosts: kube
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Block upgrade
+      block:
+        - name: "astra-nochmodx-lock disable"
+          shell: "astra-nochmodx-lock disable"
+        - name: Run the equivalent of "apt-get update" as a separate step
+          shell: "apt update"
+        - name: "astra-update -A -r"
+          shell: "astra-update -A -r"
+      when: upgrade_os
+
+- name: Prepare OS. Reboot servers.
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  hosts: kube
+  vars_files:
+    - vars/main.yml
+  vars:
+    target: kube
+  tasks:
+    - name: reboot servers
+      shell: sleep 3; reboot
+      ignore_errors: true
+      changed_when: false
+      async: 1
+      poll: 0
+    - name: wait for server to come back after reboot
+      wait_for_connection:
+        timeout: 600
+        delay: 20
+      register: reboot_result
+    - name: reboot time
+      debug:
+        msg: "The system rebooted in {{ reboot_result.elapsed }} seconds."
+
+- name: Install Docker.
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  hosts: kube
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Install Docker from Astra repo
+      package:
+        name: [docker.io]
+        state: present
+    - name: "Copy docker config"
+      copy:
+        src: "{{ playbook_dir }}/files/daemon.json"
+        dest: "/etc/docker/daemon.json"
+        owner: root
+        group: root
+        mode: 0644
+    - name: Start and enable docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+        daemon_reload: yes
+    - name: Block Docker proxy
+      block:
+        - name: Create a directory
+          file:
+            path: "/etc/systemd/system/docker.service.d"
+            state: directory
+        - name: Setup Docker Proxy
+          ansible.builtin.template:
+            src: "{{ playbook_dir }}/files/docker-proxy.j2"
+            dest: /etc/systemd/system/docker.service.d/http-proxy.conf
+      when: setup_proxy
+    - name: Restart docker service
+      systemd:
+        name: docker
+        state: restarted
+        daemon_reload: yes
+
+# Installation from the vanilla repository. On 1.7.2, there is a problem during installation, so it's better to install from packages from the Astra repository (astra_k8s_install_packages1.yml).
+- hosts: kube
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: "Copy kubernetes.list"
+      copy:
+        src: "{{ playbook_dir }}/files/kubernetes.list"
+        dest: /etc/apt/sources.list.d/kubernetes.list
+        owner: root
+        group: root
+        mode: 0644
+    - name: Create keyrings directory
+      file: path=/usr/share/keyrings state=directory mode=0755
+    - name: "Copy kubernetes-archive-keyring.gpg"
+      copy:
+        src: "{{ playbook_dir }}/files/kubernetes-archive-keyring.gpg"
+        dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+        owner: root
+        group: root
+        mode: 0644
+    - name: Run the equivalent of "apt-get update" as a separate step
+      shell: "apt update"
+    - name: Install k8s packages
+      apt:
+        # name: [kubelet,kubeadm,kubectl]
+        name: [kubelet={{ k8s_packages_version }},kubeadm={{ k8s_packages_version }},kubectl={{ k8s_packages_version }}]
+        state: present
+    - name: Hold packages
+      shell: "apt-mark hold kubelet kubeadm kubectl"
+    - name: Enable kubelet service
+      systemd:
+        name: kubelet
+        enabled: yes
+        state: started
+
+-- See whats news on k8s-pre-bootstrap
+
+-- Install HA
+ansible-playbook astra_install_ha.yml
+
+-- On master
+sudo kubeadm config images pull
+
+-- On NOmaster
+ansible kube -m shell -a "docker pull k8s.gcr.io/pause:3.6" -b

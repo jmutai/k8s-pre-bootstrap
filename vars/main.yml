@@ -1,0 +1,27 @@
+####    OPTIONS     ####
+
+upgrade_os: true
+k8s_packages_version: "1.23.4-00"
+# Docker proxy options
+setup_proxy: true                           # Set to true to configure proxy
+
+
+# Firewall options
+configure_firewall: false                    # true / false (keep it false, k8s>1.19 have issues with firewalld)
+remove_firewall: false                       # Set to true to remove firewalld
+
+####    SETTINGS    ####
+
+# Main settings
+k8s_version: "1.22"                          # Kubernetes version to be installed
+timezone: "Europe/Moscow"                    # Timezone to set on all nodes
+k8s_cni: calico                              # calico, flannel
+container_runtime: docker                    # docker, cri-o, containerd 
+pod_network_cidr: "192.168.0.0/16"           # pod subnet if using cri-o runtime
+
+# Protection settings
+selinux_state: permissive                    # SELinux state to be set on k8s nodes
+
+# Docker proxy settings
+proxy_server: "192.168.101.100:3128"       # Proxy server address and port
+docker_proxy_exclude: "127.0.0.1,localhost,192.168.0.0/24,ispp.geop.minjust.ru,pp-vip-k8s,pp-dns-01,pp-ntp-01,pp-bal-01,pp-cach-01,pp-kafka-01,pp-kafka-02,pp-kafka-03,pp-sk8s-01,pp-sk8s-02,pp-sk8s-03,pp-sk8s-04,pp-sk8s-05,pp-ceph-osd-01,pp-ceph-osd-02,pp-ceph-osd-03,pp-ceph-s-01,pp-ceph-s-02,pp-ceph-s-03,pp-ceph-s-04,pp-mk8s-01,pp-mk8s-02,pp-mk8s-03,pp-back-01,pp-pg-db-01,pp-pg-db-02,pp-mg-db-01,pp-mg-db-02,pp-mg-db-03,pp-cl-db-01"  # Adresses to exclude from proxy

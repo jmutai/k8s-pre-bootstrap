@@ -1,0 +1,4 @@
+[Service]
+Environment="HTTP_PROXY=http://{{ proxy_server }}"
+Environment="HTTPS_PROXY=http://{{ proxy_server }}"
+Environment="NO_PROXY={{ docker_proxy_exclude }}"
