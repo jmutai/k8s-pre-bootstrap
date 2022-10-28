@@ -188,13 +188,13 @@
         enabled: yes
         state: started
 
--- See whats news on k8s-pre-bootstrap
+#-- See whats news on k8s-pre-bootstrap
 
--- Install HA
-ansible-playbook astra_install_ha.yml
+#-- Install HA
+#ansible-playbook astra_install_ha.yml
 
--- On master
-sudo kubeadm config images pull
+#-- On master
+#sudo kubeadm config images pull
 
--- On NOmaster
-ansible kube -m shell -a "docker pull k8s.gcr.io/pause:3.6" -b
+#-- On NOmaster
+#ansible kube -m shell -a "docker pull k8s.gcr.io/pause:3.6" -b
