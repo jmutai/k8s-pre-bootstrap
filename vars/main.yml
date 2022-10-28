@@ -1,5 +1,8 @@
 ####    OPTIONS     ####
 
+os_prepare: true
+kubernetes_setup: true
+
 upgrade_os: true
 k8s_packages_version: "1.23.4-00"
 # Docker proxy options
@@ -25,3 +28,11 @@ selinux_state: permissive                    # SELinux state to be set on k8s no
 # Docker proxy settings
 proxy_server: "192.168.101.100:3128"       # Proxy server address and port
 docker_proxy_exclude: "127.0.0.1,localhost,192.168.0.0/24,ispp.geop.minjust.ru,pp-vip-k8s,pp-dns-01,pp-ntp-01,pp-bal-01,pp-cach-01,pp-kafka-01,pp-kafka-02,pp-kafka-03,pp-sk8s-01,pp-sk8s-02,pp-sk8s-03,pp-sk8s-04,pp-sk8s-05,pp-ceph-osd-01,pp-ceph-osd-02,pp-ceph-osd-03,pp-ceph-s-01,pp-ceph-s-02,pp-ceph-s-03,pp-ceph-s-04,pp-mk8s-01,pp-mk8s-02,pp-mk8s-03,pp-back-01,pp-pg-db-01,pp-pg-db-02,pp-mg-db-01,pp-mg-db-02,pp-mg-db-03,pp-cl-db-01"  # Adresses to exclude from proxy
+
+supported_os:
+#  - CentOS7
+#  - Ubuntu18
+#  - Ubuntu20
+#  - Debian9
+#  - Debian10
+  - AstraLinux-1

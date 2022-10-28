@@ -1,0 +1,39 @@
+---
+# Check support for Operating System
+- name: Set the os variable
+  set_fact:
+    os: "{{ ansible_distribution | replace(' ', '') }}{{ ansible_distribution_major_version }}"  # "Astra Linux" + "1"
+
+# - name: Check support for Operating System
+#   vars_files:
+#     - vars/main_vars.yml
+#   fail:
+#     msg: "Operating System = {{ os }} not supported.
+#           Supported versions are {{ supported_os }}"
+#   when: os not in supported_os
+
+# OS Prepare
+- name: OS Prepare
+  hosts: all
+  # remote_user: <user>
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  vars_files:
+    - vars/main.yml
+  roles:
+    - os-prepare
+  when: os_prepare
+
+# Kubernetes Setup
+- name: Kubernetes Setup
+  hosts: kube
+  # remote_user: <user>
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  vars_files:
+    - vars/main.yml
+  roles:
+    - kubernetes-setup
+  when: kubernetes_setup
