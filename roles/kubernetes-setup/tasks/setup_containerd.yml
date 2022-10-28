@@ -1,0 +1,33 @@
+---
+- name: Add docker repository
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docer-ce.repo
+
+- name: Install containerd
+  ansible.builtin.package:
+    name: [containerd.io]
+    state: present
+
+- name: Create containerd directories required
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /etc/containerd
+
+- name: Configure containerd
+  ansible.builtin.shell: containerd config default > /etc/containerd/config.toml
+  run_once: true
+
+- name: Set cgroup driver as systemd
+  ansible.builtin.template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+
+- name: Start and enable containerd service
+  ansible.builtin.systemd:
+    name: containerd
+    state: restarted
+    enabled: yes
+    daemon_reload: yes

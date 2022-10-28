@@ -1,0 +1,22 @@
+---
+- name: Put SELinux in permissive mode
+  selinux:
+    policy: targeted
+    state: "{{ selinux_state }}"
+
+- name: Update system packages
+  package:
+    name: "*"
+    state: latest
+
+- name: Install some packages needed to configure the nodes
+  ansible.builtin.package:
+    name: "{{ item }}"
+  loop:
+    - "{{ basic_packages }}"
+  
+- name: Disable firewalld service
+  ansible.builtin.service:
+    name: firewalld
+    state: stopped
+    enabled: no

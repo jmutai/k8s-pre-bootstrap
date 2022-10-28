@@ -1,0 +1,15 @@
+[devel_kubic_libcontainers_stable]
+name=Stable Releases of Upstream github.com/containers packages
+type=rpm-md
+baseurl=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_{{ ansible_distribution_major_version }}/
+gpgcheck=1
+gpgkey=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_{{ ansible_distribution_major_version }}/repodata/repomd.xml.key
+enabled=1
+
+[devel_kubic_libcontainers_stable_cri-o_{{ k8s_version }}]
+name=devel:kubic:libcontainers:stable:cri-o:{{ k8s_version }} (CentOS_{{ ansible_distribution_major_version }})
+type=rpm-md
+baseurl=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ k8s_version }}/CentOS_{{ ansible_distribution_major_version }}/
+gpgcheck=1
+gpgkey=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ k8s_version }}/CentOS_{{ ansible_distribution_major_version }}/repodata/repomd.xml.key
+enabled=1
