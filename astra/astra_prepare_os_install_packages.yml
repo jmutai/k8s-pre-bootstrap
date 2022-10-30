@@ -5,6 +5,6 @@
   tasks:
     - name: Install common packages
       package:
-        name: [apt-transport-https,ca-certificates,curl,vim,nano,mc,bash-completion,wget,lvm2]
+        name: [apt-transport-https,ca-certificates,curl,vim,nano,mc,bash-completion,wget,lvm2,dialog,dnsutils,net-tools]
         state: present
       ignore_errors: True
