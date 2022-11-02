@@ -1,0 +1,11 @@
+- name: /etc/yum.conf
+  template:
+    src: yum.conf.j2
+    dest: /etc/yum.conf
+    mode: 644
+
+- name: /etc/dnf/dnf.conf
+  template:
+    src: dnf.conf.j2
+    dest: /etc/dnf/dnf.conf
+    mode: 644

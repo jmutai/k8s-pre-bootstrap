@@ -1,0 +1,5 @@
+Acquire::http::proxy "http://{{ proxy_server }}:{{ proxy_port }}/";
+Acquire::https::proxy "http://{{ proxy_server }}:{{ proxy_port }}/";
+Acquire::ftp::proxy "ftp://{{ proxy_server }}:{{ proxy_port }}/";
+Acquire::socks::proxy "socks://{{ proxy_server }}:{{ proxy_port }}/";
+Acquire::::Proxy "true";

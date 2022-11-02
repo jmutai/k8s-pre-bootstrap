@@ -1,8 +1,20 @@
 ---
-# Check support for Operating System
-- name: Set the os variable
+# Set facts
+- name: Set fact - os_distrib_version
   set_fact:
-    os: "{{ ansible_distribution | replace(' ', '') }}{{ ansible_distribution_major_version }}"  # "AstraLinux-1"
+    os_distrib_version: "{{ ansible_distribution | replace(' ', '') }}{{ ansible_distribution_major_version }}"  # "AstraLinux1" "CentOS8"
+
+- name: Set fact - os_family_version
+  set_fact:
+    os_family_version: "{{ ansible_os_family | replace(' ', '') }}{{ ansible_distribution_major_version }}"  # "AstraLinux1" "RedHat8"
+
+- name: Set fact - os_distrib_version
+  set_fact:
+    os_distrib: "{{ ansible_distribution | replace(' ', '') }}"  # "AstraLinux" "CentOS"
+
+- name: Set fact - os_family_version
+  set_fact:
+    os_family: "{{ ansible_os_family | replace(' ', '') }}"  # "AstraLinux" "RedHat"
 
 # - name: Check support for Operating System
 #   vars_files:

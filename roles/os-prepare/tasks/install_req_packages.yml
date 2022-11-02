@@ -1,0 +1,6 @@
+- name: Install some packages needed to configure the nodes
+  ansible.builtin.package:
+    name: "{{ item }}"
+  loop:
+    - "{{ basic_packages }}"
+  

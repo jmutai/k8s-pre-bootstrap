@@ -1,0 +1,5 @@
+---
+basic_packages:
+  - apt-transport-https
+  - ca-certificates
+  - dialog

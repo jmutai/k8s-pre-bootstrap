@@ -1,0 +1,54 @@
+---
+- name: Add the OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "config_pm_proxy_{{ os_distrib_version }}.yml"
+    - "config_pm_proxy_{{ os_family_version }}.yml"
+    - "config_pm_proxy_{{ os_distrib }}.yml"
+    - "config_pm_proxy_{{ os_family }}.yml"
+
+# Setup network
+# setup sources
+
+- name: Config OS proxy
+  include: config_os_proxy.yaml
+  when: setup_proxy
+
+- name: Config package manager proxy
+  include: "{{ item }}"
+  with_first_found:
+    - "config_pm_proxy_{{ os_distrib_version }}.yml"
+    - "config_pm_proxy_{{ os_family_version }}.yml"
+    - "config_pm_proxy_{{ os_distrib }}.yml"
+    - "config_pm_proxy_{{ os_family }}.yml"
+  when: setup_proxy
+
+- name: Install required packages
+  include: install_req_packages.yml
+
+
+- name: gather os specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+  tags: vars
+
+- name: Install and configure docker
+  include: setup_docker.yml
+  when: container_runtime == "docker"
+
+- name: Install and configure cri-o container runtime
+  include: setup_crio.yml
+  when: container_runtime == "cri-o"
+
+- name: Install and configure containerd container runtime
+  include: setup_crio.yml
+  when: container_runtime == "containerd"
+
+- name: Install k8s packages
+  include: install_k8s_packages.yml
+
+- name: Configure firewalld
+  include: configure_firewalld.yml
+  when: configure_firewalld

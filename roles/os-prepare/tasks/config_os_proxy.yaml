@@ -1,0 +1,11 @@
+---
+- name: /etc/environment
+  template:
+    src: etc-environment.j2
+    dest: /etc/environment
+
+- name: /etc/profile.d/http_proxy.sh
+  template:
+    src: http_proxy.sh.j2
+    dest: /etc/profile.d/http_proxy.sh
+    mode: 644
