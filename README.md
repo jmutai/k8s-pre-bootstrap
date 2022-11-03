@@ -1,3 +1,11 @@
+# confirm what task names would be run if I ran this command and said "just ntp tasks"
+ansible-playbook -i production webservers.yml --tags ntp --list-tasks
+
+# confirm what hostnames might be communicated with if I said "limit to boston"
+ansible-playbook -i production webservers.yml --limit boston --list-hosts
+
+
+
 # !!!!!!!!  still under development...  !!!!!!!
 
 ## Main info
