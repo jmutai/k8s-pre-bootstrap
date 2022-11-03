@@ -7,15 +7,17 @@
     - "config_pm_proxy_{{ os_distrib }}.yml"
     - "config_pm_proxy_{{ os_family }}.yml"
 
-# Setup network
+- name: Configure OS network
+  import_tasks: config_os_network.yml
+  when: config_os_network
 # setup sources
 
 - name: Config OS proxy
-  include: config_os_proxy.yaml
+  import_tasks: config_os_proxy.yaml
   when: setup_proxy
 
 - name: Config package manager proxy
-  include: "{{ item }}"
+  import_tasks: "{{ item }}"
   with_first_found:
     - "config_pm_proxy_{{ os_distrib_version }}.yml"
     - "config_pm_proxy_{{ os_family_version }}.yml"
@@ -24,7 +26,11 @@
   when: setup_proxy
 
 - name: Install required packages
-  include: install_req_packages.yml
+  import_tasks: install_req_packages.yml
+
+
+
+
 
 
 - name: gather os specific variables

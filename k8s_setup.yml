@@ -20,9 +20,9 @@
 #   vars_files:
 #     - vars/main_vars.yml
 #   fail:
-#     msg: "Operating System = {{ os }} not supported.
+#     msg: "Operating System = {{ os_distrib_version }} not supported.
 #           Supported versions are {{ supported_os }}"
-#   when: os not in supported_os
+#   when: os_distrib_version not in supported_os
 
 # OS Prepare
 - name: OS Prepare

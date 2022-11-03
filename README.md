@@ -15,15 +15,17 @@ Forked from jmutai/k8s-pre-bootstrap, thanks to him.
 
 https://kubernetes.io/docs/setup/production-environment/
 
-## Additional playbooks
+## Additional playbooks in folder stuff
 
 - **net_config_copy.yml** - Copy /etc/host and /etc/resolv.conf to another servers.
 - **proxy_settings_copy.yml** - Copy /etc/environment and /etc/yum.conf to another servers.  
 - **prepare_os.yml** - Prepare OS.
 - **prepare_os_others.yml** - Prepare OS on other servers not included in the cluster (for example, rdbms and etc.)
-- **check_uniq.yml** - Verify the MAC address and product_uuid are unique for every node (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address)
 - **send_public_key.yml** - Deploy the public key to remote hosts (for ssh)
 - **init_cluster.yml** - Creating a single control-plane cluster with kubeadm (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
+
+## Stuff playbooks (in folder stuff)
+- **check_unique_uuid.yml** - Verify the MAC address and product_uuid are unique for every node (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address). Needed for cloned VMs. 
 
 ## Preliminary preparation of the master server
 

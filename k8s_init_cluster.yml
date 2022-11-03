@@ -1,0 +1,45 @@
+- hosts: kube_masters
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: Initialize the cluster
+      # Other CIDR for pod network
+      # shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
+
+      # Other CIDR for pod network and HA
+      # shell: kubeadm init --control-plane-endpoint "pp-vip-k8s.mydomen.com:8443" --upload-certs --pod-network-cidr 10.244.0.0/16 >> cluster_initialized.txt
+
+      # Simle init
+      shell: kubeadm init >> ~/cluster_initialized.txt
+      args:
+        chdir: $HOME
+        creates: cluster_initialized.txt
+
+    - name: Create .kube directory
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: 0755
+
+    - name: Copy admin.conf to user's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: ~/.kube/config
+        remote_src: yes
+
+    - name: Setup Calico
+        block:
+          - name: Download calico
+            command: curl https://docs.projectcalico.org/manifests/calico.yaml -o ~/calico.yaml
+            
+          - stat: path=~/calico.yaml
+            register: p
+
+          - name: Install calico
+            shell: kubectl apply -f ~/calico.yaml >> ~/install_calico.log
+            args:
+              chdir: $HOME
+              creates: install_calico.log
+            when: p.stat.exists
+        when: inventory_hostname in groups['kube_masters'][0]

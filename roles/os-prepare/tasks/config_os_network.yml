@@ -1,0 +1,11 @@
+- name: copy /etc/hosts to remote host
+  copy:
+    content: "{{ hosts_file }}"
+    dest: /etc/hosts
+    mode: 644
+
+- name: copy /etc/resolv.conf to remote host
+  template:
+    content: "{{ resolv_conf_file }}"
+    dest: /etc/resolv.conf
+    mode: 644

@@ -20,7 +20,7 @@ pp-mk8s-01
 pp-mk8s-02
 pp-mk8s-03
 
-[kube-masters]
+[kube_masters]
 pp-mk8s-01
 pp-mk8s-02
 pp-mk8s-03
