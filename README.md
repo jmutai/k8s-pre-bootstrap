@@ -4,6 +4,12 @@ ansible-playbook -i production webservers.yml --tags ntp --list-tasks
 # confirm what hostnames might be communicated with if I said "limit to boston"
 ansible-playbook -i production webservers.yml --limit boston --list-hosts
 
+tags: os_prep, kube_set, ha_set
+tags: set_proxy, config_net, time_sync, config_pm, reboot, upgrade_os
+
+В c:\MyGit\k8s-pre-bootstrap\roles\os-prepare\vars\ файлы со списком устанвливаемых пакетов на стадии os_prep.
+В c:\MyGit\k8s-pre-bootstrap\roles\os-prepare\tasks\config_pm_AstraLinux.yml содержимое /etc/apt/sources.list
+
 
 
 # !!!!!!!!  still under development...  !!!!!!!

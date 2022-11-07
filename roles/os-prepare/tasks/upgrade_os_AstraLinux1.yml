@@ -1,0 +1,6 @@
+- name: "astra-nochmodx-lock disable"
+  shell: "astra-nochmodx-lock disable"
+- name: Run the equivalent of "apt-get update" as a separate step
+  shell: "apt update"
+- name: "astra-update -A -r"
+  shell: "astra-update -A -r"

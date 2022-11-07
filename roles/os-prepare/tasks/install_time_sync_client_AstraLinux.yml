@@ -1,0 +1,26 @@
+- name: "Remove ntp, chrony packages"
+  package:
+    name: [ntp,chrony]
+    state: absent
+
+- name: "timesyncd.conf"
+  template:
+    src: timesyncd.j2
+    dest: /etc/systemd/timesyncd.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Enable timedatectl"
+  shell: "timedatectl set-ntp true"
+
+- name: "Start timedatectl"
+  systemd:
+    name: systemd-timesyncd
+    state: started
+    enabled: yes
+
+- name: "Check timesync"
+  shell: 'timedatectl status | grep "System clock synchronized: no" | wc -l'
+  register: result
+  failed_when: "'1' in result.stdout"

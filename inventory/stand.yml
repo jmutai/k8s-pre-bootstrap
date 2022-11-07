@@ -4,28 +4,23 @@ all:
     ## I. Prepare OS 
     os_prepare: true        # Prepare OS?
     config_os_network: true # copy hosts & resolv.conf
-    config_pm: true         # configure package manager
+    config_pm: true         # configure package manager (for example sources.list)
+    time_sync: true         # install NTP client
+    reboot: true            # reboot servers?
+    upgrade_os: true        # Should you upgrade the OS? This procedure is performed in stages I and II.
     ## II. Kubernetes setup
     kubernetes_setup: true  # Do you want to install the Kubernetes?
     ## III. HA setup
     ha_setup: true          # Do you want to setup HA (keepalive + haproxy)?
-    ## 
-    upgrade_os: true        # Should you upgrade the OS? This procedure is performed in stages I and II.
+
+
     ## Firewall options
     configure_firewall: false             # true / false (keep it false, k8s>1.19 have issues with firewalld)
     remove_firewall: false                # Set to true to remove firewalld at all
 
-
-    # Main settings
-    k8s_packages_version: "1.23.4-00"     # Kubernetes packages version
-    k8s_version: "1.23"                   # Kubernetes version to be installed
+    # OS settings
     timezone: "Europe/Moscow"             # Timezone to set on all nodes
-    k8s_cni: calico                       # calico, flannel
-    container_runtime: docker             # docker, cri-o, containerd 
-    pod_network_cidr: "10.244.0.0/16"    # pod subnet if using cri-o runtime (10.244.0.0/16;192.168.0.0/16)
-
-
-
+    ntp_servers: "192.168.101.2 192.168.101.3"  # list NTP server for configure NTP client
     # Protection settings
     selinux_state: permissive             # SELinux state to be set on k8s nodes
 
@@ -60,6 +55,13 @@ all:
       nameserver 192.168.101.12
       domain mydomain.local
 
+    # Kubernetes settings
+    k8s_packages_version: "1.23.4-00"     # Kubernetes packages version
+    k8s_version: "1.23"                   # Kubernetes version to be installed
+    k8s_cni: calico                       # calico, flannel
+    container_runtime: docker             # docker, cri-o, containerd 
+    pod_network_cidr: "10.244.0.0/16"     # pod subnet if using cri-o runtime (10.244.0.0/16;192.168.0.0/16)
+
   children:
     kube:
       hosts:
@@ -88,3 +90,7 @@ all:
         pp-mk8s-01:
         pp-mk8s-02:
         pp-mk8s-03:
+    others:
+      hosts:
+        pp-dns-01:
+        pp-ntp-01:

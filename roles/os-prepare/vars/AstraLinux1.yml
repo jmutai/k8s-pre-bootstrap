@@ -3,3 +3,18 @@ basic_packages:
   - apt-transport-https
   - ca-certificates
   - dialog
+
+etc_apt_sources_list: |
+  # Astra Linux repository description https://wiki.astralinux.ru/x/0oLiC
+  # Local ALSE 1.7.x Repository
+  # deb cdrom:[OS Astra Linux 1.7.0 1.7_x86-64 DVD ]/ 1.7_x86-64 contrib main non-free
+  # Remote ALSE 1.7.x Repository
+  # deb cdrom:[OS Astra Linux 1.7.0 1.7_x86-64 DVD ]/ 1.7_x86-64 contrib main non-free
+  deb http://download.astralinux.ru/astra/stable/1.7_x86-64/repository-base/ 1.7_x86-64 main contrib non-free
+  deb http://download.astralinux.ru/astra/stable/1.7_x86-64/repository-extended/ 1.7_x86-64 main contrib non-free
+  deb http://download.astralinux.ru/astra/stable/1.7_x86-64/repository-main/ 1.7_x86-64 main contrib non-free
+  deb http://download.astralinux.ru/astra/stable/1.7_x86-64/repository-update/ 1.7_x86-64 main contrib non-free
+  # Extended repo (astra-ce)
+  deb https://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-extended/ 1.7_x86-64 astra-ce
+  # Remote Debian 10.x.x Repository
+  #deb https://mirror.yandex.ru/debian/ buster main contrib non-free

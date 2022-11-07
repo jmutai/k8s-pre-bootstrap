@@ -6,15 +6,27 @@
     - "config_pm_proxy_{{ os_family_version }}.yml"
     - "config_pm_proxy_{{ os_distrib }}.yml"
     - "config_pm_proxy_{{ os_family }}.yml"
+  tags: set_proxy
 
 - name: Configure OS network
   import_tasks: config_os_network.yml
   when: config_os_network
-# setup sources
+  tags: config_net
+
+- name: Configure package manager
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "config_pm_{{ os_distrib_version }}.yml"
+    - "config_pm_{{ os_family_version }}.yml"
+    - "config_pm_{{ os_distrib }}.yml"
+    - "config_pm_{{ os_family }}.yml"
+  when: config_pm
+  tags: config_pm
 
 - name: Config OS proxy
-  import_tasks: config_os_proxy.yaml
+  import_tasks: config_os_proxy.yml
   when: setup_proxy
+  tags: set_proxy
 
 - name: Config package manager proxy
   import_tasks: "{{ item }}"
@@ -24,37 +36,39 @@
     - "config_pm_proxy_{{ os_distrib }}.yml"
     - "config_pm_proxy_{{ os_family }}.yml"
   when: setup_proxy
+  tags: set_proxy
 
-- name: Install required packages
-  import_tasks: install_req_packages.yml
+### REBOOT for network settings
+- name: Reboot servers
+  import_tasks: reboot_servers.yml
+  when: reboot
+  tags: reboot
 
-
-
-
-
-
-- name: gather os specific variables
-  include_vars: "{{ item }}"
+- name: Upgrade OS
+  import_tasks: "{{ item }}"
   with_first_found:
-    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml"
-    - "{{ ansible_distribution }}.yml"
-  tags: vars
+  - "upgrade_os_{{ os_distrib_version }}.yml"
+  - "upgrade_os_{{ os_family_version }}.yml"
+  - "upgrade_os_{{ os_distrib }}.yml"
+  - "upgrade_os_{{ os_family }}.yml"
+  when: upgrade_os
+  tags: upgrade_os
 
-- name: Install and configure docker
-  include: setup_docker.yml
-  when: container_runtime == "docker"
+- name: Install packages
+  import_tasks: install_packages.yml
 
-- name: Install and configure cri-o container runtime
-  include: setup_crio.yml
-  when: container_runtime == "cri-o"
+- name: Install time sync client
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "install_time_sync_client_{{ os_distrib_version }}.yml"
+    - "install_time_sync_client_{{ os_family_version }}.yml"
+    - "install_time_sync_client_{{ os_distrib }}.yml"
+    - "install_time_sync_client_{{ os_family }}.yml"
+  when: time_sync
+  tags: time_sync
 
-- name: Install and configure containerd container runtime
-  include: setup_crio.yml
-  when: container_runtime == "containerd"
-
-- name: Install k8s packages
-  include: install_k8s_packages.yml
-
-- name: Configure firewalld
-  include: configure_firewalld.yml
-  when: configure_firewalld
+### REBOOT for upgrade OS
+- name: Reboot servers
+  import_tasks: reboot_servers.yml
+  when: reboot
+  tags: reboot

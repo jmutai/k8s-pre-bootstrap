@@ -1,5 +1,5 @@
 ---
-# Set facts
+# Set facts (as example facts from Astra Linux 1.7 and CentOS 8)
 - name: Set fact - os_distrib_version
   set_fact:
     os_distrib_version: "{{ ansible_distribution | replace(' ', '') }}{{ ansible_distribution_major_version }}"  # "AstraLinux1" "CentOS8"
