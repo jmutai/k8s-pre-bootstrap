@@ -4,6 +4,7 @@ ansible-playbook -i production webservers.yml --tags ntp --list-tasks
 # confirm what hostnames might be communicated with if I said "limit to boston"
 ansible-playbook -i production webservers.yml --limit boston --list-hosts
 
+tags: ver
 tags: os_prep, kube_set, ha_set
 tags: set_proxy, config_net, time_sync, config_pm, install_pack, reboot, upgrade_os
 

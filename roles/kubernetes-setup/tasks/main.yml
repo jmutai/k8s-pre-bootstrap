@@ -1,17 +1,15 @@
 ---
-- name: Add the OS specific variables
-  include_vars: "{{ item }}"
+# Пример
+- name: Configure package manager
+  import_tasks: "{{ item }}"
   with_first_found:
-    - "{{ os_distrib_version }}.yml"
-    - "{{ os_family_version }}.yml"
-    - "{{ os_distrib }}.yml"
-    - "{{ os_family }}.yml"
-  tags: xxx
+    - "config_pm_{{ os_distrib_version }}.yml"
+    - "config_pm_{{ os_family_version }}.yml"
+    - "config_pm_{{ os_distrib }}.yml"
+    - "config_pm_{{ os_family }}.yml"
+  when: config_pm
+  tags: config_pm
 
-- name: Configure OS network
-  import_tasks: config_os_network.yml
-  when: config_os_network
-  tags: config_net
 
 - name: Include Pre-reqs setup task
   include: pre_setup.yml

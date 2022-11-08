@@ -6,24 +6,24 @@
   become: yes
   become_method: sudo
   gather_facts: yes
-  tags: ["always"]
+  tags: ["always", ver]
   tasks:
     # Set facts (as example facts from Astra Linux 1.7 and CentOS 8)
     - name: Set fact - os_distrib_version
       set_fact:
-        os_distrib_version: "{{ ansible_distribution | replace(' ', '') }}{{ ansible_distribution_major_version }}"  # "AstraLinux1" "CentOS8"
-
-    # - name: Set fact - os_family_version
-    #   set_fact:
-    #     os_family_version: "{{ ansible_os_family | replace(' ', '') }}{{ ansible_distribution_major_version }}"  # "AstraLinux1" "RedHat8"
-
-    # - name: Set fact - os_distrib_version
-    #   set_fact:
-    #     os_distrib: "{{ ansible_distribution | replace(' ', '') }}"  # "AstraLinux" "CentOS"
-
-    # - name: Set fact - os_family_version
-    #   set_fact:
-    #     os_family: "{{ ansible_os_family | replace(' ', '') }}"  # "AstraLinux" "RedHat"
+        os_distrib_version: "{{ ansible_distribution | replace(' ', '') | lower }}{{ ansible_distribution_major_version | lower}}"  # "astralinux1" "centos8"
+    - name: Set fact - os_family_version
+      set_fact:
+        os_family_version: "{{ ansible_os_family | replace(' ', '') | lower }}{{ ansible_distribution_major_version  | lower }}"  # "astralinux1" "redhat8"
+    - name: Set fact - os_distrib_version
+      set_fact:
+        os_distrib: "{{ ansible_distribution | replace(' ', '') | lower }}"  # "astralinux" "centos"
+    - name: Set fact - os_family_version
+      set_fact:
+        os_family: "{{ ansible_os_family | replace(' ', '') | lower }}"  # "astralinux" "redhat"
+    - name: Print os_distrib_version
+      ansible.builtin.debug:
+        msg: os_distrib_version = {{ os_distrib_version }}
 
 # OS Prepare
 - name: OS Prepare
@@ -34,7 +34,7 @@
   gather_facts: no
   pre_tasks:
     - name: include OS specific vars
-      include_vars: "{{ playbook_dir }}/{{ os_distrib_version }}.yml"
+      include_vars: "{{ playbook_dir }}/os-vars/{{ os_distrib_version }}.yml"
       tags: ["always"]
   roles:
     - os-prepare

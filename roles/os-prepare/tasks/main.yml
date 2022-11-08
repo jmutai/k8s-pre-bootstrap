@@ -1,13 +1,4 @@
 ---
-- name: Add the OS specific variables
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ os_distrib_version }}.yml"
-    - "{{ os_family_version }}.yml"
-    - "{{ os_distrib }}.yml"
-    - "{{ os_family }}.yml"
-  tags: [set_proxy, config_pm, upgrade_os, time_sync]
-
 - name: Configure OS network
   import_tasks: config_os_network.yml
   when: config_os_network
