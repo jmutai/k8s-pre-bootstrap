@@ -1,46 +1,36 @@
 ---
-# Пример
-- name: Configure package manager
-  import_tasks: "{{ item }}"
-  with_first_found:
-    - "config_pm_{{ os_distrib_version }}.yml"
-    - "config_pm_{{ os_family_version }}.yml"
-    - "config_pm_{{ os_distrib }}.yml"
-    - "config_pm_{{ os_family }}.yml"
-  when: config_pm
-  tags: config_pm
-
-
 - name: Include Pre-reqs setup task
-  include: pre_setup.yml
+  import_tasks: pre_setup.yml
+  when: pre_setup
+  tags: pre_setup
 
 - name: Include task to disable swap
-  include: disable_swap.yml
+  import_tasks: disable_swap.yml
 
 - name: Include task to configure timezone and ntp
-  include: configure_timezone_ntp.yml
+  import_tasks: configure_timezone_ntp.yml
 
 - name: Include task to load required kernel modules and sysctl configs
-  include: load_kernel_modules_sysctl.yml
+  import_tasks: load_kernel_modules_sysctl.yml
 
 - name: Include task to configure /etc/hosts file on each node
-  include: configure_etc_host_file.yml
+  import_tasks: configure_etc_host_file.yml
 
 - name: Include task to configure docker
-  include: setup_docker.yml
+  import_tasks: setup_docker.yml
   when: container_runtime == "docker"
 
 - name: Include task to configure cri-o container runtime
-  include: setup_crio.yml
+  import_tasks: setup_crio.yml
   when: container_runtime == "cri-o"
 
 - name: Include task to configure containerd container runtime
-  include: setup_containerd.yml
+  import_tasks: setup_containerd.yml
   when: container_runtime == "containerd"
 
 - name: Include task to install  k8s packages
-  include: install_k8s_packages.yml
+  import_tasks: install_k8s_packages.yml
 
 - name: Include task to configure firewalld
-  include: configure_firewalld.yml
+  import_tasks: configure_firewalld.yml
   when: configure_firewalld

@@ -1,29 +1,51 @@
 all:
   vars:
     # Main options
-    ## I. Prepare OS 
+    ## I. Prepare OS
     os_prepare: true        # Prepare OS?
+    #### I. Prepare OS - on/off tasks
     config_os_network: true # copy hosts & resolv.conf
     config_pm: true         # configure package manager (for example sources.list)
     install_pack: true      # installation of various programs (the list of programs 'basic_packages' is in files in the folder .../roles/os-prepare/vars/)
     time_sync: true         # install NTP client
     reboot: true            # reboot servers?
     upgrade_os: true        # Should you upgrade the OS? This procedure is performed in stages I and II.
+    config_ac: true         # Config Access Control system (SELinux, AppArmor, parsec)
+    #### I. Prepare OS - values
+    selinux_state: permissive                   # SELinux state to be set on k8s nodes
+    timezone: "Europe/Moscow"                   # Timezone to set on all nodes
+    ntp_servers: "192.168.101.2 192.168.101.3"  # list NTP server for configure NTP client
+    ###### Network configuration files
+    ######## /etc/hosts
+    hosts_file: |
+      127.0.0.1       localhost
+
+      # The following lines are desirable for IPv6 capable hosts
+      ::1     localhost ip6-localhost ip6-loopback
+      ff02::1 ip6-allnodes
+      ff02::2 ip6-allrouters
+    ######## /etc/resolv.conf
+    resolv_conf_file: |
+      nameserver 192.168.101.12
+      domain mydomain.local
+
     ## II. Kubernetes setup
     kubernetes_setup: true  # Do you want to install the Kubernetes?
+    #### II. Kubernetes setup - on/off tasks
+    pre_setup: true           # Install required packages for k8s
+    configure_firewall: true  # Disable, enable and\or uninstall firewall at all
+    #### II. Kubernetes setup - values
+    ## Firewall options
+    firewalld_state: stopped  # (keep it stopped, k8s>1.19 have issues with firewalld)
+    remove_firewall: false                # Set to true to remove firewalld at all
+
     ## III. HA setup
     ha_setup: true          # Do you want to setup HA (keepalive + haproxy)?
 
 
-    ## Firewall options
-    configure_firewall: false             # true / false (keep it false, k8s>1.19 have issues with firewalld)
-    remove_firewall: false                # Set to true to remove firewalld at all
 
-    # OS settings
-    timezone: "Europe/Moscow"             # Timezone to set on all nodes
-    ntp_servers: "192.168.101.2 192.168.101.3"  # list NTP server for configure NTP client
-    # Protection settings
-    selinux_state: permissive             # SELinux state to be set on k8s nodes
+
+
 
     # Proxy settings
     setup_proxy: true                     # Set to true to configure proxy
@@ -42,19 +64,7 @@ all:
       - Debian10
       - AstraLinux1
 
-    ## Network configuration files
-    ### /etc/hosts
-    hosts_file: |
-      127.0.0.1       localhost
 
-      # The following lines are desirable for IPv6 capable hosts
-      ::1     localhost ip6-localhost ip6-loopback
-      ff02::1 ip6-allnodes
-      ff02::2 ip6-allrouters
-    ### /etc/resolv.conf
-    resolv_conf_file: |
-      nameserver 192.168.101.12
-      domain mydomain.local
 
     # Kubernetes settings
     k8s_packages_version: "1.23.4-00"     # Kubernetes packages version

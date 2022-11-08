@@ -1,0 +1,5 @@
+- name: Disable, enable and\or uninstall firewall at all
+  ansible.builtin.service:
+    name: firewalld
+    state: {{ firewalld_state }}
+    enabled: no

@@ -34,7 +34,7 @@
   gather_facts: no
   pre_tasks:
     - name: include OS specific vars
-      include_vars: "{{ playbook_dir }}/os-vars/{{ os_distrib_version }}.yml"
+      include_vars: "{{ playbook_dir }}/vars/{{ os_distrib_version }}.yml"
       tags: ["always"]
   roles:
     - os-prepare
@@ -50,7 +50,7 @@
   gather_facts: no
   pre_tasks:
     - name: include OS specific vars
-      include_vars: "{{ playbook_dir }}/{{ os_distrib_version }}.yml"
+      include_vars: "{{ playbook_dir }}/vars/{{ os_distrib_version }}.yml"
       tags: ["always"]
   roles:
     - kubernetes-setup
@@ -66,7 +66,7 @@
   gather_facts: no
   pre_tasks:
     - name: include OS specific vars
-      include_vars: "{{ playbook_dir }}/{{ os_distrib_version }}.yml"
+      include_vars: "{{ playbook_dir }}/vars/{{ os_distrib_version }}.yml"
       tags: ["always"]
   roles:
     - ha-setup

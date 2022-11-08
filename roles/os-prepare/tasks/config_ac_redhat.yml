@@ -1,0 +1,4 @@
+- name: Put SELinux in permissive mode
+  selinux:
+    policy: targeted
+    state: "{{ selinux_state }}"

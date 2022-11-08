@@ -29,6 +29,26 @@
   when: setup_proxy
   tags: set_proxy
 
+- name: Disable, enable and\or uninstall firewall at all
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "configure_firewall_{{ os_distrib_version }}.yml"
+    - "configure_firewall_{{ os_family_version }}.yml"
+    - "configure_firewall_{{ os_distrib }}.yml"
+    - "configure_firewall_{{ os_family }}.yml"
+  when: configure_firewall
+  tags: config_firewall
+
+- name: Config Access Control system (SELinux, AppArmor, parsec)
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "config_ac_{{ os_distrib_version }}.yml"
+    - "config_ac_{{ os_family_version }}.yml"
+    - "config_ac_{{ os_distrib }}.yml"
+    - "config_ac_{{ os_family }}.yml"
+  when: config_ac
+  tags: config_ac
+
 ### REBOOT for network settings
 - name: Reboot servers
   import_tasks: reboot_servers.yml
