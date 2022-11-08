@@ -7,9 +7,6 @@
 - name: Include task to disable swap
   import_tasks: disable_swap.yml
 
-- name: Include task to configure timezone and ntp
-  import_tasks: configure_timezone_ntp.yml
-
 - name: Include task to load required kernel modules and sysctl configs
   import_tasks: load_kernel_modules_sysctl.yml
 

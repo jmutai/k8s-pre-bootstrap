@@ -73,12 +73,12 @@
 - name: Install time sync client
   import_tasks: "{{ item }}"
   with_first_found:
-    - "install_time_sync_client_{{ os_distrib_version }}.yml"
-    - "install_time_sync_client_{{ os_family_version }}.yml"
-    - "install_time_sync_client_{{ os_distrib }}.yml"
-    - "install_time_sync_client_{{ os_family }}.yml"
-  when: time_sync
-  tags: time_sync
+    - "configure_timezone_ntp_{{ os_distrib_version }}.yml"
+    - "configure_timezone_ntp_{{ os_family_version }}.yml"
+    - "configure_timezone_ntp_{{ os_distrib }}.yml"
+    - "configure_timezone_ntp_{{ os_family }}.yml"
+  when: configure_timezone_ntp
+  tags: config_ntp
 
 ### REBOOT for upgrade OS
 - name: Reboot servers

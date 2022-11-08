@@ -1,3 +1,7 @@
+- name: Configure timezone on all nodes
+  community.general.timezone:
+    name: "{{ timezone }}"
+
 - name: "Remove ntp, chrony packages"
   package:
     name: [ntp,chrony]

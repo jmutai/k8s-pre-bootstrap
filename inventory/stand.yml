@@ -2,16 +2,28 @@ all:
   vars:
     # Main options
     ## I. Prepare OS
-    os_prepare: true        # Prepare OS?
+    os_prepare: true              # Prepare OS?
+    config_net, config_pm, set_proxy, config_firewall, config_ac,  reboot, upgrade_os, install_pack, config_ntp, reboot
     #### I. Prepare OS - on/off tasks
-    config_os_network: true # copy hosts & resolv.conf
-    config_pm: true         # configure package manager (for example sources.list)
-    install_pack: true      # installation of various programs (the list of programs 'basic_packages' is in files in the folder .../roles/os-prepare/vars/)
-    time_sync: true         # install NTP client
-    reboot: true            # reboot servers?
-    upgrade_os: true        # Should you upgrade the OS? This procedure is performed in stages I and II.
-    config_ac: true         # Config Access Control system (SELinux, AppArmor, parsec)
+    config_os_network: true       # Сopy hosts & resolv.conf?
+    config_pm: true               # Сonfigure package manager (for example sources.list)?
+    setup_proxy: true             # Configure OS proxy?
+    configure_firewall: true      # Disable, enable and\or uninstall firewall at all?
+    install_pack: true            # Install of various programs? (the list of programs 'basic_packages' is in files in the folder .../roles/os-prepare/vars/)
+    configure_timezone_ntp: true  # Configure timezone and install NTP client?
+    reboot: true                  # Reboot servers?
+    upgrade_os: true              # Should you upgrade the OS?
+    config_ac: true               # Configure Access Control system? (SELinux, AppArmor, parsec)
     #### I. Prepare OS - values
+    # Proxy settings
+    proxy_server: "192.168.101.100"       # Proxy server ip address
+    proxy_port: "3128"                    # Proxy server port
+                                          # Adresses to exclude from proxy
+    no_proxy: "127.0.0.1,localhost,.svc,.local,.0,.1,.2,.3,.4,.5,.6,.7,.8,.9,.10,.11,.12,.13,.14,.15,.16,.17,.18,.19,.20,.21,.22,.23,.24,.25,.26,.27,.28,.29,.30,.31,.32,.33,.34,.35,.36,.37,.38,.39,.40,.41,.42,.43,.44,.45,.46,.47,.48,.49,.50,.51,.52,.53,.54,.55,.56,.57,.58,.59,.60,.61,.62,.63,.64,.65,.66,.67,.68,.69,.70,.71,.72,.73,.74,.75,.76,.77,.78,.79,.80,.81,.82,.83,.84,.85,.86,.87,.88,.89,.90,.91,.92,.93,.94,.95,.96,.97,.98,.99,.100,.101,.102,.103,.104,.105,.106,.107,.108,.109,.110,.111,.112,.113,.114,.115,.116,.117,.118,.119,.120,.121,.122,.123,.124,.125,.126,.127,.128,.129,.130,.131,.132,.133,.134,.135,.136,.137,.138,.139,.140,.141,.142,.143,.144,.145,.146,.147,.148,.149,.150,.151,.152,.153,.154,.155,.156,.157,.158,.159,.160,.161,.162,.163,.164,.165,.166,.167,.168,.169,.170,.171,.172,.173,.174,.175,.176,.177,.178,.179,.180,.181,.182,.183,.184,.185,.186,.187,.188,.189,.190,.191,.192,.193,.194,.195,.196,.197,.198,.199,.200,.201,.202,.203,.204,.205,.206,.207,.208,.209,.210,.211,.212,.213,.214,.215,.216,.217,.218,.219,.220,.221,.222,.223,.224,.225,.226,.227,.228,.229,.230,.231,.232,.233,.234,.235,.236,.237,.238,.239,.240,.241,.242,.243,.244,.245,.246,.247,.248,.249,.250,.251,.252,.253,.254,.255,server1,serverX"
+    ## Firewall options
+    firewalld_state: stopped                    # (keep it stopped, k8s>1.19 have issues with firewalld)
+    remove_firewall: false                      # Set to true to remove firewalld at all
+    #
     selinux_state: permissive                   # SELinux state to be set on k8s nodes
     timezone: "Europe/Moscow"                   # Timezone to set on all nodes
     ntp_servers: "192.168.101.2 192.168.101.3"  # list NTP server for configure NTP client
@@ -30,29 +42,20 @@ all:
       domain mydomain.local
 
     ## II. Kubernetes setup
-    kubernetes_setup: true  # Do you want to install the Kubernetes?
+    kubernetes_setup: true        # Do you want to install the Kubernetes?
     #### II. Kubernetes setup - on/off tasks
-    pre_setup: true           # Install required packages for k8s
-    configure_firewall: true  # Disable, enable and\or uninstall firewall at all
+    pre_setup: true               # Install required packages for k8s
     #### II. Kubernetes setup - values
-    ## Firewall options
-    firewalld_state: stopped  # (keep it stopped, k8s>1.19 have issues with firewalld)
-    remove_firewall: false                # Set to true to remove firewalld at all
+
 
     ## III. HA setup
-    ha_setup: true          # Do you want to setup HA (keepalive + haproxy)?
+    ha_setup: true                # Do you want to setup HA (keepalive + haproxy)?
 
 
 
 
 
 
-    # Proxy settings
-    setup_proxy: true                     # Set to true to configure proxy
-    proxy_server: "192.168.101.100"       # Proxy server ip address
-    proxy_port: "3128"                    # Proxy server port
-                                          # Adresses to exclude from proxy
-    no_proxy: "127.0.0.1,localhost,.svc,.local,.0,.1,.2,.3,.4,.5,.6,.7,.8,.9,.10,.11,.12,.13,.14,.15,.16,.17,.18,.19,.20,.21,.22,.23,.24,.25,.26,.27,.28,.29,.30,.31,.32,.33,.34,.35,.36,.37,.38,.39,.40,.41,.42,.43,.44,.45,.46,.47,.48,.49,.50,.51,.52,.53,.54,.55,.56,.57,.58,.59,.60,.61,.62,.63,.64,.65,.66,.67,.68,.69,.70,.71,.72,.73,.74,.75,.76,.77,.78,.79,.80,.81,.82,.83,.84,.85,.86,.87,.88,.89,.90,.91,.92,.93,.94,.95,.96,.97,.98,.99,.100,.101,.102,.103,.104,.105,.106,.107,.108,.109,.110,.111,.112,.113,.114,.115,.116,.117,.118,.119,.120,.121,.122,.123,.124,.125,.126,.127,.128,.129,.130,.131,.132,.133,.134,.135,.136,.137,.138,.139,.140,.141,.142,.143,.144,.145,.146,.147,.148,.149,.150,.151,.152,.153,.154,.155,.156,.157,.158,.159,.160,.161,.162,.163,.164,.165,.166,.167,.168,.169,.170,.171,.172,.173,.174,.175,.176,.177,.178,.179,.180,.181,.182,.183,.184,.185,.186,.187,.188,.189,.190,.191,.192,.193,.194,.195,.196,.197,.198,.199,.200,.201,.202,.203,.204,.205,.206,.207,.208,.209,.210,.211,.212,.213,.214,.215,.216,.217,.218,.219,.220,.221,.222,.223,.224,.225,.226,.227,.228,.229,.230,.231,.232,.233,.234,.235,.236,.237,.238,.239,.240,.241,.242,.243,.244,.245,.246,.247,.248,.249,.250,.251,.252,.253,.254,.255,server1,serverX"
 
     ## List supported OS (see fact: os_distrib_version in k8s_setup.yml)
     supported_os:

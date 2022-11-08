@@ -1,3 +1,6 @@
+# TODO configure chronyd
+
+
 # confirm what task names would be run if I ran this command and said "just ntp tasks"
 ansible-playbook -i production webservers.yml --tags ntp --list-tasks
 
@@ -6,7 +9,7 @@ ansible-playbook -i production webservers.yml --limit boston --list-hosts
 
 tags: ver
 tags: os_prep, kube_set, ha_set
-tags: config_net, config_pm, set_proxy, config_firewall, config_ac,  reboot, upgrade_os, install_pack, time_sync, reboot
+tags: config_net, config_pm, set_proxy, config_firewall, config_ac,  reboot, upgrade_os, install_pack, config_ntp, reboot
 tags: pre_setup
 
 
