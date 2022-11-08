@@ -1,28 +1,29 @@
 ---
-# Set facts (as example facts from Astra Linux 1.7 and CentOS 8)
-- name: Set fact - os_distrib_version
-  set_fact:
-    os_distrib_version: "{{ ansible_distribution | replace(' ', '') }}{{ ansible_distribution_major_version }}"  # "AstraLinux1" "CentOS8"
+# Set os_distrib_version
+- name: Set os_distrib_version
+  hosts: all
+  # remote_user: <user>
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  tags: ["always"]
+  tasks:
+    # Set facts (as example facts from Astra Linux 1.7 and CentOS 8)
+    - name: Set fact - os_distrib_version
+      set_fact:
+        os_distrib_version: "{{ ansible_distribution | replace(' ', '') }}{{ ansible_distribution_major_version }}"  # "AstraLinux1" "CentOS8"
 
-- name: Set fact - os_family_version
-  set_fact:
-    os_family_version: "{{ ansible_os_family | replace(' ', '') }}{{ ansible_distribution_major_version }}"  # "AstraLinux1" "RedHat8"
+    # - name: Set fact - os_family_version
+    #   set_fact:
+    #     os_family_version: "{{ ansible_os_family | replace(' ', '') }}{{ ansible_distribution_major_version }}"  # "AstraLinux1" "RedHat8"
 
-- name: Set fact - os_distrib_version
-  set_fact:
-    os_distrib: "{{ ansible_distribution | replace(' ', '') }}"  # "AstraLinux" "CentOS"
+    # - name: Set fact - os_distrib_version
+    #   set_fact:
+    #     os_distrib: "{{ ansible_distribution | replace(' ', '') }}"  # "AstraLinux" "CentOS"
 
-- name: Set fact - os_family_version
-  set_fact:
-    os_family: "{{ ansible_os_family | replace(' ', '') }}"  # "AstraLinux" "RedHat"
-
-# - name: Check support for Operating System
-#   vars_files:
-#     - vars/main_vars.yml
-#   fail:
-#     msg: "Operating System = {{ os_distrib_version }} not supported.
-#           Supported versions are {{ supported_os }}"
-#   when: os_distrib_version not in supported_os
+    # - name: Set fact - os_family_version
+    #   set_fact:
+    #     os_family: "{{ ansible_os_family | replace(' ', '') }}"  # "AstraLinux" "RedHat"
 
 # OS Prepare
 - name: OS Prepare
@@ -31,8 +32,10 @@
   become: yes
   become_method: sudo
   gather_facts: no
-  vars_files:
-    - vars/main.yml
+  pre_tasks:
+    - name: include OS specific vars
+      include_vars: "{{ playbook_dir }}/{{ os_distrib_version }}.yml"
+      tags: ["always"]
   roles:
     - os-prepare
   when: os_prepare
@@ -45,8 +48,10 @@
   become: yes
   become_method: sudo
   gather_facts: no
-  vars_files:
-    - vars/main.yml
+  pre_tasks:
+    - name: include OS specific vars
+      include_vars: "{{ playbook_dir }}/{{ os_distrib_version }}.yml"
+      tags: ["always"]
   roles:
     - kubernetes-setup
   when: kubernetes_setup
@@ -59,8 +64,10 @@
   become: yes
   become_method: sudo
   gather_facts: no
-  vars_files:
-    - vars/main.yml
+  pre_tasks:
+    - name: include OS specific vars
+      include_vars: "{{ playbook_dir }}/{{ os_distrib_version }}.yml"
+      tags: ["always"]
   roles:
     - ha-setup
   when: ha_setup

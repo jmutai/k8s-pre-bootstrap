@@ -4,9 +4,10 @@ basic_packages:
   - bash-completion
   - wget
   - curl
-  - firewalld
-  - python3-firewall
   - yum-utils
+
+packages_for_k8s:
   - lvm2
+  - firewalld
+  - python-firewall
   - device-mapper-persistent-data
-  - iproute-tc

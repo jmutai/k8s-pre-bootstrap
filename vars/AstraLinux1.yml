@@ -3,6 +3,13 @@ basic_packages:
   - apt-transport-https
   - ca-certificates
   - dialog
+  - vim
+  - bash-completion
+  - wget
+  - curl
+
+packages_for_k8s:
+  - lvm2
 
 etc_apt_sources_list: |
   # Astra Linux repository description https://wiki.astralinux.ru/x/0oLiC
