@@ -5,6 +5,7 @@ all:
     os_prepare: true        # Prepare OS?
     config_os_network: true # copy hosts & resolv.conf
     config_pm: true         # configure package manager (for example sources.list)
+    install_pack: true      # installation of various programs (the list of programs 'basic_packages' is in files in the folder .../roles/os-prepare/vars/)
     time_sync: true         # install NTP client
     reboot: true            # reboot servers?
     upgrade_os: true        # Should you upgrade the OS? This procedure is performed in stages I and II.

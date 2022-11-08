@@ -56,6 +56,8 @@
 
 - name: Install packages
   import_tasks: install_packages.yml
+  when: install_pack
+  tags: install_pack
 
 - name: Install time sync client
   import_tasks: "{{ item }}"
