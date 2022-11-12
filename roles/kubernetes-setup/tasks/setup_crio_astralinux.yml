@@ -1,0 +1,4 @@
+---
+- name: "STUB: Install cri-o"
+  ansible.builtin.debug:
+    msg: "stub"

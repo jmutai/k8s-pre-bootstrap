@@ -6,27 +6,33 @@
 
 - name: Include task to disable swap
   import_tasks: disable_swap.yml
+  when: dis_swap
+  tags: dis_swap
 
 - name: Include task to load required kernel modules and sysctl configs
   import_tasks: load_kernel_modules_sysctl.yml
+  when: kernel_mod
+  tags: kernel_mod
 
 - name: Include task to configure /etc/hosts file on each node
-  import_tasks: configure_etc_host_file.yml
+  import_tasks: configure_etc_hosts_file.yml
+  when: etc_hosts
+  tags: etc_hosts
 
 - name: Include task to configure docker
-  import_tasks: setup_docker.yml
-  when: container_runtime == "docker"
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "setup_{{ container_runtime }}_{{ os_distrib_version }}.yml"
+    - "setup_{{ container_runtime }}_{{ os_family_version }}.yml"
+    - "setup_{{ container_runtime }}_{{ os_distrib }}.yml"
+    - "setup_{{ container_runtime }}_{{ os_family }}.yml"
+  when: container
+  tags: container
 
-- name: Include task to configure cri-o container runtime
-  import_tasks: setup_crio.yml
-  when: container_runtime == "cri-o"
-
-- name: Include task to configure containerd container runtime
-  import_tasks: setup_containerd.yml
-  when: container_runtime == "containerd"
-
-- name: Include task to install  k8s packages
+- name: Include task to install k8s packages
   import_tasks: install_k8s_packages.yml
+  when: k8s_pack
+  tags: k8s_pack
 
 - name: Include task to configure firewalld
   import_tasks: configure_firewalld.yml

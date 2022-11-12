@@ -21,6 +21,9 @@
   ansible.builtin.template:
     src: daemon.json.j2
     dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: 0644
 
 - name: Start and enable docker service
   ansible.builtin.systemd:

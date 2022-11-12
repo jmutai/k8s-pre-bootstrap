@@ -10,7 +10,7 @@ ansible-playbook -i production webservers.yml --limit boston --list-hosts
 tags: ver
 tags: os_prep, kube_set, ha_set
 tags: config_net, config_pm, set_proxy, config_firewall, config_ac,  reboot, upgrade_os, install_pack, config_ntp, reboot
-tags: pre_setup
+tags: pre_setup, dis_swap, kernel_mod, etc_hosts, container, k8s_pack
 
 
 # !!!!!!!!  still under development...  !!!!!!!

@@ -9,6 +9,11 @@
     name: [kubelet,kubeadm,kubectl]
     disable_excludes: kubernetes
 
+- name: Install kubernetes packages
+  yum:
+    name: [kubelet,kubeadm,kubectl]
+    disable_excludes: kubernetes
+
 - name: Enable kubelet service
   ansible.builtin.service:
     name: kubelet
