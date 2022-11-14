@@ -1,5 +1,0 @@
-- name: Disable/Enable firewall
-  ansible.builtin.service:
-    name: firewalld
-    state: {{ firewalld_state }}
-    enabled: no

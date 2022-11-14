@@ -1,3 +1,0 @@
-- name: "STUB: Disable/Enable firewall"
-  ansible.builtin.debug:
-    msg: "stub"

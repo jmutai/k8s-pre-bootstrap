@@ -39,15 +39,25 @@
   when: setup_proxy
   tags: set_proxy
 
-- name: Disable/Enable firewall
+- name: Remove firewall
   import_tasks: "{{ item }}"
   with_first_found:
-    - "firewall_state_{{ os_distrib_version }}.yml"
-    - "firewall_state_{{ os_family_version }}.yml"
-    - "firewall_state_{{ os_distrib }}.yml"
-    - "firewall_state_{{ os_family }}.yml"
-  when: firewall_state
-  tags: firewall_state
+    - "remove_firewall_{{ os_distrib_version }}.yml"
+    - "remove_firewall_{{ os_family_version }}.yml"
+    - "remove_firewall_{{ os_distrib }}.yml"
+    - "remove_firewall_{{ os_family }}.yml"
+  when: remove_firewall
+  tags: remove_firewall
+
+- name: Install and configure firewall 1
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "install_firewall_{{ os_distrib_version }}.yml"
+    - "install_firewall_{{ os_family_version }}.yml"
+    - "install_firewall_{{ os_distrib }}.yml"
+    - "install_firewall_{{ os_family }}.yml"
+  when: firewall and (not remove_firewall)
+  tags: firewall
 
 - name: Config Access Control system (SELinux, AppArmor, parsec)
   import_tasks: "{{ item }}"

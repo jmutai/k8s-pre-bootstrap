@@ -1,0 +1,4 @@
+- name: Remove ufw
+  ansible.builtin.package:
+    name: ufw
+    state: absent

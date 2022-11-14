@@ -1,0 +1,54 @@
+---
+- name: Install ufw
+  ansible.builtin.package:
+    name: ufw
+    state: present
+
+- name: Start and enable ufw
+  ansible.builtin.service:
+    name: ufw
+    state: started
+    enabled: yes
+
+- name: Configure ufw on master nodes
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items: "{{ k8s_master_ports | replace('-', ':') }}"
+  when: "'master' in ansible_hostname"
+
+- name: Configure firewalld on worker nodes
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items: "{{ k8s_worker_ports | replace('-', ':') }}"
+  when: ("'node' in ansible_hostname" or "'worker' in ansible_hostname")
+
+- name: Open flannel ports on the firewall
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: udp
+  with_items: "{{ flannel_udp_ports | replace('-', ':') }}"
+  when: k8s_cni == "flannel"
+
+- name: Open calico UDP ports on the firewall
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: udp
+  with_items: "{{ calico_udp_ports | replace('-', ':') }}"
+  when: k8s_cni == "calico"
+
+- name: Open calico TCP ports on the firewall
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items: "{{ calico_tcp_ports | replace('-', ':') }}"
+  when: k8s_cni == "calico"
+
+- name: Reload firewalld
+  shell: firewall-cmd --reload

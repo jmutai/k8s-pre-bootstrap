@@ -1,5 +1,6 @@
 # TODO configure chronyd
 
+Предполагается что все хосты предназначены только для Kubernetes.
 
 # confirm what task names would be run if I ran this command and said "just ntp tasks"
 ansible-playbook -i production webservers.yml --tags ntp --list-tasks
@@ -9,9 +10,10 @@ ansible-playbook -i production webservers.yml --limit boston --list-hosts
 
 tags: ver
 tags: os_prep, kube_set, ha_set
-tags: pre_tasks, config_net, config_pm, set_proxy, firewall_state, config_ac,  reboot, upgrade_os, install_pack, config_ntp, reboot
-tags: pre_setup, dis_swap, kernel_mod, etc_hosts, container, k8s_repo, k8s_pack
 
+tags1: pre_tasks, config_net, config_pm, set_proxy, remove_firewall, firewall, config_ac,  reboot, upgrade_os, install_pack, config_ntp, reboot
+tags2: pre_setup, dis_swap, kernel_mod, etc_hosts, container, k8s_pack
+tags3: 
 
 # !!!!!!!!  still under development...  !!!!!!!
 

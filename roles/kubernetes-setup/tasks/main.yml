@@ -4,6 +4,16 @@
   when: pre_setup
   tags: pre_setup
 
+- name: Configure firewall 2
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "configure_firewall2_{{ os_distrib_version }}.yml"
+    - "configure_firewall2_{{ os_family_version }}.yml"
+    - "configure_firewall2_{{ os_distrib }}.yml"
+    - "configure_firewall2_{{ os_family }}.yml"
+  when: firewall and (not remove_firewall)
+  tags: firewall
+
 - name: Disable swap
   import_tasks: disable_swap.yml
   when: dis_swap
@@ -48,7 +58,3 @@
     - "k8s_repo_{{ os_family }}.yml"
   when: k8s_pack
   tags: k8s_pack
-
-- name: Configure firewalld
-  import_tasks: configure_firewalld.yml
-  when: configure_firewalld

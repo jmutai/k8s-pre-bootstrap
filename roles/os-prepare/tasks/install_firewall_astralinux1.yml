@@ -1,0 +1,18 @@
+---
+- name: Install ufw
+  ansible.builtin.package:
+    name: ufw
+    state: present
+
+- name: Start and enable ufw
+  ansible.builtin.service:
+    name: ufw
+    state: started
+    enabled: yes
+
+- name: Configure firewall 1
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items: '{{ firewall_1_ports }}'

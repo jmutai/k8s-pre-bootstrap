@@ -1,0 +1,4 @@
+- name: Remove firewalld
+  ansible.builtin.package:
+    name: firewalld
+    state: absent
