@@ -1,0 +1,43 @@
+---
+- name: "Copy kubernetes.list"
+  ansible.builtin.template:
+    src: 'kubernetes.repo.astralinux1.j2'
+    dest: /etc/apt/sources.list.d/kubernetes.list
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create keyrings directory
+  file: path=/usr/share/keyrings state=directory mode=0755
+
+- name: "Download kubernetes-archive-keyring.gpg"
+  ansible.builtin.get_url:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+
+- name: Install kubernetes packages
+  apt:
+    name: [kubelet,kubeadm,kubectl]
+    disable_excludes: kubernetes
+  when: not k8s_packages_version
+
+- name: Install kubernetes packages
+  apt:
+    name: ["kubelet={{ k8s_packages_version }}","kubeadm={{ k8s_packages_version }}","kubectl={{ k8s_packages_version }}"]
+    disable_excludes: kubernetes
+  when: k8s_packages_version
+
+- name: Hold packages
+  shell: "apt-mark hold kubelet kubeadm kubectl"
+
+- name: Enable kubelet service
+  ansible.builtin.service:
+    name: kubelet
+    enabled: yes

@@ -1,0 +1,22 @@
+---
+- name: Add kubernetes repository
+  ansible.builtin.template:
+    src: 'kubernetes.repo.redhat.j2'
+    dest: /etc/yum.repos.d/kubernetes.repo
+
+- name: Install kubernetes packages
+  yum:
+    name: [kubelet,kubeadm,kubectl]
+    disable_excludes: kubernetes
+  when: not k8s_packages_version
+
+- name: Install kubernetes packages
+  yum:
+    name: ["kubelet={{ k8s_packages_version }}","kubeadm={{ k8s_packages_version }}","kubectl={{ k8s_packages_version }}"]
+    disable_excludes: kubernetes
+  when: k8s_packages_version
+
+- name: Enable kubelet service
+  ansible.builtin.service:
+    name: kubelet
+    enabled: yes
