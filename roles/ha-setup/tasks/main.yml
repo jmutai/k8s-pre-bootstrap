@@ -1,0 +1,15 @@
+---
+- name: Pre-reqs setup task 3
+  import_tasks: pre_setup.yml
+  when: pre_setup
+  tags: pre_setup
+
+- name: Configure firewall 3
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "configure_firewall3_{{ os_distrib_version }}.yml"
+    - "configure_firewall3_{{ os_family_version }}.yml"
+    - "configure_firewall3_{{ os_distrib }}.yml"
+    - "configure_firewall3_{{ os_family }}.yml"
+  when: firewall and (not remove_firewall)
+  tags: firewall

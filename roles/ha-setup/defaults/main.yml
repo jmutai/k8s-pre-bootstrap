@@ -1,0 +1,4 @@
+---
+# Master nodes firewall ports
+k8s_ha_ports:
+  - 8443  # for API trough VIP

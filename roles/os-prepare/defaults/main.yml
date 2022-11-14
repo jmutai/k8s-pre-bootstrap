@@ -1,4 +1,4 @@
 ---
 # Firewall ports
 firewall_1_ports:
-    - 22
+  - 22

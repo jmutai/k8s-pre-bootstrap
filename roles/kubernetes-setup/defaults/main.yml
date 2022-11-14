@@ -1,35 +1,38 @@
 ---
 # Master nodes firewall ports
 k8s_master_ports:
-    - 22
-    - 80
-    - 443
-    - 6443
-    - 2379-2380
-    - 10250
-    - 10251
-    - 10252
+  - 22             # SSH !!!
+  - 80             # Service
+  - 443            # Kubernetes API server
+  - 6443           # Kubernetes API server
+  - 2379-2380      # etcd server client API
+  - 10250          # Kubelet API
+  - 10251          # from 1.17 Kubeadm: enable the usage of the secure kube-scheduler and kube-controller-manager ports for health checks. For kube-scheduler was 10251, becomes 10259. For kube-controller-manager was 10252, becomes 10257
+  - 10252          # from 1.17 Kubeadm: enable the usage of the secure kube-scheduler and kube-controller-manager ports for health checks. For kube-scheduler was 10251, becomes 10259. For kube-controller-manager was 10252, becomes 10257
+  - 10259          # kube-scheduler
+  - 10257          # kube-controller-manager
 
 # Worker nodes firewall ports
 k8s_worker_ports:
-    - 22
-    - 80
-    - 443
-    - 10250
-    - 30000-32767
+  - 22             # SSH !!!
+  - 80             # Service
+  - 443            # Kubernetes API server
+  - 10250          # Kubelet API
+  - 30000-32767    # NodePort Services
 
 # Calico CNI firewall ports
 calico_udp_ports:
-  - 4789
+  - 4789           # Calico networking with VXLAN enabled
+  - 51820          # Calico networking with IPv4 Wireguard enabled
+  - 51821          # Calico networking with IPv6 Wireguard enabled
 calico_tcp_ports:
-  - 5473
-  - 179
-  - 5473
+  - 5473           # Calico networking with Typha enabled
+  - 179            # Calico networking (BGP)
 
 # Flannel CNI firewall ports
 flannel_udp_ports:
-  - 8285
-  - 8472
+  - 8285           # flannel overlay network - udp backend. This is the default network configuration 
+  - 8472           # flannel overlay network - vxlan backend
 
 # Default pod subnet for cri-o runtime
 pod_network_cidr:
