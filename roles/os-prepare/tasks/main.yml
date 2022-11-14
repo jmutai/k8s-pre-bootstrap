@@ -1,4 +1,14 @@
 ---
+- name: PRE tasks
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "pre_tasks_{{ os_distrib_version }}.yml"
+    - "pre_tasks_{{ os_family_version }}.yml"
+    - "pre_tasks_{{ os_distrib }}.yml"
+    - "pre_tasks_{{ os_family }}.yml"
+  when: pre_tasks
+  tags: pre_tasks
+
 - name: Configure OS network
   import_tasks: config_os_network.yml
   when: config_os_network
@@ -29,15 +39,15 @@
   when: setup_proxy
   tags: set_proxy
 
-- name: Disable, enable and\or uninstall firewall at all
+- name: Disable/Enable firewall
   import_tasks: "{{ item }}"
   with_first_found:
-    - "configure_firewall_{{ os_distrib_version }}.yml"
-    - "configure_firewall_{{ os_family_version }}.yml"
-    - "configure_firewall_{{ os_distrib }}.yml"
-    - "configure_firewall_{{ os_family }}.yml"
-  when: configure_firewall
-  tags: config_firewall
+    - "firewall_state_{{ os_distrib_version }}.yml"
+    - "firewall_state_{{ os_family_version }}.yml"
+    - "firewall_state_{{ os_distrib }}.yml"
+    - "firewall_state_{{ os_family }}.yml"
+  when: firewall_state
+  tags: firewall_state
 
 - name: Config Access Control system (SELinux, AppArmor, parsec)
   import_tasks: "{{ item }}"

@@ -1,9 +1,4 @@
 ---
-- name: Add kubernetes repository
-  ansible.builtin.template:
-    src: 'kubernetes.repo.j2'
-    dest: /etc/yum.repos.d/kubernetes.repo
-
 - name: Install kubernetes packages
   yum:
     name: [kubelet,kubeadm,kubectl]

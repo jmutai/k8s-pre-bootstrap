@@ -29,6 +29,16 @@
   when: container
   tags: container
 
+- name: Add k8s repo to system
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "k8s_repo_{{ os_distrib_version }}.yml"
+    - "k8s_repo_{{ os_family_version }}.yml"
+    - "k8s_repo_{{ os_distrib }}.yml"
+    - "k8s_repo_{{ os_family }}.yml"
+  when: k8s_repo
+  tags: k8s_repo
+
 - name: Include task to install k8s packages
   import_tasks: install_k8s_packages.yml
   when: k8s_pack
