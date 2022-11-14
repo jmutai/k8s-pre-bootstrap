@@ -10,9 +10,10 @@
     state: started
     enabled: yes
 
-- name: Configure ufw 1
+- name: Configure ufw for HA
   community.general.ufw:
     rule: allow
     port: "{{ item }}"
     proto: tcp
-  with_items: '{{ firewall_1_ports }}'
+  with_items: "{{ k8s_ha_ports | replace('-', ':') }}"
+  when: inventory_hostname in groups['kube_masters']

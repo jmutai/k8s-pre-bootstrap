@@ -10,12 +10,13 @@
     state: started
     enabled: yes
 
-- name: Configure firewalld 1
+- name: Configure firewalld for HA
   ansible.posix.firewalld:
     port: "{{ item }}/tcp"
     permanent: yes
     state: enabled
-  with_items: '{{ firewall_1_ports }}'
+  with_items: '{{ k8s_ha_ports }}'
+  when: inventory_hostname in groups['kube_masters']
 
 - name: Reload firewalld
   shell: firewall-cmd --reload
