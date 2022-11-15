@@ -1,13 +1,14 @@
 ---
-- name: PRE tasks
+- name: PRE tasks 1
   import_tasks: "{{ item }}"
   with_first_found:
     - "pre_tasks_{{ os_distrib_version }}.yml"
     - "pre_tasks_{{ os_family_version }}.yml"
     - "pre_tasks_{{ os_distrib }}.yml"
     - "pre_tasks_{{ os_family }}.yml"
-  when: pre_tasks
-  tags: pre_tasks
+    - "pre_tasks.yml"
+  when: pre_tasks1
+  tags: pre_tasks1
 
 - name: Configure OS network
   import_tasks: config_os_network.yml
@@ -99,6 +100,17 @@
     - "configure_timezone_ntp_{{ os_family }}.yml"
   when: configure_timezone_ntp
   tags: config_ntp
+
+- name: POST tasks 1
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "post_tasks_{{ os_distrib_version }}.yml"
+    - "post_tasks_{{ os_family_version }}.yml"
+    - "post_tasks_{{ os_distrib }}.yml"
+    - "post_tasks_{{ os_family }}.yml"
+    - "post_tasks.yml"
+  when: post_tasks1
+  tags: post_tasks1
 
 ### REBOOT for upgrade OS
 - name: Reboot servers

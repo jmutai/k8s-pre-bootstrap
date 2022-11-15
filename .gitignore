@@ -2,3 +2,5 @@ hosts
 cluster_initialized.txt
 pod_network_setup.txt
 secret.yml
+/**/pre_tasks*.yml
+/**/post_tasks*.yml

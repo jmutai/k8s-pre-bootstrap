@@ -1,8 +1,14 @@
 ---
-- name: Pre-reqs setup task
-  import_tasks: pre_setup.yml
-  when: pre_setup
-  tags: pre_setup
+- name: PRE tasks 2
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "pre_tasks_{{ os_distrib_version }}.yml"
+    - "pre_tasks_{{ os_family_version }}.yml"
+    - "pre_tasks_{{ os_distrib }}.yml"
+    - "pre_tasks_{{ os_family }}.yml"
+    - "pre_tasks.yml"
+  when: pre_tasks2
+  tags: pre_tasks2
 
 - name: Configure firewall 2
   import_tasks: "{{ item }}"
@@ -58,3 +64,14 @@
     - "k8s_repo_{{ os_family }}.yml"
   when: k8s_pack
   tags: k8s_pack
+
+- name: POST tasks 2
+  import_tasks: "{{ item }}"
+  with_first_found:
+    - "post_tasks_{{ os_distrib_version }}.yml"
+    - "post_tasks_{{ os_family_version }}.yml"
+    - "post_tasks_{{ os_distrib }}.yml"
+    - "post_tasks_{{ os_family }}.yml"
+    - "post_tasks.yml"
+  when: post_tasks2
+  tags: post_tasks2

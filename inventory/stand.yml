@@ -13,7 +13,8 @@ all:
     ## I. Prepare OS
     os_prepare: true              # Prepare OS?
     #### I. Prepare OS - on/off tasks
-    pre_tasks: true               # Execute PRE tasks? (many specific tasks for a particular OS).
+    pre_tasks1: false             # Execute PRE tasks? (many specific tasks (for a particular OS)).
+    post_tasks1: false            # Execute POST tasks? (many specific tasks (for a particular OS)).
     config_os_network: true       # Сopy hosts & resolv.conf?
     config_pm: true               # Сonfigure package manager (for example sources.list)?
     setup_proxy: false            # Configure OS proxy? (/etc/environment, /etc/profile.d/http_proxy.sh).
@@ -54,6 +55,8 @@ all:
     ## II. Kubernetes setup
     kubernetes_setup: true        # Do you want to install the Kubernetes?
     #### II. Kubernetes setup - on/off tasks
+    pre_tasks2: false             # Execute PRE tasks? (many specific tasks (for a particular OS)).
+    post_tasks2: false            # Execute POST tasks? (many specific tasks (for a particular OS)).
     pre_setup: true               # Install required packages for k8s? (the list of programs 'packages_for_k8s' is in files in the folder vars/).
     firewall2: true               # Configure firewall for k8s?
     dis_swap: true                # Disable SWAP?
@@ -71,6 +74,9 @@ all:
 
     ## III. HA setup
     ha_setup: true                # Do you want to setup HA (keepalive + haproxy)?
+    #### III. HA setup - on/off tasks
+    pre_tasks3: false             # Execute PRE tasks? (many specific tasks (for a particular OS)).
+    post_tasks3: false            # Execute POST tasks? (many specific tasks (for a particular OS)).
 
   children:
     kube:
