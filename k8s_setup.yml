@@ -1,6 +1,6 @@
 ---
-# Set os_distrib_version
-- name: Set os_distrib_version
+# Define values to ansible distrib, version, family facts
+- name: Define values to ansible distrib, version, family facts
   hosts: all
   # remote_user: <user>
   become: yes

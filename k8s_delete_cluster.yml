@@ -1,11 +1,11 @@
 ---
-- hosts: all
+- hosts: kube
   become: yes
   become_method: sudo
   gather_facts: no
   tasks:
    - name: Delete cluster
-     command: kubeadm reset -f
+     command: "kubeadm reset -f"
      register: output
 
    - name: Output delete cluster
