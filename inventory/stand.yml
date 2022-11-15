@@ -57,17 +57,11 @@ all:
     #### II. Kubernetes setup - on/off tasks
     pre_tasks2: false             # Execute PRE tasks? (many specific tasks (for a particular OS)).
     post_tasks2: false            # Execute POST tasks? (many specific tasks (for a particular OS)).
-    pre_setup: true               # Install required packages for k8s? (the list of programs 'packages_for_k8s' is in files in the folder vars/).
-    firewall2: true               # Configure firewall for k8s?
-    dis_swap: true                # Disable SWAP?
-    kernel_mod: true              # Load kernel modules?
     etc_hosts: false              # Add to /etc/hosts all servers? (if you have DNS, then this is not necessary).
-    container: true               # Install container runtime?
-    k8s_pack: true                # Install k8s packages?
     #### II. Kubernetes setup - values
     # Kubernetes settings
-    k8s_packages_version: "1.23.4-00"     # Kubernetes packages version. Leave the value empty for 'latest'.
-    k8s_version: "1.23"                   # Kubernetes version for CRI-O repo.
+    k8s_packages_version: "1.23.4-00"     # (example: "1.23.4-00") Kubernetes packages version. Leave the value empty for 'latest'.
+    k8s_version: "1.23"                   # (example: "1.23") Kubernetes version for CRI-O repo.
     k8s_cni: calico                       # calico, flannel.
     container_runtime: docker             # docker, cri-o, containerd.
     pod_network_cidr: "10.244.0.0/16"     # pod subnet if using cri-o runtime (10.244.0.0/16;192.168.0.0/16).
