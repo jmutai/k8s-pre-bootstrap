@@ -4,7 +4,7 @@
   gather_facts: no
   tasks:
     - name: join worker
-      shell: {{ mc }} >> ~/join_worker.log
+      shell: "{{ mc }} >> ~/join_worker.log"
       args:
         chdir: $HOME
         creates: join_worker.log

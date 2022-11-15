@@ -65,6 +65,7 @@ all:
     k8s_cni: calico                       # calico, flannel.
     container_runtime: docker             # docker, cri-o, containerd.
     pod_network_cidr: "10.244.0.0/16"     # pod subnet if using cri-o runtime (10.244.0.0/16;192.168.0.0/16).
+    k8s_admins: []                        # Kubernetes administrators on host. Leave the value empty [] if you want to assign administrators yourself.
 
     ## III. HA setup
     ha_setup: true                # Do you want to setup HA (keepalive + haproxy)?
