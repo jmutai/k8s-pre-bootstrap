@@ -1,14 +1,5 @@
 all:
   vars:
-    ## List supported OS (see fact: os_distrib_version in k8s_setup.yml)
-    supported_os:
-      - centos7
-      - centos8
-      - ubuntu18
-      - ubuntu20
-      - debian9
-      - debian10
-      - astralinux1
     # Main options
     ## I. Prepare OS
     os_prepare: true              # Prepare OS?
@@ -75,8 +66,9 @@ all:
     #### III. HA setup - values
     vip_port: 8443                        # VIP for k8s HA
 
+# List hosts
   children:
-    kube:
+    kube:          # Kubernetes nodes
       hosts:
         pp-bal-01:
         pp-cach-01:
@@ -98,12 +90,12 @@ all:
         pp-mk8s-01:
         pp-mk8s-02:
         pp-mk8s-03:
-    kube_masters:
+    kube_masters:  # Kubernetes mastars
       hosts:
         pp-mk8s-01:
         pp-mk8s-02:
         pp-mk8s-03:
     others:
-      hosts:
+      hosts:       # Additional servers
         pp-dns-01:
         pp-ntp-01:
