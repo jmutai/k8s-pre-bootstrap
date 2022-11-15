@@ -13,7 +13,7 @@ tags: os_prep, kube_set, ha_set
 
 tags1: pre_tasks, config_net, config_pm, set_proxy, remove_firewall, firewall, config_ac,  reboot, upgrade_os, install_pack, config_ntp, reboot
 tags2: pre_setup, dis_swap, kernel_mod, etc_hosts, container, k8s_pack
-tags3: 
+tags3: firewall, 
 
 # !!!!!!!!  still under development...  !!!!!!!
 

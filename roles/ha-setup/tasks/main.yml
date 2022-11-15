@@ -18,6 +18,7 @@
   package:
     name: [keepalived,haproxy,psmisc]  # killall in psmisc
     state: present
+  tags: [haproxy, keepalived]
 
 - name: "Copy etc-keepalived-keepalived.master.conf"
   template:
@@ -27,6 +28,7 @@
     group: root
     mode: 0644
   when: inventory_hostname in groups['kube_masters'][0]
+  tags: keepalived
 
 - name: "Copy etc-keepalived-keepalived.backup.conf"
   template:
@@ -36,6 +38,7 @@
     group: root
     mode: 0644
   when: (inventory_hostname in groups['kube_masters'][1]) or (inventory_hostname in groups['kube_masters'][2])
+  tags: keepalived
 
 - name: "Copy etc-haproxy-haproxy.cfg"
   template:
@@ -44,15 +47,18 @@
     owner: root
     group: root
     mode: 0644
+  tags: haproxy
 
 - name: Enable keepalived service
   systemd:
     name: keepalived
     enabled: yes
     state: started
+  tags: keepalived
 
 - name: Restart haproxy service
   systemd:
     name: haproxy
     state: restarted
     daemon_reload: yes
+  tags: haproxy
