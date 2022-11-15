@@ -1,4 +1,5 @@
 ---
+# Common part
 - name: Install ufw
   ansible.builtin.package:
     name: ufw
@@ -10,10 +11,24 @@
     state: started
     enabled: yes
 
+- name: Allow out and enable UFW
+  community.general.ufw:
+    state: enabled
+    policy: allow
+    direction: out
+
+# Rules
 - name: Configure ufw for HA
   community.general.ufw:
     rule: allow
     port: "{{ item }}"
     proto: tcp
-  with_items: "{{ k8s_ha_ports | replace('-', ':') }}"
+  with_items: "{{ vip_port }}"
   when: inventory_hostname in groups['kube_masters']
+
+# VRRP Settings
+- name: Allow VRRP traffic
+  community.general.ufw:
+    rule: allow
+    dest: "224.0.0.18"
+    comment: "VRRP Broadcast"

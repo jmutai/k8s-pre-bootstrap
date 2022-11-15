@@ -15,8 +15,16 @@
     port: "{{ item }}/tcp"
     permanent: yes
     state: enabled
-  with_items: '{{ k8s_ha_ports }}'
+  with_items: '{{ vip_port }}'
   when: inventory_hostname in groups['kube_masters']
+
+# VRRP Settings
+- name: Add rich rule for keepalived vrrp
+  firewalld:
+    rich_rule: 'rule protocol value="vrrp" accept'
+    permanent: true
+    immediate: true
+    state: enabled
 
 - name: Reload firewalld
   shell: firewall-cmd --reload

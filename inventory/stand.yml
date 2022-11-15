@@ -71,6 +71,8 @@ all:
     #### III. HA setup - on/off tasks
     pre_tasks3: false             # Execute PRE tasks? (many specific tasks (for a particular OS)).
     post_tasks3: false            # Execute POST tasks? (many specific tasks (for a particular OS)).
+    #### III. HA setup - values
+    vip_port: 8443                        # VIP for k8s HA
 
   children:
     kube:

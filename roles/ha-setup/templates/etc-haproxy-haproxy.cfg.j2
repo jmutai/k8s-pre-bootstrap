@@ -32,7 +32,7 @@ defaults
 # apiserver frontend which proxys to the control plane nodes
 #---------------------------------------------------------------------
 frontend apiserver
-    bind *:8443
+    bind *:{{ vip_port }}
     mode tcp
     option tcplog
     default_backend apiserver

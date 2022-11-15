@@ -20,7 +20,7 @@ vrrp_instance VI_1 {
         auth_pass 42
     }
     virtual_ipaddress {
-        {{ vip }}
+        {{ vip_port }}
     }
     track_script {
         check_haproxy
