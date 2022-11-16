@@ -1,4 +1,21 @@
-# TODO configure chronyd
+# Build docker
+```
+DOCKER_BUILDKIT=1 docker build --progress plain --compress --tag ministrbob/ansible .
+```
+# Docker run
+```
+mkdir c:\!SAVE\k8s_setup\
+cd c:\!SAVE\k8s_setup\
+-- Редактировать файлы
+c:\MyGit\k8s-pre-bootstrap\vars\example.secret.yml c:\!SAVE\k8s_setup\secret.yml
+c:\MyGit\k8s-pre-bootstrap\inventory\example.standXXX.yml     c:\!SAVE\k8s_setup\stand.yml
+
+docker run -v c:\MyGit\k8s-pre-bootstrap\inventory\stand.yml:/ansible/inventory/stand.yml ministrbob/ansible ansible-playbook -i /ansible/inventory/stand.yml send_public_key.yml
+docker run -v /c/!SAVE/k8s_setup/stand.yml:/ansible/inventory/stand.yml ministrbob/ansible ansible-playbook -i /ansible/inventory/stand.yml send_public_key.yml
+docker run -v /c/!SAVE/k8s_setup/stand.yml:/ansible/inventory/stand.yml -v /c/!SAVE/k8s_setup/secret.yml:/ansible/vars/secret.yml ministrbob/ansible ansible-playbook -i /ansible/inventory/stand.yml send_public_key.yml
+```
+
+
 
 Предполагается что все хосты предназначены только для Kubernetes.
 
@@ -14,6 +31,8 @@ tags: os_prep, kube_set, ha_set
 tags1: pre_tasks, config_net, config_pm, set_proxy, remove_firewall, firewall, config_ac,  reboot, upgrade_os, install_pack, config_ntp, reboot
 tags2: pre_setup, dis_swap, kernel_mod, etc_hosts, container, k8s_pack
 tags3: firewall, 
+
+# ---------------------------------------------------------------------
 
 # !!!!!!!!  still under development...  !!!!!!!
 
