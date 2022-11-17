@@ -1,5 +1,5 @@
 ---
-- name: Generate /etc/hosts file
+- name: Configure /etc/hosts file on each node
   ansible.builtin.template:
     src: hosts.j2
     dest: /etc/hosts
