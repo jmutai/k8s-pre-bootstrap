@@ -12,7 +12,7 @@
 
 - name: Configure firewalld for HA
   ansible.posix.firewalld:
-    port: "{{ port }}/tcp"
+    port: "{{ port | string }}/tcp"
     permanent: yes
     state: enabled
   loop: '{{ vip_port }}'

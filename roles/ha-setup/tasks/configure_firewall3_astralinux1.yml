@@ -21,7 +21,7 @@
 - name: Configure ufw for HA
   community.general.ufw:
     rule: allow
-    port: "{{ port }}"
+    port: "{{ port | string }}"
     proto: tcp
   loop: "{{ vip_port }}"
   loop_control:

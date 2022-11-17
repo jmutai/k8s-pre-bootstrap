@@ -12,7 +12,7 @@
 
 - name: Configure firewalld 1
   ansible.posix.firewalld:
-    port: "{{ port }}/tcp"
+    port: "{{ port | string }}/tcp"
     permanent: yes
     state: enabled
   loop: '{{ firewall_1_ports }}'

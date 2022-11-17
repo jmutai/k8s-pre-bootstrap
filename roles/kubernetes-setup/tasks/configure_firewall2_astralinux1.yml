@@ -21,7 +21,7 @@
 - name: Configure ufw on master nodes
   community.general.ufw:
     rule: allow
-    port: "{{ port }}"
+    port: "{{ port | string }}"
     proto: tcp
   loop: "{{ k8s_master_ports | replace('-', ':') }}"
   loop_control:
@@ -31,7 +31,7 @@
 - name: Configure ufw on worker nodes
   community.general.ufw:
     rule: allow
-    port: "{{ port }}"
+    port: "{{ port | string }}"
     proto: tcp
   loop: "{{ k8s_worker_ports | replace('-', ':') }}"
   loop_control:
@@ -41,7 +41,7 @@
 - name: Open flannel ports on the ufw
   community.general.ufw:
     rule: allow
-    port: "{{ port }}"
+    port: "{{ port | string }}"
     proto: udp
   loop: "{{ flannel_udp_ports | replace('-', ':') }}"
   loop_control:
@@ -51,7 +51,7 @@
 - name: Open calico UDP ports on the ufw
   community.general.ufw:
     rule: allow
-    port: "{{ port }}"
+    port: "{{ port | string }}"
     proto: udp
   loop: "{{ calico_udp_ports | replace('-', ':') }}"
   loop_control:
@@ -61,7 +61,7 @@
 - name: Open calico TCP ports on the ufw
   community.general.ufw:
     rule: allow
-    port: "{{ port }}"
+    port: "{{ port | string }}"
     proto: tcp
   loop: "{{ calico_tcp_ports | replace('-', ':') }}"
   loop_control:

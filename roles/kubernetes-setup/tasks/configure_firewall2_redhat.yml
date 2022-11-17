@@ -12,7 +12,7 @@
 
 - name: Configure firewalld on master nodes
   ansible.posix.firewalld:
-    port: "{{ port }}/tcp"
+    port: "{{ port | string }}/tcp"
     permanent: yes
     state: enabled
   loop: '{{ k8s_master_ports }}'
@@ -22,7 +22,7 @@
 
 - name: Configure firewalld on worker nodes
   ansible.posix.firewalld:
-    port: "{{ port }}/tcp"
+    port: "{{ port | string }}/tcp"
     permanent: yes
     state: enabled
   loop: '{{ k8s_worker_ports }}'
@@ -32,7 +32,7 @@
 
 - name: Open flannel ports on the firewall
   ansible.posix.firewalld:
-    port: "{{ port }}/udp"
+    port: "{{ port | string }}/udp"
     permanent: yes
     state: enabled
   loop: "{{ flannel_udp_ports }}"
@@ -42,7 +42,7 @@
 
 - name: Open calico UDP ports on the firewall
   ansible.posix.firewalld:
-    port: "{{ port }}/udp"
+    port: "{{ port | string }}/udp"
     permanent: yes
     state: enabled
   loop: "{{ calico_udp_ports }}"
@@ -52,7 +52,7 @@
 
 - name: Open calico TCP ports on the firewall
   ansible.posix.firewalld:
-    port: "{{ port }}/tcp"
+    port: "{{ port | string }}/tcp"
     permanent: yes
     state: enabled
   loop: "{{ calico_tcp_ports }}"
