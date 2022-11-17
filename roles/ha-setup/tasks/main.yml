@@ -1,6 +1,6 @@
 ---
 - name: PRE tasks 3
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "pre_tasks_{{ os_distrib_version }}.yml"
     - "pre_tasks_{{ os_family_version }}.yml"
@@ -11,7 +11,7 @@
   tags: pre_tasks3
 
 - name: Configure firewall 3
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "configure_firewall3_{{ os_distrib_version }}.yml"
     - "configure_firewall3_{{ os_family_version }}.yml"
@@ -70,7 +70,7 @@
   tags: haproxy
 
 - name: POST tasks 3
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "post_tasks_{{ os_distrib_version }}.yml"
     - "post_tasks_{{ os_family_version }}.yml"

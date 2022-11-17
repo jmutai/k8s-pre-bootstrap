@@ -1,6 +1,6 @@
 ---
 - name: PRE tasks 1
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "pre_tasks_{{ os_distrib_version }}.yml"
     - "pre_tasks_{{ os_family_version }}.yml"
@@ -16,7 +16,7 @@
   tags: config_net
 
 - name: Configure package manager
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "config_pm_{{ os_distrib_version }}.yml"
     - "config_pm_{{ os_family_version }}.yml"
@@ -31,7 +31,7 @@
   tags: set_proxy
 
 - name: Config package manager proxy
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "config_pm_proxy_{{ os_distrib_version }}.yml"
     - "config_pm_proxy_{{ os_family_version }}.yml"
@@ -41,7 +41,7 @@
   tags: set_proxy
 
 - name: Remove firewall
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "remove_firewall_{{ os_distrib_version }}.yml"
     - "remove_firewall_{{ os_family_version }}.yml"
@@ -51,7 +51,7 @@
   tags: remove_firewall
 
 - name: Install and configure firewall 1
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "install_firewall_{{ os_distrib_version }}.yml"
     - "install_firewall_{{ os_family_version }}.yml"
@@ -61,7 +61,7 @@
   tags: firewall
 
 - name: Config Access Control system (SELinux, AppArmor, parsec)
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "config_ac_{{ os_distrib_version }}.yml"
     - "config_ac_{{ os_family_version }}.yml"
@@ -77,7 +77,7 @@
   tags: reboot
 
 - name: Upgrade OS
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
   - "upgrade_os_{{ os_distrib_version }}.yml"
   - "upgrade_os_{{ os_family_version }}.yml"
@@ -92,7 +92,7 @@
   tags: install_pack
 
 - name: Install time sync client
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "configure_timezone_ntp_{{ os_distrib_version }}.yml"
     - "configure_timezone_ntp_{{ os_family_version }}.yml"
@@ -102,7 +102,7 @@
   tags: config_ntp
 
 - name: POST tasks 1
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "post_tasks_{{ os_distrib_version }}.yml"
     - "post_tasks_{{ os_family_version }}.yml"

@@ -1,6 +1,6 @@
 ---
 - name: PRE tasks 2
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "pre_tasks_{{ os_distrib_version }}.yml"
     - "pre_tasks_{{ os_family_version }}.yml"
@@ -11,7 +11,7 @@
   tags: pre_tasks2
 
 - name: Configure firewall 2
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "configure_firewall2_{{ os_distrib_version }}.yml"
     - "configure_firewall2_{{ os_family_version }}.yml"
@@ -34,7 +34,7 @@
   tags: etc_hosts
 
 - name: Configure container runtime
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "setup_{{ container_runtime }}_{{ os_distrib_version }}.yml"
     - "setup_{{ container_runtime }}_{{ os_family_version }}.yml"
@@ -43,7 +43,7 @@
   tags: container
 
 - name: Install k8s packages
-  import_tasks: install_k8s_packages.yml
+  include_tasks: install_k8s_packages.yml
   with_first_found:
     - "install_k8s_packages_{{ os_distrib_version }}.yml"
     - "install_k8s_packages_{{ os_family_version }}.yml"
@@ -52,7 +52,7 @@
   tags: k8s_pack
 
 - name: POST tasks 2
-  import_tasks: "{{ item }}"
+  include_tasks: "{{ item }}"
   with_first_found:
     - "post_tasks_{{ os_distrib_version }}.yml"
     - "post_tasks_{{ os_family_version }}.yml"
