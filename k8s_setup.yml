@@ -37,8 +37,8 @@
       include_vars: "{{ playbook_dir }}/vars/{{ os_distrib_version }}.yml"
       tags: ["always"]
   roles:
-    - os-prepare
-  when: os_prepare
+    - role: os-prepare
+      when: os_prepare
   tags: os_prep
 
 # Kubernetes Setup
@@ -53,8 +53,8 @@
       include_vars: "{{ playbook_dir }}/vars/{{ os_distrib_version }}.yml"
       tags: ["always"]
   roles:
-    - kubernetes-setup
-  when: kubernetes_setup
+    - role: kubernetes-setup
+      when: kubernetes_setup
   tags: kube_set
 
 # HA Setup
@@ -69,6 +69,6 @@
       include_vars: "{{ playbook_dir }}/vars/{{ os_distrib_version }}.yml"
       tags: ["always"]
   roles:
-    - ha-setup
-  when: ha_setup
+    - role: ha-setup
+      when: ha_setup
   tags: ha_set
