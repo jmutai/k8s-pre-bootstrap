@@ -59,7 +59,7 @@
 
 # HA Setup
 - name: HA Setup
-  hosts: kube-masters
+  hosts: kube_masters
   # remote_user: <user>
   become: yes
   become_method: sudo
