@@ -13,14 +13,14 @@
 
 - name: Allow out and enable UFW
   community.general.ufw:
-    state: enabled
-    policy: allow
-    direction: outgoing
+    state: "enabled"
+    policy: "allow"
+    direction: "outgoing"
 
 # Rules
 - name: Configure ufw 1
   community.general.ufw:
-    rule: allow
+    rule: "allow"
     port: "{{ item }}"
-    proto: tcp
+    proto: "tcp"
   loop: "{{ firewall_1_ports }}"
