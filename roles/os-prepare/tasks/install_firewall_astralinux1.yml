@@ -15,7 +15,7 @@
   community.general.ufw:
     state: enabled
     policy: allow
-    direction: out
+    direction: outgoing
 
 # Rules
 - name: Configure ufw 1
