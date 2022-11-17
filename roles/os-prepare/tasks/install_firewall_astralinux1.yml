@@ -23,4 +23,4 @@
     rule: allow
     port: "{{ item }}"
     proto: tcp
-  with_items: '{{ firewall_1_ports }}'
+  loop: "{{ firewall_1_ports }}"
