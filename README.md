@@ -1,3 +1,15 @@
+-- Проверить SSH соединение 
+ssh worker@astra170-1.dmz.dear.com.ru
+
+-- Запуск с паролем
+ansible-playbook -i inventory/stand.yml send_public_key.yml -b --ask-pass
+-- Эта ошибка может значить что пароль не правильный
+Failed to connect to the host via ssh: worker@astra170-1.dmz.dear.com.ru: Permission denied (publickey,password).
+-- Всё равно получаю эту ошибку, тогда запуск через paramiko
+ansible-playbook -i inventory/stand.yml send_public_key.yml -c paramiko -b --ask-pass
+-- Проверка доступности всех хостов
+ansible -i inventory/stand.yml all -m ping
+ 
 
 
 
