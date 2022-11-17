@@ -1,19 +1,3 @@
-# Build docker
-```
-DOCKER_BUILDKIT=1 docker build --progress plain --compress --tag ministrbob/ansible .
-```
-# Docker run
-```
-mkdir c:\!SAVE\k8s_setup\
-cd c:\!SAVE\k8s_setup\
--- Редактировать файлы
-c:\MyGit\k8s-pre-bootstrap\vars\example.secret.yml c:\!SAVE\k8s_setup\secret.yml
-c:\MyGit\k8s-pre-bootstrap\inventory\example.standXXX.yml     c:\!SAVE\k8s_setup\stand.yml
-
-docker run -v c:\MyGit\k8s-pre-bootstrap\inventory\stand.yml:/ansible/inventory/stand.yml ministrbob/ansible ansible-playbook -i /ansible/inventory/stand.yml send_public_key.yml
-docker run -v /c/!SAVE/k8s_setup/stand.yml:/ansible/inventory/stand.yml ministrbob/ansible ansible-playbook -i /ansible/inventory/stand.yml send_public_key.yml
-docker run -v /c/!SAVE/k8s_setup/stand.yml:/ansible/inventory/stand.yml -v /c/!SAVE/k8s_setup/secret.yml:/ansible/vars/secret.yml ministrbob/ansible ansible-playbook -i /ansible/inventory/stand.yml send_public_key.yml
-```
 
 
 
