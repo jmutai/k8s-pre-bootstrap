@@ -12,12 +12,9 @@
 
 - name: Configure firewalld for HA
   ansible.posix.firewalld:
-    port: "{{ port | string }}/tcp"
+    port: "{{ vip_port | string }}/tcp"
     permanent: yes
     state: enabled
-  loop: '{{ vip_port }}'
-  loop_control:
-    loop_var: port
   when: inventory_hostname in groups['kube_masters']
 
 # VRRP Settings
