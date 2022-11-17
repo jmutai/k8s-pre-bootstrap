@@ -9,6 +9,14 @@ Failed to connect to the host via ssh: worker@astra170-1.dmz.dear.com.ru: Permis
 ansible-playbook -i inventory/stand.yml send_public_key.yml -c paramiko -b --ask-pass
 -- Проверка доступности всех хостов
 ansible -i inventory/stand.yml all -m ping
+
+ERROR! couldn't resolve module/action 'community.general.modprobe'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible-galaxy collection install community.general
+
+ERROR! couldn't resolve module/action 'ansible.posix.sysctl'. This often indicates a misspelling, missing collection, or incorrect module path.
+ansible-galaxy collection install ansible.posix
+
+
  
 
 
