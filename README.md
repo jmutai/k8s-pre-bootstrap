@@ -16,7 +16,8 @@ ansible-galaxy collection install community.general
 ERROR! couldn't resolve module/action 'ansible.posix.sysctl'. This often indicates a misspelling, missing collection, or incorrect module path.
 ansible-galaxy collection install ansible.posix
 
-
+ansible-playbook -i inventory/stand.yml k8s_setup.yml
+ansible-playbook -i inventory/stand.yml k8s_setup.yml --list-tasks
  
 
 
