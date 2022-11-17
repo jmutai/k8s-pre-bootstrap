@@ -1,5 +1,5 @@
 - name: copy /etc/apt/sources.list to remote host
   copy:
-    content: {{ etc_apt_sources_list }}
+    content: "{{ etc_apt_sources_list }}"
     dest: /etc/apt/sources.list
     mode: 644
