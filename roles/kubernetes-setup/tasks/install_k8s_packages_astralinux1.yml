@@ -22,14 +22,12 @@
   apt:
     name: [kubelet,kubeadm,kubectl]
     update_cache: yes
-    disable_excludes: kubernetes
   when: not (k8s_packages_version | length > 0)
 
 - name: Install kubernetes packages
   apt:
     name: ["kubelet={{ k8s_packages_version }}","kubeadm={{ k8s_packages_version }}","kubectl={{ k8s_packages_version }}"]
     update_cache: yes
-    disable_excludes: kubernetes
   when: (k8s_packages_version | length > 0)
 
 - name: Hold packages
