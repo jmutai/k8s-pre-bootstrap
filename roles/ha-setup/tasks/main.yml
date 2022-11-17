@@ -1,13 +1,9 @@
 ---
 - name: PRE tasks 3
-  include_tasks: "{{ item }}"
-  with_first_found:
-    - "pre_tasks_{{ os_distrib_version }}.yml"
-    - "pre_tasks_{{ os_family_version }}.yml"
-    - "pre_tasks_{{ os_distrib }}.yml"
-    - "pre_tasks_{{ os_family }}.yml"
-    - "pre_tasks.yml"
-  when: pre_tasks3
+  ansible.builtin.include_tasks: '{{ tasks_file }}'
+  when: pre_tasks3 and tasks_file | length > 0
+  vars:
+    tasks_file: "{{ lookup('ansible.builtin.first_found', files=['pre_tasks_{{ os_distrib_version }}.yml', 'pre_tasks_{{ os_family_version }}.yml', 'pre_tasks_{{ os_distrib }}.yml', 'pre_tasks.yml'], errors='ignore') }}"
   tags: pre_tasks3
 
 - name: Configure firewall 3
@@ -70,12 +66,8 @@
   tags: haproxy
 
 - name: POST tasks 3
-  include_tasks: "{{ item }}"
-  with_first_found:
-    - "post_tasks_{{ os_distrib_version }}.yml"
-    - "post_tasks_{{ os_family_version }}.yml"
-    - "post_tasks_{{ os_distrib }}.yml"
-    - "post_tasks_{{ os_family }}.yml"
-    - "post_tasks.yml"
-  when: post_tasks3
+  ansible.builtin.include_tasks: '{{ tasks_file }}'
+  when: post_tasks3 and tasks_file | length > 0
+  vars:
+    tasks_file: "{{ lookup('ansible.builtin.first_found', files=['pre_tasks_{{ os_distrib_version }}.yml', 'pre_tasks_{{ os_family_version }}.yml', 'pre_tasks_{{ os_distrib }}.yml', 'pre_tasks.yml'], errors='ignore') }}"
   tags: post_tasks3
