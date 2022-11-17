@@ -18,21 +18,19 @@
     group: root
     mode: 0644
 
-- name: Run the equivalent of "apt-get update" as a separate step
-  apt:
-    update_cache: yes
-
 - name: Install kubernetes packages
   apt:
     name: [kubelet,kubeadm,kubectl]
+    update_cache: yes
     disable_excludes: kubernetes
-  when: not k8s_packages_version
+  when: not (k8s_packages_version | length > 0)
 
 - name: Install kubernetes packages
   apt:
     name: ["kubelet={{ k8s_packages_version }}","kubeadm={{ k8s_packages_version }}","kubectl={{ k8s_packages_version }}"]
+    update_cache: yes
     disable_excludes: kubernetes
-  when: k8s_packages_version
+  when: (k8s_packages_version | length > 0)
 
 - name: Hold packages
   shell: "apt-mark hold kubelet kubeadm kubectl"
