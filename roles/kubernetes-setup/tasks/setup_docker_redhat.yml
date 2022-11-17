@@ -11,11 +11,13 @@
 
 - name: Create other directories required
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ dir_name }}"
     state: directory
-  with_items:
+  loop:
     - /etc/docker
     - /etc/systemd/system/docker.service.d
+  loop_control:
+    loop_var: dir_name
 
 - name: Set cgroup driver as systemd
   ansible.builtin.template:

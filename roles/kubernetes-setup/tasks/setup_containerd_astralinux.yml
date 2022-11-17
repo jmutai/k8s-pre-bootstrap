@@ -6,10 +6,8 @@
 
 - name: Create containerd directories required
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "/etc/containerd"
     state: directory
-  with_items:
-    - /etc/containerd
 
 - name: Configure containerd
   ansible.builtin.shell: containerd config default > /etc/containerd/config.toml

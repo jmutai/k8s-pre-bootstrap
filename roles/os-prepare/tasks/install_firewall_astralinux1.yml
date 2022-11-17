@@ -21,6 +21,8 @@
 - name: Configure ufw 1
   community.general.ufw:
     rule: "allow"
-    port: "{{ item }}"
+    port: "{{ port }}"
     proto: "tcp"
   loop: "{{ firewall_1_ports }}"
+  loop_control:
+    loop_var: port

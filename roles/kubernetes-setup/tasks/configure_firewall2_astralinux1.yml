@@ -21,39 +21,49 @@
 - name: Configure ufw on master nodes
   community.general.ufw:
     rule: allow
-    port: "{{ item }}"
+    port: "{{ port }}"
     proto: tcp
-  with_items: "{{ k8s_master_ports | replace('-', ':') }}"
+  loop: "{{ k8s_master_ports | replace('-', ':') }}"
+  loop_control:
+    loop_var: port
   when: inventory_hostname in groups['kube_masters']
 
 - name: Configure ufw on worker nodes
   community.general.ufw:
     rule: allow
-    port: "{{ item }}"
+    port: "{{ port }}"
     proto: tcp
-  with_items: "{{ k8s_worker_ports | replace('-', ':') }}"
+  loop: "{{ k8s_worker_ports | replace('-', ':') }}"
+  loop_control:
+    loop_var: port
   when: inventory_hostname in groups['kube']
 
 - name: Open flannel ports on the ufw
   community.general.ufw:
     rule: allow
-    port: "{{ item }}"
+    port: "{{ port }}"
     proto: udp
-  with_items: "{{ flannel_udp_ports | replace('-', ':') }}"
+  loop: "{{ flannel_udp_ports | replace('-', ':') }}"
+  loop_control:
+    loop_var: port
   when: k8s_cni == "flannel"
 
 - name: Open calico UDP ports on the ufw
   community.general.ufw:
     rule: allow
-    port: "{{ item }}"
+    port: "{{ port }}"
     proto: udp
-  with_items: "{{ calico_udp_ports | replace('-', ':') }}"
+  loop: "{{ calico_udp_ports | replace('-', ':') }}"
+  loop_control:
+    loop_var: port
   when: k8s_cni == "calico"
 
 - name: Open calico TCP ports on the ufw
   community.general.ufw:
     rule: allow
-    port: "{{ item }}"
+    port: "{{ port }}"
     proto: tcp
-  with_items: "{{ calico_tcp_ports | replace('-', ':') }}"
+  loop: "{{ calico_tcp_ports | replace('-', ':') }}"
+  loop_control:
+    loop_var: port
   when: k8s_cni == "calico"

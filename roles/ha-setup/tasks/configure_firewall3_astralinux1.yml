@@ -21,9 +21,11 @@
 - name: Configure ufw for HA
   community.general.ufw:
     rule: allow
-    port: "{{ item }}"
+    port: "{{ port }}"
     proto: tcp
-  with_items: "{{ vip_port }}"
+  loop: "{{ vip_port }}"
+  loop_control:
+    loop_var: port
   when: inventory_hostname in groups['kube_masters']
 
 # VRRP Settings
