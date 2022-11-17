@@ -39,7 +39,7 @@
   tags: container
 
 - name: Install k8s packages
-  include_tasks: install_k8s_packages.yml
+  include_tasks: "{{ item }}"
   with_first_found:
     - "install_k8s_packages_{{ os_distrib_version }}.yml"
     - "install_k8s_packages_{{ os_family_version }}.yml"
