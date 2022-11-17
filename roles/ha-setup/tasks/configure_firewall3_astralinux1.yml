@@ -13,9 +13,9 @@
 
 - name: Allow out and enable UFW
   community.general.ufw:
-    state: enabled
-    policy: allow
-    direction: out
+    state: "enabled"
+    policy: "allow"
+    direction: "outgoing"
 
 # Rules
 - name: Configure ufw for HA
