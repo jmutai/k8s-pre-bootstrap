@@ -44,6 +44,9 @@
           loop: "{{ k8s_admins }}"
 
     - name: Setup Calico
+      become: yes
+      become_user: "{{ k8s_admins[0] }}"
+      become_method: sudo
       block:
         - name: Download calico.yaml
           get_url:
@@ -54,9 +57,6 @@
           register: p
 
         - name: Install calico (execute )
-          become: yes
-          become_user: "{{ k8s_admins[0] }}"
-          become_method: sudo
           shell: "kubectl apply -f ~/calico.yaml 2>&1 | tee ~/install_calico.log"
           args:
             chdir: $HOME
