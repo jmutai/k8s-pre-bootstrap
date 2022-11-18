@@ -4,13 +4,13 @@
   become_method: sudo
   gather_facts: no
   tasks:
-   - name: Delete cluster
-     command: "kubeadm reset -f"
-     register: output
+    - name: Delete cluster
+      command: "kubeadm reset -f"
+      register: output
 
-   - name: Output delete cluster
-     debug:
-       msg: "{{ output.stdout.split('\n') }}"
+    - name: Output delete cluster
+      debug:
+        msg: "{{ output.stdout.split('\n') }}"
 
     - name: Delete /etc/cni/net.d
       file:
