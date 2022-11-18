@@ -52,4 +52,9 @@
           args:
             chdir: $HOME
             creates: install_calico.log
+          register: output_calico
           when: p.stat.exists
+
+        - name: Output install calico
+          debug:
+            msg: "{{ output_calico.stdout.split('\n') }}"
