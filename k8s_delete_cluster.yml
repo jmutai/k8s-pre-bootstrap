@@ -17,7 +17,7 @@
         path: "/etc/cni/net.d"
         state: absent
 
-    - name: Delete /etc/cni/net.d
+    - name: Delete logs
       file:
         path: "{{ item }}"
         state: absent
@@ -26,3 +26,9 @@
         - "~/cluster_init.log"
         - "~/install_calico.log"
       ignore_errors: yes
+
+    - name: Delete .kube directory
+      file:
+        path: "/home/{{ item }}/.kube"
+        state: absent
+      loop: "{{ k8s_admins }}"
