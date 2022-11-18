@@ -20,27 +20,27 @@
       block:
         - name: Create .kube directory
           file:
-            path: /home/"{{ item }}"/.kube
+            path: "/home/{{ item }}/.kube"
             state: directory
             mode: 0755
-          loop: {{ k8s_admins }}
+          loop: "{{ k8s_admins }}"
 
         - name: Copy admin.conf to user's kube config
           copy:
-            src: /etc/kubernetes/admin.conf
-            dest: /home/"{{ item }}"/.kube/config
+            src: "/etc/kubernetes/admin.conf"
+            dest: "/home/{{ item }}/.kube/config"
             remote_src: yes
-          loop: {{ k8s_admins }}
+          loop: "{{ k8s_admins }}"
       when: k8s_admins | length > 0
 
     - name: Setup Calico
       block:
         - name: Add docker repository
           get_url:
-            url: https://docs.projectcalico.org/manifests/calico.yaml
-            dest: ~/calico.yaml
+            url: "https://docs.projectcalico.org/manifests/calico.yaml"
+            dest: "~/calico.yaml"
           
-        - stat: path=~/calico.yaml
+        - stat: "path=~/calico.yaml"
           register: p
 
         - name: Install calico
