@@ -16,3 +16,13 @@
       file:
         path: "/etc/cni/net.d"
         state: absent
+
+    - name: Delete /etc/cni/net.d
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "~/join_worker.log"
+        - "~/cluster_init.log"
+        - "~/install_calico.log"
+      ignore_errors: yes
