@@ -35,7 +35,7 @@
             src: "/etc/kubernetes/admin.conf"
             dest: "/home/{{ item }}/.kube/config"
             owner: "{{ item }}"
-
+            remote_src: yes
           loop: "{{ k8s_admins }}"
       when: k8s_admins | length > 0
 
