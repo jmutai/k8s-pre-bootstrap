@@ -1,0 +1,3 @@
+# Join commands (they will be received after cluster initialization)
+join_master_cmd: ""
+join_worker_cmd: ""

@@ -10,4 +10,9 @@
 
    - name: Output delete cluster
      debug:
-       var: output.stdout
+       msg: "{{ output.stdout.split('\n') }}"
+
+    - name: Delete /etc/cni/net.d
+      file:
+        path: "/etc/cni/net.d"
+        state: absent
