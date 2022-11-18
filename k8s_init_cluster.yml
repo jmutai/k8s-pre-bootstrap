@@ -26,6 +26,7 @@
           file:
             path: "/home/{{ item }}/.kube"
             state: directory
+            owner: "{{ item }}"
             mode: 0755
           loop: "{{ k8s_admins }}"
 
@@ -33,13 +34,14 @@
           copy:
             src: "/etc/kubernetes/admin.conf"
             dest: "/home/{{ item }}/.kube/config"
-            remote_src: yes
+            owner: "{{ item }}"
+
           loop: "{{ k8s_admins }}"
       when: k8s_admins | length > 0
 
     - name: Setup Calico
       block:
-        - name: Add docker repository
+        - name: Download calico.yaml
           get_url:
             url: "https://docs.projectcalico.org/manifests/calico.yaml"
             dest: "~/calico.yaml"
