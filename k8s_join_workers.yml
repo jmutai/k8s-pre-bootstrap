@@ -10,4 +10,8 @@
       shell: "{{ join_worker_cmd }} 2>&1 | tee ~/join_worker.log"
       args:
         chdir: $HOME
-        creates: join_worker.log
+      register: output
+
+    - name: Output init cluster
+      debug:
+        msg: "{{ output.stdout.split('\n') }}"

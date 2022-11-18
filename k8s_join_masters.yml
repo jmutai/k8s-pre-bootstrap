@@ -1,14 +1,14 @@
-# ansible-playbook k8s_init_cluster.yml
-# Examples INIT commands:
-#   kubeadm init
-#   kubeadm init --pod-network-cidr=10.244.0.0/16
-#   kubeadm init --control-plane-endpoint pp-vip-k8s.mydomen.com:8443 --upload-certs --pod-network-cidr 10.244.0.0/16
 ---
 - hosts: kube_masters,!kube_masters[0]
   become: yes
   become_method: sudo
   gather_facts: no
   tasks:
+    - name: Check list k8s admins
+      fail: 
+        msg: "ERROR: List k8s administrators is empty (var k8s_admins)"
+      when: not (k8s_admins | length > 0)
+
     - name: Include join commands
       include_vars: "{{ playbook_dir }}/vars/join_commands.yml"
 
@@ -16,7 +16,11 @@
       shell: "{{ join_master_cmd }} 2>&1 | tee ~/cluster_init.log"
       args:
         chdir: $HOME
-        creates: cluster_init.log
+      register: output
+
+    - name: Output init cluster
+      debug:
+        msg: "{{ output.stdout.split('\n') }}"
 
     - name: Configure k8s administrators
       block:
@@ -24,6 +28,7 @@
           file:
             path: "/home/{{ item }}/.kube"
             state: directory
+            owner: "{{ item }}"
             mode: 0755
           loop: "{{ k8s_admins }}"
 
@@ -31,6 +36,6 @@
           copy:
             src: "/etc/kubernetes/admin.conf"
             dest: "/home/{{ item }}/.kube/config"
+            owner: "{{ item }}"
             remote_src: yes
           loop: "{{ k8s_admins }}"
-      when: k8s_admins | length > 0
