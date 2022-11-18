@@ -14,6 +14,7 @@
       args:
         chdir: $HOME
         creates: cluster_init.log
+      when: inventory_hostname in groups['kube_masters'][0]
 
     - name: Configure k8s administrators
       block:
@@ -22,14 +23,14 @@
             path: /home/"{{ item }}"/.kube
             state: directory
             mode: 0755
-          loop: k8s_admins
+          loop: {{ k8s_admins }}
 
         - name: Copy admin.conf to user's kube config
           copy:
             src: /etc/kubernetes/admin.conf
             dest: /home/"{{ item }}"/.kube/config
             remote_src: yes
-          loop: k8s_admins
+          loop: {{ k8s_admins }}
       when: k8s_admins | length > 0
 
     - name: Setup Calico

@@ -322,11 +322,13 @@ sudo apt-mark unhold docker
 
 ---
 ## Kubernetes Cluster
-You can init 
+Init manualy
 ## Init Cluster on Master 
-
+Examples of three different ways to initialize a cluster.  
 ```
-ansible-playbook init_cluster.yml
+ansible-playbook -i inventory/stand.yml k8s_init_cluster.yml --extra-vars "mc='kubeadm init'"
+ansible-playbook -i inventory/stand.yml k8s_init_cluster.yml --extra-vars "mc='kubeadm init --pod-network-cidr=10.244.0.0/16'"
+ansible-playbook -i inventory/stand.yml k8s_init_cluster.yml --extra-vars "mc='kubeadm init --control-plane-endpoint \"pp-vip-k8s.mydomen.com:8443\" --upload-certs --pod-network-cidr 10.244.0.0/16'"
 ```
 
 In folder `/root` will be created two files:
