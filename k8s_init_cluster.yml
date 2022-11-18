@@ -33,7 +33,7 @@
             state: directory
             owner: "{{ item }}"
             mode: 0755
-          loop: "{{ k8s_admins + "['root']" }}"
+          loop: "{{ k8s_admins }}"
 
         - name: Copy admin.conf to user's kube config
           copy:
