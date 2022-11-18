@@ -14,6 +14,11 @@
       args:
         chdir: $HOME
         creates: cluster_init.log
+      register: output
+
+    - name: Output init cluster
+      debug:
+        msg: "{{ output.stdout.split('\n') }}"
 
     - name: Configure k8s administrators
       block:
