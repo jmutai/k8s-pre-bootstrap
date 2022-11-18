@@ -9,6 +9,11 @@
   become_method: sudo
   gather_facts: no
   tasks:
+    - name: Check list k8s admins
+      fail: 
+        msg: "ERROR: List k8s administrators is empty (var k8s_admins)"
+      when: not (k8s_admins | length > 0)
+
     - name: Initialize the cluster
       shell: "{{ mc }} 2>&1 | tee ~/cluster_init.log"
       args:
@@ -28,7 +33,7 @@
             state: directory
             owner: "{{ item }}"
             mode: 0755
-          loop: "{{ k8s_admins }}"
+          loop: "{{ k8s_admins + "['root']" }}"
 
         - name: Copy admin.conf to user's kube config
           copy:
@@ -37,7 +42,6 @@
             owner: "{{ item }}"
             remote_src: yes
           loop: "{{ k8s_admins }}"
-      when: k8s_admins | length > 0
 
     - name: Setup Calico
       block:
@@ -49,7 +53,10 @@
         - stat: "path=~/calico.yaml"
           register: p
 
-        - name: Install calico
+        - name: Install calico (execute )
+          become: yes
+          become_user: "{{ k8s_admins[0] }}"
+          become_method: sudo
           shell: "kubectl apply -f ~/calico.yaml 2>&1 | tee ~/install_calico.log"
           args:
             chdir: $HOME

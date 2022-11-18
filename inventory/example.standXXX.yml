@@ -55,8 +55,8 @@ all:
     k8s_version: "1.23"                   # (example: "1.23") Kubernetes version for CRI-O repo.
     k8s_cni: calico                       # calico, flannel.
     container_runtime: docker             # docker, cri-o, containerd.
-    pod_network_cidr: "10.244.0.0/16"     # pod subnet if using cri-o runtime (10.244.0.0/16;192.168.0.0/16).
-    k8s_admins: []                        # Kubernetes administrators on host. Leave the value empty [] if you want to assign administrators yourself.
+    pod_network_cidr: "10.244.0.0/16"     # Pod subnet if using cri-o runtime (10.244.0.0/16;192.168.0.0/16).
+    k8s_admins: ['root']                  # Kubernetes administrators on masters. There must be at least one administrator (example, root), otherwise it will not be possible to initialize CNI plugin.
 
     ## III. HA setup
     ha_setup: true                # Do you want to setup HA (keepalive + haproxy)?
