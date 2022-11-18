@@ -25,7 +25,6 @@
         - "~/join_worker.log"
         - "~/cluster_init.log"
         - "~/install_calico.log"
-      ignore_errors: yes
 
     - name: Delete .kube directory
       file:
