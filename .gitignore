@@ -6,4 +6,4 @@ secret.yml
 /**/post_tasks*.yml
 inventory/stand*.yml
 /**/test*.yml
-vars/example.join_commands.yml
+vars/join_commands.yml
