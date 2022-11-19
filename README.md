@@ -108,17 +108,36 @@ cd k8s_setup
 
 ## Setting up ansible
 
-You can change ansible settings in ansible.cfg file. 
+You can change ansible settings in ansible.cfg file. By default, the settings are optimal.  
+
 ```bash
-ansible --version (you can see where config)
-sudo nano /etc/ansible/ansible.cfg
+cp ansible.cfg.example ansible.cfg
+nano ansible.cfg
 ```
 
-such settings
+## Set up inventory for the stand
+
+The name of the stand (`stand.yml`) can be anything. It is possible to keep several configuration files here for several stands.  
+All variables have comments explaining the purpose of the variables.  
+The project uses three groups:
+
+- kube - All servers for the cluster Kubernetes (masters and workers and others).  
+- kube_masters - Servers for master components Kubernetes. There may be one. For HA cofiguration it is better to have three master servers.  
+- auxiliary - Auxiliary stand servers that are not included in the Kubernetes cluster. For them, only the first stage `OS prepare` is performed, for example, DNS, NTP, etc.  
+
+```bash
+cp inventory/stand.yml.example inventory/stand.yml
+nano inventory/stand.yml
 ```
-inventory = /home/<user>/ansible/hosts
-host_key_checking = False
-```
+
+
+
+
+
+
+
+
+
 
 - Edit file hosts (list of servers). Example in hosts_example.
 ```

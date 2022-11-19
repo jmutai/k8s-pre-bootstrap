@@ -96,7 +96,7 @@ all:
         pp-mk8s-01:
         pp-mk8s-02:
         pp-mk8s-03:
-    others:
+    auxiliary:
       hosts:       # Additional servers
         pp-dns-01:
         pp-ntp-01:
