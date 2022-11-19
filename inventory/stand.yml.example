@@ -1,5 +1,7 @@
 all:
   vars:
+    # SSH options
+    ansible_user: "user1"                        # User which is used when accessing the remote machines via SSH.
     # Main options
     ## I. Prepare OS
     os_prepare: true              # Prepare OS?

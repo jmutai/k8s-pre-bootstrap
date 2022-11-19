@@ -43,7 +43,6 @@ tags3: firewall,
 # k8s_setup project
 
 This project contains several playbooks that help you automate setting up a Kubernetes Cluster on VMs or bare-metal servers. `kubeadm` deployment method is used [Bootstrapping clusters with kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/).  
-The entire installation is performed under an account with administrator rights (sudo).  
 
 ## Quick start
 
@@ -121,34 +120,21 @@ The name of the stand (`stand.yml`) can be anything. It is possible to keep seve
 All variables have comments explaining the purpose of the variables.  
 The project uses three groups:
 
-- kube - All servers for the cluster Kubernetes (masters and workers and others).  
-- kube_masters - Servers for master components Kubernetes. There may be one. For HA cofiguration it is better to have three master servers.  
-- auxiliary - Auxiliary stand servers that are not included in the Kubernetes cluster. For them, only the first stage `OS prepare` is performed, for example, DNS, NTP, etc.  
+- **kube** - All servers for the cluster Kubernetes (masters and workers and others).  
+- **kube_masters** - Servers for master components Kubernetes. There may be one. For HA cofiguration it is better to have three master servers.  
+- **auxiliary** - Auxiliary stand servers that are not included in the Kubernetes cluster. For them, only the first stage `OS prepare` is performed, for example, DNS, NTP, etc.  
 
 ```bash
 cp inventory/stand.yml.example inventory/stand.yml
 nano inventory/stand.yml
 ```
 
+## Deploy the public key to remote hosts (setup passwordless authentication) and visudo current user
 
+Generate SSH keys of any type.  
 
-
-
-
-
-
-
-
-- Edit file hosts (list of servers). Example in hosts_example.
-```
-nano hosts
-```
-
-### Deploy the public key to remote hosts (setup passwordless authentication) and visudo current user
-
-- Generate keys
-```
-ssh-keygen -t rsa
+```bash
+ssh-keygen -t ed25519
 ```
 
 - Edit **send_public_key.yml**, insert instead of ```<sshkey>``` line with public key from ```/home/<user>/.ssh/id_rsa.pub```. You can see key ```cat /home/$USER/.ssh/id_rsa.pub```.
