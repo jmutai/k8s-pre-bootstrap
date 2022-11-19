@@ -1,6 +1,3 @@
-Некоторые действия не реализованы и они предствлены заглушками (stub) можно поискать по файлам и найти такие действия.
-
-
 -- Проверить SSH соединение 
 ssh worker@astra170-1.dmz.dear.com.ru
 
@@ -40,38 +37,48 @@ tags1: pre_tasks, config_net, config_pm, set_proxy, remove_firewall, firewall, c
 tags2: pre_setup, dis_swap, kernel_mod, etc_hosts, container, k8s_pack
 tags3: firewall, 
 
+
 # ---------------------------------------------------------------------
 
-# !!!!!!!!  still under development...  !!!!!!!
+# k8s_setup project
 
-## Main info
+This project contains several playbooks that help you automate setting up a Kubernetes Cluster on VMs or bare-metal servers. `kubeadm` deployment method is used [Bootstrapping clusters with kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/).  
+The entire installation is performed under an account with administrator rights (sudo).  
 
-This playbook helps you setting up a Kubernetes Cluster on VMs or bare-metal servers.
-The entire installation is performed under regular user account (but which is sudo user).
-Forked from jmutai/k8s-pre-bootstrap, thanks to him.
+## Quick start
 
-## OS on which it was used
+Follow the steps from point [Kubernetes cluster deployment](#kubernetes-cluster-deployment) in sequence.  
 
-- CentOS 7
-- Astra Linux 1.7
+## Supported Linux distribution (distros)
 
-## Documentation
+The playbook supports any Linux distributions, since you can add your own tasklist for each distribution or family of distributions. At the moment, the playbook contains tasklists for CentOS 7, CentOS 8, Debian, Ubuntu. The playbook was previously tested on CentOS 7 but has changed a lot since then. The current version has been tested on Astra Linux 1.7 (similar to Debian 10).  
 
-https://kubernetes.io/docs/setup/production-environment/
+## Main ideas (basic concept)
 
-## Additional playbooks in folder stuff
+- All variables and list of hosts are collected in one file inventory (see example `inventory\example.standXXX.yml`).  
+- Main playbook `k8s_setup.yml` is divided into three stages (each of which is represented by a separate role): `OS prepare`, `Kubernetes setup` and `HA setup`. Each of which can be performed separately (or not performed). This can be regulated by variables in inventory (see example `inventory\example.standXXX.yml`) and tags.  
+- Each step in each of the three stages can be performed separately (or not performed). This can be regulated by variables in inventory (see example `inventory\example.standXXX.yml`) and tags.  
+- Stage `OS prepare` helps to prepare the server operating system and can be used not only for servers intended for the Kubernetes, but also for auxiliary servers (group `others`) included in this stand, for example, DNS, NTP, etc.  
+- Stage `Kubernetes Setup` OS prepare for K8S, setup container runtime and install k8s packages.  
+- Stage `HA Setup` installation and configuration of keepalived and haproxy.  
+- Support for various Linux distributions is implemented by adding a tasklists whose names are given by ansible facts `os_distrib_version`, `os_family_version`, `os_distrib` and `os_family` (see `k8s_setup.yml`). **Attention!** Some tasks for some Linux distributions are not currently implemented, for example `Config Access Control system (SELinux, AppArmor, parsec)`, and are left as a stub (see `roles/os-prepare/tasks/config_ac_astralinux.yml`).  
 
-- **net_config_copy.yml** - Copy /etc/host and /etc/resolv.conf to another servers.
-- **proxy_settings_copy.yml** - Copy /etc/environment and /etc/yum.conf to another servers.  
-- **prepare_os.yml** - Prepare OS.
-- **prepare_os_others.yml** - Prepare OS on other servers not included in the cluster (for example, rdbms and etc.)
-- **send_public_key.yml** - Deploy the public key to remote hosts (for ssh)
-- **init_cluster.yml** - Creating a single control-plane cluster with kubeadm (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
+## Main playbooks
+
+- **k8s_setup.yml** - Main playbook for OS prepare, Kubernetes setup and HA setup.  
+- **send_public_key.yml** - Set up passwordless access via SSH.  
+- **k8s_init_cluster.yml** - K8s cluster initialization (kubeadm init).  
+- **k8s_join_masters.yml** - Join masters (for HA).  
+- **k8s_join_workers.yml** - Join workers.  
+- **k8s_delete_cluster.yml** - Delete k8s cluster (HA is not deleted).  
 
 ## Stuff playbooks (in folder stuff)
-- **check_unique_uuid.yml** - Verify the MAC address and product_uuid are unique for every node (https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address). Needed for cloned VMs. 
 
-## Preliminary preparation of the master server
+- **check_unique_uuid.yml** - [Verify the MAC address and product_uuid are unique for every node](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address). Needed for cloned VMs.
+
+## Kubernetes cluster deployment
+
+### Preliminary preparation of the master server
 
 - Install git and ansible on the control computer
 ```
@@ -103,7 +110,7 @@ host_key_checking = False
 nano hosts
 ```
 
-# Deploy the public key to remote hosts (setup passwordless authentication) and visudo current user
+### Deploy the public key to remote hosts (setup passwordless authentication) and visudo current user
 
 - Generate keys
 ```
@@ -124,14 +131,14 @@ ansible-playbook send_public_key.yml -b --ask-pass -kK
 ```
 
 
-## Verify the MAC address and product_uuid are unique for every node
+### Verify the MAC address and product_uuid are unique for every node
 
 Playbook **check_uniq.yml** show MAC addresses and UUID. If VMs were cloned, then they may have not uniqu MAC and UUID. **You must visually verify that everything is unique**.  
 ```
 ansible-playbook check_uniq.yml
 ```
 
-## Preliminary preparation infrastructure
+### Preliminary preparation infrastructure
   
 - It is desirable that all servers distinguish each other by name. To do this, either you need to have a configured DNS or prepare files ```/etc/hosts``` and ```/etc/resolv.conf``` on the master and copy them to other servers using **net_config_copy.yml**.
 - WARNING: Executed only for workers. You prepare configuration files on the Master, and then using ansible they are copied to the Workers.  
@@ -216,7 +223,7 @@ proxy=http://10.1.113.15:1010
 ansible-playbook install_chrony.yml
 ```
 
-## !!! Prepare OS !!!
+### !!! Prepare OS !!!
 - To do this! (using prepare_os.yml). Disable SELinux, Install common packages, Disable SWAP, Load required modules, Modify sysctl entries, Update OS if it need, Reboot OS (using **prepare_os.yml**).  
 To understand the example see `hosts_example` file. Ansible installed on first master.  
 First execute this on the host with ansible. In this example it is first K8S master. This is just an OS update.
@@ -251,7 +258,7 @@ Example changes
 [kubelet-1.21.3,kubeadm-1.21.3,kubectl-1.21.3]
 ```
 
-## Update variables in playbook file k8s-prep.yml (presented variant when firewalld is completely removed)
+#### Update variables in playbook file k8s-prep.yml (presented variant when firewalld is completely removed)
 
 In file **setup_docker.yml** specific versions of packages are indicated (taken from the documentation - https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker).  
 You need to check which version of the packages is currently indicated in the documentation and, if necessary, fix it.
@@ -296,7 +303,7 @@ This playbook installed all needed software on all servers without creating the 
 ansible-playbook k8s-prep.yml
 ```
 
-## Additional options and checks after installation  
+### Additional options and checks after installation  
 - Check versions  
 ```
 sudo docker --version
@@ -321,9 +328,9 @@ sudo apt-mark unhold docker
 ```
 
 ---
-## Kubernetes Cluster
+### Kubernetes Cluster
 Init manualy
-## Init Cluster on Master 
+#### Init Cluster on Master 
 Examples of three different ways to initialize a cluster.  
 ```
 ansible-playbook -i inventory/stand.yml k8s_init_cluster.yml --extra-vars "mc='kubeadm init'"
@@ -353,7 +360,7 @@ kube-proxy-z4qvt                          1/1     Running   0          39m
 kube-scheduler-rtz-ppd-mk8s-01            1/1     Running   0          39m
 ```
 
-## Join workers
+#### Join workers
 
 Join all workers servers to cluster. Copy command for join workers from `/root/cluster_initialized.txt` to `join_workers.yml`.
 
@@ -366,7 +373,7 @@ You can check on the master server
 kubectl get nodes
 ```
 
-## Clean up (if something went wrong while creating the cluster)
+### Clean up (if something went wrong while creating the cluster)
 
 See https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down
 ```
