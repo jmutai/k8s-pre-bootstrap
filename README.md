@@ -47,11 +47,15 @@ The entire installation is performed under an account with administrator rights 
 
 ## Quick start
 
-Follow the steps from point [Kubernetes cluster deployment](#kubernetes-cluster-deployment) in sequence.  
+Follow the steps from point [How to use this project](#how-to-use-this-project) in sequence.  
 
 ## Supported Linux distribution (distros)
 
 The playbook supports any Linux distributions, since you can add your own tasklist for each distribution or family of distributions. At the moment, the playbook contains tasklists for CentOS 7, CentOS 8, Debian, Ubuntu. The playbook was previously tested on CentOS 7 but has changed a lot since then. The current version has been tested on Astra Linux 1.7 (similar to Debian 10).  
+
+## Project system requirements
+
+Ansible version `2.9+`.  
 
 ## Main ideas (basic concept)
 
@@ -76,25 +80,36 @@ The playbook supports any Linux distributions, since you can add your own taskli
 
 - **check_unique_uuid.yml** - [Verify the MAC address and product_uuid are unique for every node](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address). Needed for cloned VMs.
 
-## Kubernetes cluster deployment
+# How to use this project
 
-### Preliminary preparation of the master server
+The project requires Ansible, which can be installed both on one of the computers of the current stand and a completely separate computer that has network access to all computers of the stand (admin's computer).
 
-- Install git and ansible on the control computer
-```
-sudo yum install -y epel-release ansible git platform-python nano
+## Install Git and Ansible
+
+Installation is different for different Linux distributions, so see the documentation for those software products:  
+
+- [Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Installing Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+
+For ansible you will need to install additional collections.
+
+```bash
+ansible-galaxy collection install community.general
+ansible-galaxy collection install ansible.posix
 ```
 
-- Clone the Git Project to folder ~/ansible:
-```
+## Git clone project
+
+```bash
 cd ~
-git clone https://github.com/MinistrBob/k8s-pre-bootstrap.git .
-cd k8s-pre-bootstrap
-cp hosts_example hosts
+git clone https://github.com/MinistrBob/k8s_setup.git
+cd k8s_setup
 ```
 
-- Setting up ansible
-```
+## Setting up ansible
+
+You can change ansible settings in ansible.cfg file. 
+```bash
 ansible --version (you can see where config)
 sudo nano /etc/ansible/ansible.cfg
 ```
