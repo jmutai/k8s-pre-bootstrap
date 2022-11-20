@@ -22,7 +22,6 @@
 # Deploy the public key to remote hosts
 - hosts: all
   gather_facts: no
-  ansible_user: "{{ user1 }}"
   tasks:
 #  - name: show user
 #    debug:
