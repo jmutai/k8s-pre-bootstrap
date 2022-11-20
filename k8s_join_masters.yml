@@ -23,19 +23,5 @@
         msg: "{{ output.stdout.split('\n') }}"
 
     - name: Configure k8s administrators
-      block:
-        - name: Create .kube directory
-          file:
-            path: "/home/{{ item }}/.kube"
-            state: directory
-            owner: "{{ item }}"
-            mode: 0755
-          loop: "{{ k8s_admins }}"
-
-        - name: Copy admin.conf to user's kube config
-          copy:
-            src: "/etc/kubernetes/admin.conf"
-            dest: "/home/{{ item }}/.kube/config"
-            owner: "{{ item }}"
-            remote_src: yes
-          loop: "{{ k8s_admins }}"
+      include_tasks: configure_k8s_admin.yml
+      loop: "{{ k8s_admins }}"
