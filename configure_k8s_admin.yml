@@ -3,9 +3,13 @@
   changed_when: false
   register: user_home
 
+- name: user_home.stdout
+  debug:
+    var: user_home.stdout
+
 - name: Create .kube directory
   file:
-    path: "{{ user_home }}/.kube"
+    path: "{{ user_home.stdout }}/.kube"
     state: directory
     owner: "{{ item }}"
     mode: 0755
@@ -13,6 +17,6 @@
 - name: Copy admin.conf to user's kube config
   copy:
     src: "/etc/kubernetes/admin.conf"
-    dest: "{{ user_home }}/.kube/config"
+    dest: "{{ user_home.stdout }}/.kube/config"
     owner: "{{ item }}"
     remote_src: yes
