@@ -1,6 +1,6 @@
 [defaults]
 host_key_checking = false
-inventory = ./hosts
+inventory = inventory/stand.yml
 interpreter_python = auto_silent
 #interpreter_python=/usr/bin/python3
 

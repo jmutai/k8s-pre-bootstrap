@@ -1,0 +1,52 @@
+---
+# Check required variables
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Check ansible_user
+      fail: 
+        msg: "ERROR: Variable ansible_user is not defined or is empty"
+      when: (ansible_user is not defined) or (ansible_user | length <= 0)
+    - name: ansible_user
+      ansible.builtin.debug:
+        msg: "ansible_user={{ ansible_user }}"
+
+    - name: Check ansible_private_key_file
+      fail: 
+        msg: "ERROR: Variable ansible_private_key_file is not defined or is empty"
+      when: (ansible_private_key_file is not defined) or (ansible_private_key_file | length <= 0)
+    - name: ansible_private_key_file
+      ansible.builtin.debug:
+        msg: "ansible_private_key_file={{ ansible_private_key_file }}"
+
+# Deploy the public key to remote hosts and visudo user
+- hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  tasks:
+  - name: Set authorized key taken from file
+    ansible.posix.authorized_key:
+      user: "{{ ansible_user }}"
+      state: present
+      key: "{{ lookup('file', ansible_private_key_file + '.pub') }}"
+  - name: visudo
+    lineinfile:
+      path: "/etc/sudoers.d/{{ ansible_user }}"
+      line: "{{ ansible_user }} ALL=(ALL) NOPASSWD:ALL"
+      create: yes
+      owner: root 
+      group: root 
+      mode: "0440"
+      state: present
+      validate: 'visudo -c -f %s'
+
+# Checking availability of all hosts 
+- hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  tasks:
+  - name: ping
+    ansible.builtin.ping:

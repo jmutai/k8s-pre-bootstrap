@@ -1,34 +1,6 @@
--- Проверить SSH соединение 
-ssh worker@astra170-1.dmz.dear.com.ru
-
--- Запуск с паролем
-ansible-playbook -i inventory/stand.yml send_public_key.yml -b --ask-pass
--- Эта ошибка может значить что пароль не правильный
-Failed to connect to the host via ssh: worker@astra170-1.dmz.dear.com.ru: Permission denied (publickey,password).
--- Всё равно получаю эту ошибку, тогда запуск через paramiko
-ansible-playbook -i inventory/stand.yml send_public_key.yml -c paramiko -b --ask-pass
--- Проверка доступности всех хостов
-ansible -i inventory/stand.yml all -m ping
-
-ERROR! couldn't resolve module/action 'community.general.modprobe'. This often indicates a misspelling, missing collection, or incorrect module path.
-ansible-galaxy collection install community.general
-
-ERROR! couldn't resolve module/action 'ansible.posix.sysctl'. This often indicates a misspelling, missing collection, or incorrect module path.
-ansible-galaxy collection install ansible.posix
-
 ansible-playbook -i inventory/stand.yml k8s_setup.yml
 ansible-playbook -i inventory/stand.yml k8s_setup.yml --list-tasks
  
-
-
-
-Предполагается что все хосты предназначены только для Kubernetes.
-
-# confirm what task names would be run if I ran this command and said "just ntp tasks"
-ansible-playbook -i production webservers.yml --tags ntp --list-tasks
-
-# confirm what hostnames might be communicated with if I said "limit to boston"
-ansible-playbook -i production webservers.yml --limit boston --list-hosts
 
 tags: ver
 tags: os_prep, kube_set, ha_set
@@ -54,7 +26,8 @@ The playbook supports any Linux distributions, since you can add your own taskli
 
 ## Project system requirements
 
-Ansible version `2.9+`.  
+- Ansible version `2.9+`.  
+- On all servers, a sudo user must be created under which the SSH connection occurs. You yourself can automate the process of creating such a user if it does not exist. When cloning virtual machines from a template, there is usually such an administrator user already there.  
 
 ## Main ideas (basic concept)
 
@@ -68,12 +41,12 @@ Ansible version `2.9+`.
 
 ## Main playbooks
 
-- **k8s_setup.yml** - Main playbook for OS prepare, Kubernetes setup and HA setup.  
-- **send_public_key.yml** - Set up passwordless access via SSH.  
-- **k8s_init_cluster.yml** - K8s cluster initialization (kubeadm init).  
-- **k8s_join_masters.yml** - Join masters (for HA).  
-- **k8s_join_workers.yml** - Join workers.  
-- **k8s_delete_cluster.yml** - Delete k8s cluster (HA is not deleted).  
+- **k8s_setup.yml**             - Main playbook for OS prepare, Kubernetes setup and HA setup.  
+- **deploy_ssh_public_key.yml** - Set up passwordless access via SSH.  
+- **k8s_init_cluster.yml**      - K8s cluster initialization (kubeadm init).  
+- **k8s_join_masters.yml**      - Join masters (for HA).  
+- **k8s_join_workers.yml**      - Join workers.  
+- **k8s_delete_cluster.yml**    - Delete k8s cluster (HA is not deleted).  
 
 ## Stuff playbooks (in folder stuff)
 
@@ -90,7 +63,7 @@ Installation is different for different Linux distributions, so see the document
 - [Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [Installing Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
-For ansible you will need to install additional collections.
+**Attention!** For ansible you will need to install additional collections.
 
 ```bash
 ansible-galaxy collection install community.general
@@ -114,10 +87,23 @@ cp ansible.cfg.example ansible.cfg
 nano ansible.cfg
 ```
 
-## Set up inventory for the stand
+If you have one stand and one inventory then you can define an `inventory` variable so you don't have to specify it every time.
 
-The name of the stand (`stand.yml`) can be anything. It is possible to keep several configuration files here for several stands.  
+```bash
+inventory = inventory/standXXX.yml
+```
+
+## Generate SSH key of any type
+
+```bash
+ssh-keygen -t ed25519
+```
+
+## Configure inventory for the stand
+
 All variables have comments explaining the purpose of the variables.  
+The name of the stand (`stand.yml`) can be anything. It is possible to keep several configuration files here for several stands.  
+**Attention!** Two variables are required for SSH options: `ansible_user` and `ansible_private_key_file` (see `inventory/stand.yml.example`).  
 The project uses three groups:
 
 - **kube** - All servers for the cluster Kubernetes (masters and workers and others).  
@@ -125,37 +111,46 @@ The project uses three groups:
 - **auxiliary** - Auxiliary stand servers that are not included in the Kubernetes cluster. For them, only the first stage `OS prepare` is performed, for example, DNS, NTP, etc.  
 
 ```bash
-cp inventory/stand.yml.example inventory/stand.yml
-nano inventory/stand.yml
+cp inventory/stand.yml.example inventory/standXXX.yml
+nano inventory/standXXX.yml
 ```
 
-## Deploy the public key to remote hosts (setup passwordless authentication) and visudo current user
+## Deploy SSH public key to remote hosts (setup SSH passwordless authentication) and visudo user
 
-Generate SSH keys of any type.  
+(Optional) You can check SSH connection is on one of host manualy to make sure that the ssh connection is established at all.  
 
 ```bash
-ssh-keygen -t ed25519
+ssh -i ~/.ssh/id_ed25519 user1@pp-ceph-osd-01
 ```
 
-- Edit **send_public_key.yml**, insert instead of ```<sshkey>``` line with public key from ```/home/<user>/.ssh/id_rsa.pub```. You can see key ```cat /home/$USER/.ssh/id_rsa.pub```.
+Playbook executed with password.  
 
-- Edit **send_public_key.yml**, insert instead of ```<username>``` user name (user under whom the installation is performed). 
-
-- Deploy key with ansible
 ```
-ansible-playbook send_public_key.yml -b --ask-pass
-```
-If you get the error "missing sudo password", try this
-```
-ansible-playbook send_public_key.yml -b --ask-pass -kK
+$ ansible-playbook -i hosts k8s-prep.yml --ask-pass
+ansible-playbook -i inventory/stand.yml deploy_ssh_public_key.yml --ask-pass
 ```
 
+Playbook executed as sudo user - with password:
 
-### Verify the MAC address and product_uuid are unique for every node
-
-Playbook **check_uniq.yml** show MAC addresses and UUID. If VMs were cloned, then they may have not uniqu MAC and UUID. **You must visually verify that everything is unique**.  
 ```
-ansible-playbook check_uniq.yml
+$ ansible-playbook -i hosts k8s-prep.yml --ask-pass --ask-become-pass
+```
+
+
+-- Запуск с паролем
+ansible-playbook -i inventory/stand.yml deploy_ssh_public_key.yml -b --ask-pass
+-- Эта ошибка может значить что пароль не правильный
+Failed to connect to the host via ssh: worker@astra170-1.dmz.dear.com.ru: Permission denied (publickey,password).
+-- Всё равно получаю эту ошибку, тогда запуск через paramiko
+ansible-playbook -i inventory/stand.yml deploy_ssh_public_key.yml -c paramiko -b --ask-pass
+
+
+## (Optional) Verify the MAC address and product_uuid are unique for every node
+
+Playbook **check_unique_uuid.yml** show MAC addresses and UUID. If VMs were cloned, then they may have not uniqu MAC and UUID. **You must visually verify that everything is unique**.  
+
+```bash
+ansible-playbook stuff/check_unique_uuid.yml
 ```
 
 ### Preliminary preparation infrastructure

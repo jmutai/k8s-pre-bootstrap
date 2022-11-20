@@ -1,7 +1,11 @@
 all:
   vars:
     # SSH options
-    ansible_user: "user1"                        # User which is used when accessing the remote machines via SSH.
+    ansible_user: "user1"                              # User which is used when accessing the remote machines via SSH.
+                                                       # If commented out or leave an empty value, then the playbook will use the current user on behalf of which the playbook is running. This is the default ansible behavior.
+    ansible_private_key_file: "~/.ssh/id_ed25519"      # SSH key file that contains the key that is used when accessing the remote machines via SSH.
+                                                       # If you comment out or leave an empty value, then the playbook will try to find other keys, if they are not there, it will create a new key for the specified user `ansible_user`, if the user is not specified, then for the current one.
+
     # Main options
     ## I. Prepare OS
     os_prepare: true              # Prepare OS?
