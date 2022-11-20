@@ -1,7 +1,6 @@
 ---
 # Check required variables
-- hosts: localhost
-  connection: local
+- hosts: all[0]
   gather_facts: no
   tasks:
     - name: Check ansible_user
@@ -20,17 +19,27 @@
       ansible.builtin.debug:
         msg: "ansible_private_key_file={{ ansible_private_key_file }}"
 
-# Deploy the public key to remote hosts and visudo user
+# Deploy the public key to remote hosts
 - hosts: all
-  become: yes
-  become_method: sudo
   gather_facts: no
+  ansible_user: "{{ user1 }}"
   tasks:
+#  - name: show user
+#    debug:
+#      # msg: "{{ lookup('env', 'USER') }}"
+#      msg: "{{ ansible_user }}"
   - name: Set authorized key taken from file
     ansible.posix.authorized_key:
       user: "{{ ansible_user }}"
       state: present
       key: "{{ lookup('file', ansible_private_key_file + '.pub') }}"
+
+# Visudo user
+- hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  tasks:
   - name: visudo
     lineinfile:
       path: "/etc/sudoers.d/{{ ansible_user }}"
