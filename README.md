@@ -1,20 +1,36 @@
-ansible-playbook -i inventory/stand.yml k8s_setup.yml
-ansible-playbook -i inventory/stand.yml k8s_setup.yml --list-tasks
- 
-
-tags: ver
-tags: os_prep, kube_set, ha_set
-
-tags1: pre_tasks, config_net, config_pm, set_proxy, remove_firewall, firewall, config_ac,  reboot, upgrade_os, install_pack, config_ntp, reboot
-tags2: pre_setup, dis_swap, kernel_mod, etc_hosts, container, k8s_pack
-tags3: firewall, 
-
-
-# ---------------------------------------------------------------------
-
 # k8s_setup project
 
+## Contents
+
+- [k8s_setup project](#k8s-setup-project)
+  - [Quick start](#quick-start)
+  - [Supported Linux distribution (distros)](#supported-linux-distribution--distros-)
+  - [Project system requirements](#project-system-requirements)
+  - [Main ideas (basic concept)](#main-ideas--basic-concept-)
+  - [Playbooks](#playbooks)
+  - [Stuff playbooks (in folder stuff)](#stuff-playbooks--in-folder-stuff-)
+  - [WARNINGS](#warnings)
+  - [How to use this project](#how-to-use-this-project)
+    - [Install Git and Ansible](#install-git-and-ansible)
+    - [Git clone project](#git-clone-project)
+    - [Setting up ansible](#setting-up-ansible)
+    - [Generate SSH key of any type](#generate-ssh-key-of-any-type)
+    - [Configure inventory for the stand](#configure-inventory-for-the-stand)
+    - [Deploy SSH public key to remote hosts (setup SSH passwordless authentication) and visudo user](#deploy-ssh-public-key-to-remote-hosts--setup-ssh-passwordless-authentication--and-visudo-user)
+    - [(Optional) Verify the MAC address and product_uuid are unique for every node](#-optional--verify-the-mac-address-and-product-uuid-are-unique-for-every-node)
+    - [Running playbook k8s_setup.yml](#running-playbook-k8s-setupyml)
+    - [Cluster initialization on one master](#cluster-initialization-on-one-master)
+    - [Copy commands for join masters and workers](#copy-commands-for-join-masters-and-workers)
+    - [(Optional) Join masters](#-optional--join-masters)
+    - [Join workers](#join-workers)
+  - [Clean up (if something went wrong while creating the cluster)](#clean-up--if-something-went-wrong-while-creating-the-cluster-)
+
+<br/>
+<br/>
+
 This project contains several playbooks that help you automate setting up a Kubernetes Cluster on VMs or bare-metal servers. `kubeadm` deployment method is used [Bootstrapping clusters with kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/).  
+
+<br/>
 
 ## Quick start
 
@@ -39,7 +55,7 @@ The playbook supports any Linux distributions, since you can add your own taskli
 - Stage `HA Setup` installation and configuration of keepalived and haproxy.  
 - Support for various Linux distributions is implemented by adding a tasklists whose names are given by ansible facts `os_distrib_version`, `os_family_version`, `os_distrib` and `os_family` (see `k8s_setup.yml`). **Attention!** Some tasks for some Linux distributions are not currently implemented, for example `Config Access Control system (SELinux, AppArmor, parsec)`, and are left as a stub (see `roles/os-prepare/tasks/config_ac_astralinux.yml`).  
 
-## Main playbooks
+## Playbooks
 
 - **k8s_setup.yml**             - Main playbook for OS prepare, Kubernetes setup and HA setup.  
 - **deploy_ssh_public_key.yml** - Set up passwordless access via SSH.  
@@ -52,11 +68,16 @@ The playbook supports any Linux distributions, since you can add your own taskli
 
 - **check_unique_uuid.yml** - [Verify the MAC address and product_uuid are unique for every node](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address). Needed for cloned VMs.
 
-# How to use this project
+## WARNINGS
+
+- Step `config_os_network` assumes that the network in the OS is managed by the `networking` and `resolvconf` services. If the network settings are managed by the `NetworkManager` service, disable this step.  
+- Virtual IP (VIP) must be recognized via DNS or be included in the `/etc/hosts` file.  
+
+## How to use this project
 
 The project requires Ansible, which can be installed both on one of the computers of the current stand and a completely separate computer that has network access to all computers of the stand (admin's computer).
 
-## Install Git and Ansible
+### Install Git and Ansible
 
 Installation is different for different Linux distributions, so see the documentation for those software products:  
 
@@ -70,7 +91,7 @@ ansible-galaxy collection install community.general
 ansible-galaxy collection install ansible.posix
 ```
 
-## Git clone project
+### Git clone project
 
 ```bash
 cd ~
@@ -78,7 +99,7 @@ git clone https://github.com/MinistrBob/k8s_setup.git
 cd k8s_setup
 ```
 
-## Setting up ansible
+### Setting up ansible
 
 You can change ansible settings in ansible.cfg file. By default, the settings are optimal.  
 
@@ -93,15 +114,15 @@ If you have one stand and one inventory then you can define an `inventory` varia
 inventory = inventory/standXXX.yml
 ```
 
-## Generate SSH key of any type
+### Generate SSH key of any type
 
 ```bash
 ssh-keygen -t ed25519
 ```
 
-## Configure inventory for the stand
+### Configure inventory for the stand
 
-All variables have comments explaining the purpose of the variables.  
+All variables in `stand.yml.example` have comments explaining the purpose of the variables.  
 The name of the stand (`stand.yml`) can be anything. It is possible to keep several configuration files here for several stands.  
 **Attention!** Two variables are required for SSH options: `ansible_user` and `ansible_private_key_file` (see `inventory/stand.yml.example`).  
 The project uses three groups:
@@ -115,254 +136,74 @@ cp inventory/stand.yml.example inventory/standXXX.yml
 nano inventory/standXXX.yml
 ```
 
-## Deploy SSH public key to remote hosts (setup SSH passwordless authentication) and visudo user
+### Deploy SSH public key to remote hosts (setup SSH passwordless authentication) and visudo user
 
-(Optional) You can check SSH connection is on one of host manualy to make sure that the ssh connection is established at all.  
+(Optional) You can check SSH connection is on one of host manualy to make sure that the ssh connection is established at all.
 
 ```bash
 ssh -i ~/.ssh/id_ed25519 user1@pp-ceph-osd-01
 ```
 
-Playbook executed with password.  
+Playbook executed with password.
 
-```
-$ ansible-playbook -i hosts k8s-prep.yml --ask-pass
-ansible-playbook -i inventory/stand.yml deploy_ssh_public_key.yml --ask-pass
-```
-
-Playbook executed as sudo user - with password:
-
-```
-$ ansible-playbook -i hosts k8s-prep.yml --ask-pass --ask-become-pass
+```bash
+ansible-playbook -i inventory/standXXX.yml deploy_ssh_public_key.yml --ask-pass
 ```
 
+If on the remote server the sudo command asks for a password, then you need to specify it too.  
+Playbook executed with password and sudo password.
 
--- Запуск с паролем
-ansible-playbook -i inventory/stand.yml deploy_ssh_public_key.yml -b --ask-pass
--- Эта ошибка может значить что пароль не правильный
-Failed to connect to the host via ssh: worker@astra170-1.dmz.dear.com.ru: Permission denied (publickey,password).
--- Всё равно получаю эту ошибку, тогда запуск через paramiko
-ansible-playbook -i inventory/stand.yml deploy_ssh_public_key.yml -c paramiko -b --ask-pass
+```bash
+ansible-playbook -i inventory/standXXX.yml deploy_ssh_public_key.yml --ask-pass --ask-become-pass
+```
 
+If even after specifying the correct password you get error `Permission denied (publickey,password)` then you can try to use module `paramiko` instead of `openssh` to connect SSH.  
+In the future, after the public key is installed, `paramiko` does not need to be used.
 
-## (Optional) Verify the MAC address and product_uuid are unique for every node
+```bash
+ansible-playbook -i inventory/standXXX.yml deploy_ssh_public_key.yml -c paramiko --ask-pass
+```
+
+### (Optional) Verify the MAC address and product_uuid are unique for every node
 
 Playbook **check_unique_uuid.yml** show MAC addresses and UUID. If VMs were cloned, then they may have not uniqu MAC and UUID. **You must visually verify that everything is unique**.  
+**NOTE**: VMware ESXi changes the MAC address during virtual machine cloning.
 
 ```bash
 ansible-playbook stuff/check_unique_uuid.yml
 ```
 
-### Preliminary preparation infrastructure
-  
-- It is desirable that all servers distinguish each other by name. To do this, either you need to have a configured DNS or prepare files ```/etc/hosts``` and ```/etc/resolv.conf``` on the master and copy them to other servers using **net_config_copy.yml**.
-- WARNING: Executed only for workers. You prepare configuration files on the Master, and then using ansible they are copied to the Workers.  
-- WARNING: If you use Network Manager (in the CentOS 7 by default it that) to change the DNS settings, changing file ```/etc/resolv.conf``` is not enough, you need to change the network settings, for example in ```/etc/sysconfig/network-scripts/ifcfg-ens192```, otherwise the Network Manager will overwrite file ```/etc/resolv.conf``` when the OS reboots
-```
-ansible-playbook net_config_copy.yml
+### Running playbook k8s_setup.yml
+
+This playbook does all the main work and fully prepares the cluster before it is initialized.
+
+```bash
+ansible-playbook -i inventory/standXXX.yml k8s_setup.yml
 ```
 
-- If Internet works through a proxy, then you need configure `/etc/environment`, `/etc/yum.conf`, `/etc/profile.d/http_proxy.sh` files, and run command that copy this files to another servers.
-- WARNING: Executed only for workers. You prepare configuration files on the Master, and then using ansible they are copied to the Workers.  
-```
-ansible-playbook proxy_settings_copy.yml
-```
-This is example files:  
-```
-# nano /etc/environment
+### Cluster initialization on one master
 
+Examples of three different ways to initialize a cluster. Here extra-vars parameter `mc` is the cluster initialization command.
 
-https_proxy=http://10.1.113.15:1010/
-http_proxy=http://10.1.113.15:1010/
-no_proxy=localhost,127.0.0.0/8,::1,10.128.0.0/16,10.147.245.11,10.147.245.12,10.147.245.13,10.147.245.14,10.147.245.15,10.147.245.16,10.147.245.17,10.147.245.18,10.147.245.19,10.147.245.20,10.147.245.21,10.147.245.22,10.147.245.23,10.147.245.24,10.147.245.25,10.147.245.26,10.147.245.27,10.147.245.28,10.147.245.29,10.147.245.30,10.147.245.31,10.147.245.32,10.147.245.33,10.147.245.34,10.147.245.35,10.147.245.36,10.147.245.37,10.147.245.38,10.147.245.39
-all_proxy=socks://10.1.113.15:1010/
-ftp_proxy=http://10.1.113.15:1010/
-HTTP_PROXY=http://10.1.113.15:1010/
-FTP_PROXY=http://10.1.113.15:1010/
-ALL_PROXY=socks://10.1.113.15:1010/
-NO_PROXY=localhost,127.0.0.0/8,::1,10.128.0.0/16,10.147.245.11,10.147.245.12,10.147.245.13,10.147.245.14,10.147.245.15,10.147.245.16,10.147.245.17,10.147.245.18,10.147.245.19,10.147.245.20,10.147.245.21,10.147.245.22,10.147.245.23,10.147.245.24,10.147.245.25,10.147.245.26,10.147.245.27,10.147.245.28,10.147.245.29,10.147.245.30,10.147.245.31,10.147.245.32,10.147.245.33,10.147.245.34,10.147.245.35,10.147.245.36,10.147.245.37,10.147.245.38,10.147.245.39
-HTTPS_PROXY=http://10.1.113.15:1010/
-```
-```
-# sudo chmod 755 /etc/profile.d/http_proxy.sh
-# nano /etc/profile.d/http_proxy.sh
-
-
-https_proxy=http://10.1.113.15:1010/
-http_proxy=http://10.1.113.15:1010/
-no_proxy=localhost,127.0.0.0/8,::1,10.128.0.0/16,10.147.245.11,10.147.245.12,10.147.245.13,10.147.245.14,10.147.245.15,10.147.245.16,10.147.245.17,10.147.245.18,10.147.245.19,10.147.245.20,10.147.245.21,10.147.245.22,10.147.245.23,10.147.245.24,10.147.245.25,10.147.245.26,10.147.245.27,10.147.245.28,10.147.245.29,10.147.245.30,10.147.245.31,10.147.245.32,10.147.245.33,10.147.245.34,10.147.245.35,10.147.245.36,10.147.245.37,10.147.245.38,10.147.245.39
-all_proxy=socks://10.1.113.15:1010/
-ftp_proxy=http://10.1.113.15:1010/
-HTTP_PROXY=http://10.1.113.15:1010/
-FTP_PROXY=http://10.1.113.15:1010/
-ALL_PROXY=socks://10.1.113.15:1010/
-NO_PROXY=localhost,127.0.0.0/8,::1,10.128.0.0/16,10.147.245.11,10.147.245.12,10.147.245.13,10.147.245.14,10.147.245.15,10.147.245.16,10.147.245.17,10.147.245.18,10.147.245.19,10.147.245.20,10.147.245.21,10.147.245.22,10.147.245.23,10.147.245.24,10.147.245.25,10.147.245.26,10.147.245.27,10.147.245.28,10.147.245.29,10.147.245.30,10.147.245.31,10.147.245.32,10.147.245.33,10.147.245.34,10.147.245.35,10.147.245.36,10.147.245.37,10.147.245.38,10.147.245.39
-HTTPS_PROXY=http://10.1.113.15:1010/
-```
-```
-# add one string at the end of file
-# nano /etc/yum.conf
-
-
-[main]
-cachedir=/var/cache/yum/$basearch/$releasever
-keepcache=0
-debuglevel=2
-logfile=/var/log/yum.log
-exactarch=1
-obsoletes=1
-gpgcheck=1
-plugins=1
-installonly_limit=5
-bugtracker_url=http://bugs.centos.org/set_project.php?project_id=23&ref=http://bugs.centos.org/bug_report_page.php?category=yum
-distroverpkg=centos-release
-
-
-#  This is the default, if you make this bigger yum won't see if the metadata
-# is newer on the remote and so you'll "gain" the bandwidth of not having to
-# download the new metadata and "pay" for it by yum not having correct
-# information.
-#  It is esp. important, to have correct metadata, for distributions like
-# Fedora which don't keep old packages around. If you don't like this checking
-# interupting your command line usage, it's much better to have something
-# manually check the metadata once an hour (yum-updatesd will do this).
-# metadata_expire=90m
-
-# PUT YOUR REPOS HERE OR IN separate files named file.repo
-# in /etc/yum.repos.d
-proxy=http://10.1.113.15:1010
+```bash
+ansible-playbook -i inventory/standXXX.yml k8s_init_cluster.yml --extra-vars "mc='kubeadm init'"
+ansible-playbook -i inventory/standXXX.yml k8s_init_cluster.yml --extra-vars "mc='kubeadm init --pod-network-cidr=10.244.0.0/16'"
+ansible-playbook -i inventory/standXXX.yml k8s_init_cluster.yml --extra-vars "mc='kubeadm init --control-plane-endpoint pp-vip-k8s.mydomen.com:8443 --upload-certs --pod-network-cidr 10.244.0.0/16'"
 ```
 
-- All servers must have time synchronization configured (using **install_chrony.yml**). If time synchronization is already set and working, do not perform this step. If you want to use another time synchronization program, install it manually or by editing **install_chrony.yml**.  
-```
-ansible-playbook install_chrony.yml
-```
+During the initialization process, two log files will be created:
 
-### !!! Prepare OS !!!
-- To do this! (using prepare_os.yml). Disable SELinux, Install common packages, Disable SWAP, Load required modules, Modify sysctl entries, Update OS if it need, Reboot OS (using **prepare_os.yml**).  
-To understand the example see `hosts_example` file. Ansible installed on first master.  
-First execute this on the host with ansible. In this example it is first K8S master. This is just an OS update.
-```
-ansible-playbook prepare_os.yml -e target=ansible
-```
-Then execute on the all other hosts K8S.  
-```
-ansible-playbook prepare_os.yml -e target='kube:!ansible'
-```
-If you need prepare OS on other servers not included in the cluster (for example, rdbms and etc.). This is just an OS update.
-```
-ansible-playbook prepare_os_others.yml -e target=others
-```
-
-Сheck settings 
-```
-ansible kube -m shell -a 'lsmod | grep br_netfilter' -b
-ansible kube -m shell -a 'cat /etc/modules-load.d/k8s.conf'
-ansible kube -m shell -a 'cat /etc/sysctl.conf'
-```
-
-#### Install specific version packages
-If you need install specific version docker or kubernetes, you neet edit these yml files  
-```
-nano ~/ansible/roles/kubernetes-bootstrap/tasks/install_k8s_packages.yml
-nano ~/ansible/roles/kubernetes-bootstrap/tasks/setup_docker.yml
-```
-Example changes  
-```
-[containerd.io-1.2.13,docker-ce-19.03.11,docker-ce-cli-19.03.11]
-[kubelet-1.21.3,kubeadm-1.21.3,kubectl-1.21.3]
-```
-
-#### Update variables in playbook file k8s-prep.yml (presented variant when firewalld is completely removed)
-
-In file **setup_docker.yml** specific versions of packages are indicated (taken from the documentation - https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker).  
-You need to check which version of the packages is currently indicated in the documentation and, if necessary, fix it.
-
-
-```
-nano k8s-prep.yml
----
-- name: Setup Proxy
-  hosts: k8s-nodes
-  # remote_user: <user>
-  become: yes
-  become_method: sudo
-  # gather_facts: no
-  vars:
-    k8s_cni: calico                                      # calico, flannel
-    container_runtime: docker                            # docker, cri-o, containerd
-    configure_firewalld: false                            # true / false
-    remove_firewalld: true                               # Set to true to remove firewalld	
-    # Docker registry
-    setup_proxy: false                                   # Set to true to configure proxy
-    proxy_server: "proxy.example.com:8080"               # Proxy server address and port
-    docker_proxy_exclude: "localhost,127.0.0.1"          # Adresses to exclude from proxy
-  roles:
-    - kubernetes-bootstrap
-```
-
-If you are using non root remote user, then set username and enable sudo:
-```
-become: yes
-become_method: sudo
-```
-
-To **enable proxy**, set the value of `setup_proxy` to `true` and provide proxy details in **vars**: `proxy_server` and `docker_proxy_exclude`.  
-To **remove Firewalld**, set the value of `remove_firewalld` to `true` and `configure_firewalld` to `false`.  
-To **install and configure Firewalld**, set the value of `remove_firewalld` to `false` and `configure_firewalld` to `true`.  
-
-## Running Playbook with role kubernetes-bootstrap
-
-This playbook installed all needed software on all servers without creating the cluster itself.  
-```
-ansible-playbook k8s-prep.yml
-```
-
-### Additional options and checks after installation  
-- Check versions  
-```
-sudo docker --version
-sudo kubelet --version
-# until the host is added to the cluster, the kubectl will generate an error
-sudo kubectl version
-sudo kubeadm version
-ansible kube -m shell -a "docker --version && sudo kubelet --version && sudo kubeadm version" -b
-```
-- You can add any user to the `docker` group so that this user can run `docker` even without root\sudo permissions. After add you need relogin.  
-```
-sudo usermod -aG docker $USER
-ansible kube -m shell -a "usermod -aG docker USERNAME" -b
-```
-- You can prevent update specific packages (only example for docker) during system update  
-```
-# CentOS
-sudo yum update --exclude=docker
-# Debiam\Ubunta
-sudo apt-mark hold docker && sudo apt-get upgrade
-sudo apt-mark unhold docker
-```
-
----
-### Kubernetes Cluster
-Init manualy
-#### Init Cluster on Master 
-Examples of three different ways to initialize a cluster.  
-```
-ansible-playbook -i inventory/stand.yml k8s_init_cluster.yml --extra-vars "mc='kubeadm init'"
-ansible-playbook -i inventory/stand.yml k8s_init_cluster.yml --extra-vars "mc='kubeadm init --pod-network-cidr=10.244.0.0/16'"
-ansible-playbook -i inventory/stand.yml k8s_init_cluster.yml --extra-vars "mc='kubeadm init --control-plane-endpoint pp-vip-k8s.mydomen.com:8443 --upload-certs --pod-network-cidr 10.244.0.0/16'"
-```
-
-In folder `/root` will be created two files:
-- `cluster_initialized.txt` - Cluster creation log and command for join workers.
-- `pod_network_setup.txt` - Pod network installation log. 
+- `cluster_init.log` - Cluster initialization log and command for join masters and workers.
+- `install_calico.log` - Pod network installation log.
 
 To check the cluster you can execute (this is as example):
-```
-# kubectl get nodes -o wide
+
+```bash
+$ kubectl get nodes -o wide
 NAME              STATUS   ROLES    AGE   VERSION   INTERNAL-IP     EXTERNAL-IP   OS-IMAGE                KERNEL-VERSION                CONTAINER-RUNTIME
-rtz-ppd-mk8s-01   Ready    master   39m   v1.19.2   10.147.245.25   <none>        CentOS Linux 7 (Core)   3.10.0-1127.19.1.el7.x86_64   docker://19.3.11
-# kubectl -n kube-system get pod
+pp-mk8s-01   Ready    master   39m   v1.19.2   10.147.245.25   <none>        CentOS Linux 7 (Core)   3.10.0-1127.19.1.el7.x86_64   docker://19.3.11
+
+$ kubectl -n kube-system get pod
 NAME                                      READY   STATUS    RESTARTS   AGE
 calico-kube-controllers-c9784d67d-98dx8   1/1     Running   0          39m
 calico-node-ml9gv                         1/1     Running   0          39m
@@ -375,24 +216,43 @@ kube-proxy-z4qvt                          1/1     Running   0          39m
 kube-scheduler-rtz-ppd-mk8s-01            1/1     Running   0          39m
 ```
 
-#### Join workers
+### Copy commands for join masters and workers
 
-Join all workers servers to cluster. Copy command for join workers from `/root/cluster_initialized.txt` to `join_workers.yml`.
+Copy command for join masters and workers from screnn or file `cluster_init.log` to `vars/join_commands.yml`.
 
-```
-ansible-playbook join_workers.yml
+### (Optional) Join masters
+
+If you are setting high availability (HA) configuration then you need to join other masters to cluster.
+
+```bash
+ansible-playbook -i inventory/standXXX.yml k8s_join_masters.yml
 ```
 
-You can check on the master server
+### Join workers
+
+Join all workers servers to cluster.
+
+```bash
+ansible-playbook -i inventory/standXXX.yml k8s_join_workers.yml
 ```
+
+You can check on the master server.
+
+```bash
 kubectl get nodes
 ```
 
-### Clean up (if something went wrong while creating the cluster)
+## Clean up (if something went wrong while creating the cluster)
 
-See https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down
+See [Clean up](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down)
+
+```bash
+ansible-playbook -i inventory/standXXX.yml k8s_delete_cluster.yml
 ```
-# Undo controlplane init on master
-sudo kubeadm reset
+
+If you have a need to clean the iptavles (you can not do this).  
+
+```bash
 sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
+sudo iptables -L -n -t nat
 ```
