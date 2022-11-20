@@ -70,6 +70,7 @@ The playbook supports any Linux distributions, since you can add your own taskli
 
 ## WARNINGS
 
+- At stage `Prepare OS`, the reboot is performed twice, so it is better to execute the playbook from a separate server (administrator's computer), otherwise the playbook execution will be interrupted.  
 - Step `config_os_network` assumes that the network in the OS is managed by the `networking` and `resolvconf` services. If the network settings are managed by the `NetworkManager` service, disable this step.  
 - Virtual IP (VIP) must be recognized via DNS or be included in the `/etc/hosts` file.  
 
