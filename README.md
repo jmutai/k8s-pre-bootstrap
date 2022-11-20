@@ -67,10 +67,16 @@ The playbook supports any Linux distributions, since you can add your own taskli
 ## Stuff playbooks (in folder stuff)
 
 - **check_unique_uuid.yml** - [Verify the MAC address and product_uuid are unique for every node](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address). Needed for cloned VMs.
+- **reboot_servers.yml** - Playbook for reboot servers.
+Example: Reboot all servers except one.
+
+```bash
+ansible-playbook stuff/reboot_servers.yml -e 'target=all,!pp-bal-01'
+```
 
 ## !!! WARNINGS !!!
 
-- At stage `Prepare OS`, the reboot is performed twice, so it is better to execute the playbook from a separate server (administrator's computer), otherwise the playbook execution will be interrupted.  
+- At stage `Prepare OS`, the reboot is performed twice, so it is better to execute the playbook from a separate server (administrator's computer), otherwise the playbook execution will be interrupted.  See `reboot_servers.yml` in [Stuff playbooks (in folder stuff)](#stuff-playbooks-in-folder-stuff). If you do not have a separate computer, then you can perform a workaround. Turn off the second and third stages. Set `reboot=false`. After completing the first stage, first restart the server from which you are running the playbook manually, and then restart all servers using stuff/reboot_servers.yml (see [Stuff playbooks (in folder stuff)](#stuff-playbooks-in-folder-stuff)).  
 - Step `config_os_network` assumes that the network in the OS is managed by the `networking` and `resolvconf` services. If the network settings are managed by the `NetworkManager` service, disable this step.  
 - Virtual IP (VIP) must be recognized via DNS or be included in the `/etc/hosts` file.  
 
