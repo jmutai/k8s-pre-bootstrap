@@ -18,9 +18,17 @@
     group: root
     mode: 0644
 
-- name: Run the equivalent of "apt-get update" as a separate step
-  ansible.builtin.apt:
-    update_cache: yes
+#- name: Run the equivalent of "apt-get update" as a separate step
+#  ansible.builtin.apt:
+#    update_cache: yes
+
+- name: "apt update"
+  command: "apt update"
+  register: output
+
+- name: Output apt update
+  debug:
+    msg: "{{ output.stdout.split('\n') }}"
 
 - name: Install kubernetes packages
   apt:
