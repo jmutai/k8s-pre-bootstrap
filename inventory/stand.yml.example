@@ -97,7 +97,7 @@ all:
         pp-mk8s-01:
         pp-mk8s-02:
         pp-mk8s-03:
-    kube_masters:  # Kubernetes mastars
+    kube_masters:  # Kubernetes masters
       hosts:
         pp-mk8s-01:
         pp-mk8s-02:
