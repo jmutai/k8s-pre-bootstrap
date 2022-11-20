@@ -1,0 +1,18 @@
+- name: Get user home directory
+  shell: "getent passwd {{ item }}  | awk -F: '{ print $6 }'"
+  changed_when: false
+  register: user_home
+
+- name: Create .kube directory
+  file:
+    path: "{{ user_home }}/.kube"
+    state: directory
+    owner: "{{ item }}"
+    mode: 0755
+
+- name: Copy admin.conf to user's kube config
+  copy:
+    src: "/etc/kubernetes/admin.conf"
+    dest: "{{ user_home }}/.kube/config"
+    owner: "{{ item }}"
+    remote_src: yes
