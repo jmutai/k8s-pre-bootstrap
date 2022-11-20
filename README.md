@@ -1,4 +1,4 @@
-# k8s_setup project
+# k8s_setup
 
 ## Contents
 
@@ -50,9 +50,9 @@ The playbook supports any Linux distributions, since you can add your own taskli
 - All variables and list of hosts are collected in one file inventory (see example `inventory\example.standXXX.yml`).  
 - Main playbook `k8s_setup.yml` is divided into three stages (each of which is represented by a separate role): `OS prepare`, `Kubernetes setup` and `HA setup`. Each of which can be performed separately (or not performed). This can be regulated by variables in inventory (see example `inventory\example.standXXX.yml`) and tags.  
 - Each step in each of the three stages can be performed separately (or not performed). This can be regulated by variables in inventory (see example `inventory\example.standXXX.yml`) and tags.  
-- Stage `OS prepare` helps to prepare the server operating system and can be used not only for servers intended for the Kubernetes, but also for auxiliary servers (group `others`) included in this stand, for example, DNS, NTP, etc.  
+- Stage `OS prepare` helps to prepare the server operating system and can be used not only for servers intended for the Kubernetes, but also for auxiliary servers (group `auxiliary`) included in this stand, for example, DNS, NTP, etc.  
 - Stage `Kubernetes Setup` OS prepare for K8S, setup container runtime and install k8s packages.  
-- Stage `HA Setup` installation and configuration of keepalived and haproxy.  
+- Stage `HA Setup` installation and configuration of `keepalived` and `haproxy`.  
 - Support for various Linux distributions is implemented by adding a tasklists whose names are given by ansible facts `os_distrib_version`, `os_family_version`, `os_distrib` and `os_family` (see `k8s_setup.yml`). **Attention!** Some tasks for some Linux distributions are not currently implemented, for example `Config Access Control system (SELinux, AppArmor, parsec)`, and are left as a stub (see `roles/os-prepare/tasks/config_ac_astralinux.yml`).  
 
 ## Playbooks
@@ -68,7 +68,7 @@ The playbook supports any Linux distributions, since you can add your own taskli
 
 - **check_unique_uuid.yml** - [Verify the MAC address and product_uuid are unique for every node](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#verify-mac-address). Needed for cloned VMs.
 
-## WARNINGS
+## !!! WARNINGS !!!
 
 - At stage `Prepare OS`, the reboot is performed twice, so it is better to execute the playbook from a separate server (administrator's computer), otherwise the playbook execution will be interrupted.  
 - Step `config_os_network` assumes that the network in the OS is managed by the `networking` and `resolvconf` services. If the network settings are managed by the `NetworkManager` service, disable this step.  
@@ -102,7 +102,7 @@ cd k8s_setup
 
 ### Setting up ansible
 
-You can change ansible settings in ansible.cfg file. By default, the settings are optimal.  
+You can change ansible settings in `ansible.cfg` file. By default, the settings are optimal.  
 
 ```bash
 cp ansible.cfg.example ansible.cfg
@@ -219,7 +219,7 @@ kube-scheduler-rtz-ppd-mk8s-01            1/1     Running   0          39m
 
 ### Copy commands for join masters and workers
 
-Copy command for join masters and workers from screnn or file `cluster_init.log` to `vars/join_commands.yml`.
+Copy command for join masters and workers from screen or from file `cluster_init.log` to `vars/join_commands.yml`.
 
 ### (Optional) Join masters
 
@@ -245,7 +245,7 @@ kubectl get nodes
 
 ## Clean up (if something went wrong while creating the cluster)
 
-See [Clean up](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down)
+See kubernetes documentation: [Clean up](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down)
 
 ```bash
 ansible-playbook -i inventory/standXXX.yml k8s_delete_cluster.yml
