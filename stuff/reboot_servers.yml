@@ -1,0 +1,19 @@
+- hosts: all,!this-server
+  become: yes
+  become_method: sudo
+  gather_facts: no
+  tasks:
+    - name: reboot servers
+      shell: sleep 3; reboot
+      ignore_errors: true
+      changed_when: false
+      async: 1
+      poll: 0
+    - name: wait for server to come back after reboot
+      wait_for_connection:
+        timeout: 600
+        delay: 20
+      register: reboot_result
+    - name: reboot time
+      debug:
+        msg: "The system rebooted in {{ reboot_result.elapsed }} seconds."
