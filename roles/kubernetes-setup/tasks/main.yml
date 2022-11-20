@@ -47,6 +47,15 @@
     - "k8s_repo_{{ os_family }}.yml"
   tags: k8s_pack
 
+- name: Download k8s docker images
+  command: "kubeadm config images pull"
+  register: output
+  tags: ddi
+
+- name: Output download k8s docker images
+  debug:
+    msg: "{{ output.stdout.split('\n') }}"
+
 - name: POST tasks 2
   ansible.builtin.include_tasks: '{{ tasks_file }}'
   when: post_tasks2 and tasks_file | length > 0
