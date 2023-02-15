@@ -70,7 +70,7 @@ $ vim k8s-prep.yml
   become_method: sudo
   #gather_facts: no
   vars:
-    k8s_version: "1.20"                                  # Kubernetes version to be installed
+    k8s_version: "1.26"                                  # Kubernetes version to be installed
     selinux_state: permissive                            # SELinux state to be set on k8s nodes
     timezone: "Africa/Nairobi"                           # Timezone to set on all nodes
     k8s_cni: calico                                      # calico, flannel
