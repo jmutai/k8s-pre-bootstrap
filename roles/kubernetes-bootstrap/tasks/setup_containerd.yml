@@ -15,7 +15,8 @@
     state: directory
   with_items:
     - /etc/containerd
-
+    - /etc/docker
+    
 - name: Configure containerd
   ansible.builtin.shell: containerd config default > /etc/containerd/config.toml
   run_once: true
