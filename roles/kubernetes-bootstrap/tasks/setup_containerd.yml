@@ -26,6 +26,19 @@
     src: daemon.json.j2
     dest: /etc/docker/daemon.json
 
+- name: Set cgroup driver as systemd
+  ansible.builtin.template:
+    src: 10-containerd-net.conflist.j2
+    dest: /etc/cni/net.d/10-containerd-net.conflist
+
+- name: Configure containerd subnet
+  ansible.builtin.replace:
+    path: /etc/cni/net.d/10-containerd-net.conflist
+    regexp: '10\.88\.0\.0\/16'
+    replace: '{{ pod_network_cidr }}'
+  ignore_errors: True
+
+
 - name: Start and enable containerd service
   ansible.builtin.systemd:
     name: containerd
