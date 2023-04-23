@@ -18,8 +18,12 @@
     - /etc/docker
     - /etc/cni/net.d
     
-- name: Configure containerd
+- name: Configure containerd (1/2)
   ansible.builtin.shell: containerd config default > /etc/containerd/config.toml
+  run_once: true
+
+- name: Configure containerd (2/2)
+  ansible.builtin.shell: crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock --set image-endpoint=unix:///run/containerd/containerd.sock
   run_once: true
 
 - name: Set cgroup driver as systemd
