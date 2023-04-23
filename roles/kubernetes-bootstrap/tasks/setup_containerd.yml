@@ -16,6 +16,7 @@
   with_items:
     - /etc/containerd
     - /etc/docker
+    - /etc/cni/net.d
     
 - name: Configure containerd
   ansible.builtin.shell: containerd config default > /etc/containerd/config.toml
