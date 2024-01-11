@@ -184,3 +184,5 @@ k8smaster01                : ok=23   changed=3    unreachable=0    failed=0    s
 k8snode01                  : ok=23   changed=3    unreachable=0    failed=0    skipped=11   rescued=0    ignored=0
 k8snode02                  : ok=23   changed=3    unreachable=0    failed=0    skipped=11   rescued=0    ignored=0
 ```
+
+Next check article on bootsrapping k8s control plane: https://computingforgeeks.com/install-kubernetes-cluster-on-rocky-linux-with-kubeadm-crio/
