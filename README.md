@@ -8,8 +8,8 @@ It only helps you automate the standard Kubernetes bootstrapping pre-reqs.
 
 - CentOS 7
 - CentOS 8
-- Rocky Linux 8
-- AlmaLinux 8
+- Rocky Linux 8|9
+- AlmaLinux 8|9
 
 ## Required Ansible
 Ansible version required `2.10+`
