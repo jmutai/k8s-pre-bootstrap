@@ -51,4 +51,4 @@
   when: k8s_cni == "calico"
 
 - name: Reload firewalld
-  shell: firewall-cmd --reload
+  ansible.builtin.shell: firewall-cmd --reload

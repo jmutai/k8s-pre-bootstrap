@@ -17,24 +17,21 @@
     - {key: net.ipv4.ip_forward,  value: 1}
 
 - name: Install cri-o
-  yum:
+  ansible.builtin.yum:
     name: cri-o
     state: latest
     update_cache: yes
 
 - name: Configure cri-o subnet
   ansible.builtin.replace:
-    path: /etc/cni/net.d/100-crio-bridge.conf
+    path: '{{ item }}'
     regexp: '10\.85\.0\.0\/16'
     replace: '{{ pod_network_cidr }}'
   ignore_errors: True
-
-- name: Configure cri-o subnet
-  ansible.builtin.replace:
-    path: /etc/cni/net.d/100-crio-bridge.conflist
-    regexp: '10\.85\.0\.0\/16'
-    replace: '{{ pod_network_cidr }}'
-  ignore_errors: True
+  with_items:
+    - /etc/cni/net.d/100-crio-bridge.conf
+    - /etc/cni/net.d/100-crio-bridge.conflist
+    - /etc/cni/net.d/11-crio-ipv4-bridge.conflist
 
 - name: Start and enable crio service
   ansible.builtin.service:

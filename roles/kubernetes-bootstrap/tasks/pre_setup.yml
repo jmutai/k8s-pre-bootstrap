@@ -1,11 +1,11 @@
 ---
 - name: Put SELinux in permissive mode
-  selinux:
+  ansible.posix.selinux:
     policy: targeted
     state: "{{ selinux_state }}"
 
 - name: Update system packages
-  package:
+  ansible.builtin.package:
     name: "*"
     state: latest
 

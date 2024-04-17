@@ -5,7 +5,7 @@
     dest: /etc/yum.repos.d/kubernetes.repo
 
 - name: Install kubernetes packages
-  yum:
+  ansible.builtin.yum:
     name: [kubelet,kubeadm,kubectl]
     disable_excludes: kubernetes
 

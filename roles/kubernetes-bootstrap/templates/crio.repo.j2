@@ -1,15 +1,6 @@
-[devel_kubic_libcontainers_stable]
-name=Stable Releases of Upstream github.com/containers packages
-type=rpm-md
-baseurl=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_distro_version }}/
-gpgcheck=1
-gpgkey=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_distro_version }}/repodata/repomd.xml.key
+[cri-o]
+name=CRI-O
+baseurl=https://pkgs.k8s.io/addons:/cri-o:/prerelease:/main/rpm/
 enabled=1
-
-[devel_kubic_libcontainers_stable_cri-o_{{ k8s_version }}]
-name=devel:kubic:libcontainers:stable:cri-o:{{ k8s_version }} ({{ crio_distro_version }})
-type=rpm-md
-baseurl=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ k8s_version }}/{{ crio_distro_version }}/
 gpgcheck=1
-gpgkey=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ k8s_version }}/{{ crio_distro_version }}/repodata/repomd.xml.key
-enabled=1
+gpgkey=https://pkgs.k8s.io/addons:/cri-o:/prerelease:/main/rpm/repodata/repomd.xml.key
