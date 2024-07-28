@@ -6,10 +6,9 @@ It only helps you automate the standard Kubernetes bootstrapping pre-reqs.
 
 ## Supported OS
 
-- CentOS 7
-- CentOS 8
 - Rocky Linux 8|9
 - AlmaLinux 8|9
+- CentOS Stream 9
 
 ## Required Ansible
 Ansible version required `2.10+`
