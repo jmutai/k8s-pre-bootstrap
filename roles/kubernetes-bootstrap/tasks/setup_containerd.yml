@@ -28,6 +28,7 @@
     state: present
     backup: yes
 
+
 - name: Start and enable containerd service
   ansible.builtin.systemd:
     name: containerd
