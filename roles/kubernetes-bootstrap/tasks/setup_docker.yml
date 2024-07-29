@@ -40,3 +40,70 @@
     name: docker
     state: restarted
     daemon_reload: yes
+
+- name: Get the latest version of cri-dockerd
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest
+    return_content: yes
+  register: latest_release
+
+- name: Extract version number from latest release
+  ansible.builtin.set_fact:
+    cri_dockerd_version: "{{ latest_release.json.tag_name | regex_replace('v', '') }}"
+
+- name: Debug version number
+  ansible.builtin.debug:
+    msg: "Latest cri-dockerd version is {{ cri_dockerd_version }}"
+
+- name: Download cri-dockerd tarball
+  ansible.builtin.get_url:
+    url: "https://github.com/Mirantis/cri-dockerd/releases/download/v{{ cri_dockerd_version }}/cri-dockerd-{{ cri_dockerd_version }}.amd64.tgz"
+    dest: "/tmp/cri-dockerd-{{ cri_dockerd_version }}.amd64.tgz"
+
+- name: Extract cri-dockerd tarball
+  ansible.builtin.unarchive:
+    src: "/tmp/cri-dockerd-{{ cri_dockerd_version }}.amd64.tgz"
+    dest: "/tmp/"
+    remote_src: yes
+
+- name: Move cri-dockerd to /usr/local/bin
+  ansible.builtin.command:
+    cmd: mv /tmp/cri-dockerd/cri-dockerd /usr/local/bin/
+  args:
+    creates: /usr/local/bin/cri-dockerd
+
+- name: Download cri-docker.service
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.service
+    dest: /tmp/cri-docker.service
+
+- name: Download cri-docker.socket
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.socket
+    dest: /tmp/cri-docker.socket
+
+- name: Move systemd service and socket files to /etc/systemd/system
+  ansible.builtin.command:
+    cmd: mv /tmp/cri-docker.service /tmp/cri-docker.socket /etc/systemd/system/
+  args:
+    creates: /etc/systemd/system/cri-docker.service
+
+- name: Update cri-docker.service to use /usr/local/bin/cri-dockerd
+  ansible.builtin.command:
+    cmd: sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Enable and start cri-docker.service
+  ansible.builtin.systemd:
+    name: cri-docker.service
+    enabled: yes
+    state: restarted
+
+- name: Enable and start cri-docker.socket
+  ansible.builtin.systemd:
+    name: cri-docker.socket
+    enabled: yes
+    state: restarted
