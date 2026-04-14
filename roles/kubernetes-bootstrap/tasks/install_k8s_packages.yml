@@ -1,14 +1,63 @@
 ---
-- name: Add kubernetes repository
+# --- RedHat: Add K8s YUM repo ---
+- name: Add Kubernetes repository (RedHat)
   ansible.builtin.template:
-    src: 'kubernetes.repo.j2'
+    src: kubernetes.repo.j2
     dest: /etc/yum.repos.d/kubernetes.repo
+  when: ansible_os_family == "RedHat"
 
-- name: Install kubernetes packages
+- name: Install Kubernetes packages (RedHat)
   ansible.builtin.yum:
-    name: [kubelet,kubeadm,kubectl]
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
     disable_excludes: kubernetes
+  when: ansible_os_family == "RedHat"
 
+# --- Debian/Ubuntu: Add K8s APT repo ---
+- name: Create keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  when: ansible_os_family == "Debian"
+
+- name: Add Kubernetes GPG key (Debian)
+  ansible.builtin.shell: >
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/v{{ k8s_version }}/deb/Release.key
+    | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  args:
+    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  when: ansible_os_family == "Debian"
+
+- name: Add Kubernetes APT repository (Debian)
+  ansible.builtin.template:
+    src: kubernetes.list.j2
+    dest: /etc/apt/sources.list.d/kubernetes.list
+  when: ansible_os_family == "Debian"
+
+- name: Install Kubernetes packages (Debian)
+  ansible.builtin.apt:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Hold Kubernetes packages (Debian)
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
+  when: ansible_os_family == "Debian"
+
+# --- Enable kubelet (both families) ---
 - name: Enable kubelet service
   ansible.builtin.service:
     name: kubelet

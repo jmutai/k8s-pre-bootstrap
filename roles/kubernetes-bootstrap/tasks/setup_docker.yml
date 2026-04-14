@@ -1,15 +1,48 @@
 ---
-- name: Add docker repository
+# --- RedHat: Add Docker CE repo ---
+- name: Add Docker CE repository (RedHat)
   ansible.builtin.get_url:
     url: https://download.docker.com/linux/centos/docker-ce.repo
-    dest: /etc/yum.repos.d/docer-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+  when: ansible_os_family == "RedHat"
 
-- name: Install supported version of docker
+# --- Debian/Ubuntu: Add Docker CE repo ---
+- name: Create keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  when: ansible_os_family == "Debian"
+
+- name: Add Docker GPG key (Debian)
+  ansible.builtin.shell: >
+    curl -fsSL https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg
+    -o /etc/apt/keyrings/docker.asc
+  args:
+    creates: /etc/apt/keyrings/docker.asc
+  when: ansible_os_family == "Debian"
+
+- name: Add Docker CE repository (Debian)
+  ansible.builtin.copy:
+    content: >
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc]
+      https://download.docker.com/linux/{{ ansible_distribution | lower }}
+      {{ ansible_distribution_release }} stable
+    dest: /etc/apt/sources.list.d/docker.list
+  when: ansible_os_family == "Debian"
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+# --- Install Docker (both families) ---
+- name: Install Docker CE
   ansible.builtin.package:
-    name: [docker-ce]
+    name: docker-ce
     state: present
 
-- name: Create other directories required
+- name: Create Docker directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -40,7 +73,9 @@
     name: docker
     state: restarted
     daemon_reload: yes
+  when: setup_proxy
 
+# --- Install cri-dockerd (Mirantis) ---
 - name: Get the latest version of cri-dockerd
   ansible.builtin.uri:
     url: https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest
@@ -51,7 +86,7 @@
   ansible.builtin.set_fact:
     cri_dockerd_version: "{{ latest_release.json.tag_name | regex_replace('v', '') }}"
 
-- name: Debug version number
+- name: Show cri-dockerd version
   ansible.builtin.debug:
     msg: "Latest cri-dockerd version is {{ cri_dockerd_version }}"
 
@@ -82,15 +117,18 @@
     url: https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.socket
     dest: /tmp/cri-docker.socket
 
-- name: Move systemd service and socket files to /etc/systemd/system
+- name: Move systemd service and socket files
   ansible.builtin.command:
     cmd: mv /tmp/cri-docker.service /tmp/cri-docker.socket /etc/systemd/system/
   args:
     creates: /etc/systemd/system/cri-docker.service
 
-- name: Update cri-docker.service to use /usr/local/bin/cri-dockerd
-  ansible.builtin.command:
-    cmd: sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
+- name: Update cri-docker.service binary path
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system/cri-docker.service
+    regexp: '/usr/bin/cri-dockerd'
+    line: 'ExecStart=/usr/local/bin/cri-dockerd --container-runtime-endpoint fd://'
+    state: present
 
 - name: Reload systemd daemon
   ansible.builtin.systemd:

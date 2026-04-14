@@ -6,48 +6,56 @@ It only helps you automate the standard Kubernetes bootstrapping pre-reqs.
 
 ## Supported OS
 
-- Rocky Linux 8|9
-- AlmaLinux 8|9
+**RedHat family:**
+- Rocky Linux 9|10
+- AlmaLinux 9|10
 - CentOS Stream 9
 
+**Debian family:**
+- Ubuntu 24.04 LTS (Noble Numbat)
+- Debian 13 (Trixie)
+- Debian 12 (Bookworm)
+
 ## Required Ansible
-Ansible version required `2.10+`
+Ansible version required `2.14+`
+
+Install required collections:
+
+```bash
+ansible-galaxy collection install -r requirements.yml
+```
 
 ## Tasks in the role
 
 This role contains tasks to:
 
 - Install basic packages required
-- Setup standard system requirements - Disable Swap, Modify sysctl, Disable SELinux
-- Install and configure a container runtime of your Choice - cri-o, Docker, Containerd
+- Setup standard system requirements - Disable Swap, Modify sysctl, Disable SELinux (RedHat only)
+- Automatically reboot if a kernel update was applied
+- Install and configure a container runtime of your choice - containerd, CRI-O, or Docker (with cri-dockerd)
 - Install the Kubernetes packages - kubelet, kubeadm and kubectl
-- Configure Firewalld on Kubernetes Master and Worker nodes (Only Kubernetes <1.19 version)
+- Hold Kubernetes packages to prevent accidental upgrades (Debian/Ubuntu)
+- Configure firewall rules - firewalld on RedHat, ufw on Debian/Ubuntu (optional)
 
 ## How to use this role
 
 - Clone the Project:
 
 ```bash
-$ git clone https://github.com/jmutai/k8s-pre-bootstrap.git
+git clone https://github.com/jmutai/k8s-pre-bootstrap.git
+cd k8s-pre-bootstrap
 ```
 
-- Configure `/etc/hosts` file in your bastion or workstation with all nodes and ip addresses. Example:
+- Install Ansible collection dependencies:
 
 ```bash
-192.168.200.10 k8smaster01.example.com k8smaster01
-192.168.200.11 k8smaster02.example.com k8smaster02
-192.168.200.12 k8smaster03.example.com k8smaster03
-
-192.168.200.13 k8snode01.example.com k8snode01
-192.168.200.14 k8snode02.example.com k8snode02
-192.168.200.15 k8snode03.example.com k8snode03
-192.168.200.16 k8snode04.example.com k8snode04
+ansible-galaxy collection install -r requirements.yml
 ```
 
-- Update your inventory, for example:
+- Update your inventory:
 
 ```bash
-$ vim hosts
+vim hosts
 [k8snodes]
 k8smaster01
 k8smaster02
@@ -55,133 +63,106 @@ k8smaster03
 k8snode01
 k8snode02
 k8snode03
-k8snode04
 ```
 
-- Update variables in playbook file
+- Update variables in playbook file:
 
 ```yaml
-$ vim k8s-prep.yml
+vim k8s-prep.yml
 ---
 - name: Prepare Kubernetes Nodes for Cluster bootstrapping
   hosts: k8snodes
-  remote_user: root
   become: yes
   become_method: sudo
-  #gather_facts: no
   vars:
-    k8s_version: "1.29"                                  # Kubernetes version to be installed
-    selinux_state: permissive                            # SELinux state to be set on k8s nodes                 
+    k8s_version: "1.35"                                  # Kubernetes version to be installed
+    selinux_state: permissive                            # SELinux state to be set on k8s nodes (RedHat only)
     timezone: "Africa/Nairobi"                           # Timezone to set on all nodes
     k8s_cni: calico                                      # calico, flannel
-    container_runtime: cri-o                             # docker, cri-o, containerd 
-    pod_network_cidr: "172.18.0.0/16"                    # pod subnet if using cri-o runtime
-    configure_firewalld: false                           # true / false (keep it false, k8s>1.19 have issues with firewalld)
+    container_runtime: containerd                        # docker, cri-o, containerd
+    pod_network_cidr: "192.168.0.0/16"                   # Pod network CIDR
+    configure_firewalld: false                           # true / false (enable firewall rules)
     # Docker proxy support
     setup_proxy: false                                   # Set to true to configure proxy
     proxy_server: "proxy.example.com:8080"               # Proxy server address and port
-    docker_proxy_exclude: "localhost,127.0.0.1"          # Adresses to exclude from proxy
+    docker_proxy_exclude: "localhost,127.0.0.1"          # Addresses to exclude from proxy
   roles:
     - kubernetes-bootstrap
 ```
 
 If you are using non root remote user, then set username and enable sudo:
 
-```bash
+```yaml
 become: yes
 become_method: sudo
 ```
 
 To enable proxy, set the value of `setup_proxy` to `true` and provide proxy details.
 
+## Variables Reference
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `k8s_version` | `1.35` | Kubernetes minor version to install |
+| `selinux_state` | `permissive` | SELinux state (RedHat only, ignored on Debian) |
+| `timezone` | `Africa/Nairobi` | System timezone for all nodes |
+| `k8s_cni` | `calico` | CNI plugin: `calico` or `flannel` |
+| `container_runtime` | `containerd` | Runtime: `containerd`, `cri-o`, or `docker` |
+| `pod_network_cidr` | `192.168.0.0/16` | Pod network CIDR |
+| `configure_firewalld` | `false` | Enable firewall configuration |
+| `setup_proxy` | `false` | Enable Docker proxy configuration |
+| `proxy_server` | `proxy.example.com:8080` | Proxy server address |
+| `docker_proxy_exclude` | `localhost,127.0.0.1` | Proxy exclusions |
+
 ## Running Playbook
 
 Once all values are updated, you can then run the playbook against your nodes.
 
-**NOTE**: Recommended to disable. if you must enable, a pattern in hostname is required for master and worker nodes:
+Check playbook syntax to ensure no errors:
 
-Check file:
-
-```yaml
-$ vim roles/kubernetes-bootstrap/tasks/configure_firewalld.yml
-....
-- name: Configure firewalld on master nodes
-  ansible.posix.firewalld:
-    port: "{{ item }}/tcp"
-    permanent: yes
-    state: enabled
-  with_items: '{{ k8s_master_ports }}'
-  when: "'master' in ansible_hostname"
-
-- name: Configure firewalld on worker nodes
-  ansible.posix.firewalld:
-    port: "{{ item }}/tcp"
-    permanent: yes
-    state: enabled
-  with_items: '{{ k8s_worker_ports }}'
-  when: ("'node' in ansible_hostname" or "'worker' in ansible_hostname")
-
+```bash
+ansible-playbook --syntax-check k8s-prep.yml -i hosts
 ```
 
-If your master nodes doesn't contain `master` and nodes doesn't have `node or worker` as part of its hostname, update the file to reflect your naming pattern. My nodes are named like below:
+Playbook executed as root user - with ssh key:
+
+```bash
+ansible-playbook -i hosts k8s-prep.yml
+```
+
+Playbook executed as sudo user - with password:
+
+```bash
+ansible-playbook -i hosts k8s-prep.yml --ask-pass --ask-become-pass
+```
+
+Playbook executed as sudo user - with ssh key and passwordless sudo:
+
+```bash
+ansible-playbook -i hosts k8s-prep.yml --become
+```
+
+### Firewall Configuration
+
+**NOTE**: Firewall configuration is disabled by default (`configure_firewalld: false`). If enabled, a pattern in hostname is required for master and worker nodes. The role uses:
+- **firewalld** on RedHat family
+- **ufw** on Debian/Ubuntu family
+
+Hostnames must contain `master` for control plane nodes and `node` or `worker` for worker nodes. Example:
 
 ```
 k8smaster01
 k8smaster02
 k8sworker01
-....
+k8sworker02
 ```
 
-Check playbook syntax to ensure no errors:
+## Tested On
 
-```
-$ ansible-playbook --syntax-check k8s-prep.yml -i hosts
+| OS | K8s Version | Container Runtime | Result |
+|----|------------|-------------------|--------|
+| Rocky Linux 10.1 | v1.35.3 | containerd v2.2.2 | Pass |
+| Ubuntu 24.04 LTS | v1.35.3 | containerd v2.2.2 | Pass |
+| Debian 12 | v1.35.3 | containerd v2.2.2 | Pass |
 
-playbook: k8s-prep.yml
-```
-
-Playbook executed as root user - with ssh key:
-
-```
-$ ansible-playbook -i hosts k8s-prep.yml
-```
-
-Playbook executed as root user - with password:
-
-```
-$ ansible-playbook -i hosts k8s-prep.yml --ask-pass
-```
-
-Playbook executed as sudo user - with password:
-
-```
-$ ansible-playbook -i hosts k8s-prep.yml --ask-pass --ask-become-pass
-```
-
-Playbook executed as sudo user - with ssh key and sudo password:
-
-```
-$ ansible-playbook -i hosts k8s-prep.yml --ask-become-pass
-```
-
-Playbook executed as sudo user - with ssh key and passwordless sudo:
-
-```
-$ ansible-playbook -i hosts k8s-prep.yml --ask-become-pass
-```
-
-Execution should be successful without errors:
-
-```
-TASK [kubernetes-bootstrap : Reload firewalld] *********************************************************************************************************
-changed: [k8smaster01]
-changed: [k8snode01]
-changed: [k8snode02]
-
-PLAY RECAP *********************************************************************************************************************************************
-k8smaster01                : ok=23   changed=3    unreachable=0    failed=0    skipped=11   rescued=0    ignored=0
-k8snode01                  : ok=23   changed=3    unreachable=0    failed=0    skipped=11   rescued=0    ignored=0
-k8snode02                  : ok=23   changed=3    unreachable=0    failed=0    skipped=11   rescued=0    ignored=0
-```
-
-Next check article on bootsrapping k8s control plane: https://computingforgeeks.com/install-kubernetes-cluster-on-rocky-linux-with-kubeadm-crio/
+Next: Bootstrap the K8s control plane - https://computingforgeeks.com/install-kubernetes-cluster-on-rocky-linux-with-kubeadm-crio/

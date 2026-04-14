@@ -1,0 +1,12 @@
+---
+basic_packages:
+  - vim
+  - bash-completion
+  - wget
+  - curl
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - software-properties-common
+  - iproute2

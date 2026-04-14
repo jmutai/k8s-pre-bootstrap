@@ -1,39 +1,70 @@
 ---
-- name: Configure Cri-o YUM repository
+# --- RedHat: Add CRI-O YUM repository ---
+- name: Configure CRI-O YUM repository (RedHat)
   ansible.builtin.template:
     src: crio.repo.j2
     dest: /etc/yum.repos.d/crio.repo
+  when: ansible_os_family == "RedHat"
 
-- name: Setup required sysctl params
-  ansible.posix.sysctl:
-    name: '{{ item.key }}'
-    value: '{{ item.value }}'
-    sysctl_set: yes
-    state: present
-    reload: yes
-  with_items:
-    - {key: net.bridge.bridge-nf-call-ip6tables, value: 1}
-    - {key: net.bridge.bridge-nf-call-iptables,  value: 1}
-    - {key: net.ipv4.ip_forward,  value: 1}
+# --- Debian/Ubuntu: Add CRI-O APT repository ---
+- name: Create keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  when: ansible_os_family == "Debian"
 
-- name: Install cri-o
+- name: Add CRI-O GPG key (Debian)
+  ansible.builtin.shell: >
+    curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/stable:/v{{ k8s_version }}/deb/Release.key
+    | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+  args:
+    creates: /etc/apt/keyrings/cri-o-apt-keyring.gpg
+  when: ansible_os_family == "Debian"
+
+- name: Configure CRI-O APT repository (Debian)
+  ansible.builtin.template:
+    src: crio.list.j2
+    dest: /etc/apt/sources.list.d/cri-o.list
+  when: ansible_os_family == "Debian"
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+# --- Install CRI-O (both families) ---
+- name: Install CRI-O (RedHat)
   ansible.builtin.yum:
     name: cri-o
     state: latest
     update_cache: yes
+  when: ansible_os_family == "RedHat"
 
-- name: Configure cri-o subnet
+- name: Install CRI-O (Debian)
+  ansible.builtin.apt:
+    name: cri-o
+    state: latest
+  when: ansible_os_family == "Debian"
+
+- name: Find CRI-O CNI config files
+  ansible.builtin.find:
+    paths: /etc/cni/net.d
+    patterns:
+      - '100-crio-bridge.conf'
+      - '100-crio-bridge.conflist'
+      - '11-crio-ipv4-bridge.conflist'
+  register: crio_cni_files
+
+- name: Configure CRI-O pod network CIDR
   ansible.builtin.replace:
-    path: '{{ item }}'
+    path: '{{ item.path }}'
     regexp: '10\.85\.0\.0\/16'
     replace: '{{ pod_network_cidr }}'
-  ignore_errors: True
-  with_items:
-    - /etc/cni/net.d/100-crio-bridge.conf
-    - /etc/cni/net.d/100-crio-bridge.conflist
-    - /etc/cni/net.d/11-crio-ipv4-bridge.conflist
+  loop: "{{ crio_cni_files.files }}"
+  when: crio_cni_files.files | length > 0
 
-- name: Start and enable crio service
+- name: Start and enable CRI-O service
   ansible.builtin.service:
     name: crio
     state: restarted

@@ -24,13 +24,11 @@ calico_udp_ports:
 calico_tcp_ports:
   - 5473
   - 179
-  - 5473
 
 # Flannel CNI firewall ports
 flannel_udp_ports:
   - 8285
   - 8472
 
-# Default pod subnet for cri-o runtime
-pod_network_cidr:
-  - "192.168.0.0/16"
+# Default pod network CIDR (used by CRI-O and passed to kubeadm)
+pod_network_cidr: "192.168.0.0/16"

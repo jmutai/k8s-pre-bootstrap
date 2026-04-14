@@ -3,20 +3,52 @@
   ansible.posix.selinux:
     policy: targeted
     state: "{{ selinux_state }}"
+  when: ansible_os_family == "RedHat"
 
-- name: Update system packages
-  ansible.builtin.package:
+- name: Update system packages (RedHat)
+  ansible.builtin.yum:
     name: "*"
     state: latest
+  register: yum_update
+  when: ansible_os_family == "RedHat"
 
-- name: Install some packages needed to configure the nodes
+- name: Update system packages (Debian)
+  ansible.builtin.apt:
+    upgrade: dist
+    update_cache: yes
+  register: apt_update
+  when: ansible_os_family == "Debian"
+
+- name: Check if reboot is required (kernel update)
+  ansible.builtin.shell: |
+    CURRENT=$(uname -r)
+    {% if ansible_os_family == "RedHat" %}
+    LATEST=$(rpm -q --last kernel-core 2>/dev/null | head -1 | awk '{print $1}' | sed 's/kernel-core-//')
+    {% else %}
+    LATEST=$(ls -t /boot/vmlinuz-* 2>/dev/null | head -1 | sed 's|/boot/vmlinuz-||')
+    {% endif %}
+    if [ "$CURRENT" != "$LATEST" ] && [ -n "$LATEST" ]; then
+      echo "reboot_needed"
+    else
+      echo "ok"
+    fi
+  register: reboot_check
+  changed_when: false
+
+- name: Reboot if kernel was updated
+  ansible.builtin.reboot:
+    reboot_timeout: 300
+    msg: "Rebooting after kernel update"
+  when: reboot_check.stdout | trim == "reboot_needed"
+
+- name: Install required packages
   ansible.builtin.package:
-    name: "{{ item }}"
-  loop:
-    - "{{ basic_packages }}"
-  
+    name: "{{ basic_packages }}"
+    state: present
+
 - name: Disable firewalld service
   ansible.builtin.service:
     name: firewalld
     state: stopped
     enabled: no
+  when: ansible_os_family == "RedHat"

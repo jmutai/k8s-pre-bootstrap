@@ -1,21 +1,19 @@
 ---
 - name: Prepare Kubernetes Nodes for Cluster bootstrapping
   hosts: k8snodes
-  remote_user: root
   become: yes
   become_method: sudo
-  #gather_facts: no
   vars:
-    k8s_version: "1.30"                                  # Kubernetes version to be installed
-    selinux_state: permissive                            # SELinux state to be set on k8s nodes                 
+    k8s_version: "1.35"                                  # Kubernetes version to be installed
+    selinux_state: permissive                            # SELinux state to be set on k8s nodes (RedHat only)
     timezone: "Africa/Nairobi"                           # Timezone to set on all nodes
     k8s_cni: calico                                      # calico, flannel
-    container_runtime: cri-o                             # docker, cri-o, containerd 
-    pod_network_cidr: "172.18.0.0/16"                    # pod subnet if using cri-o runtime
-    configure_firewalld: false                           # true / false (keep it false, k8s>1.19 have issues with firewalld)
+    container_runtime: containerd                        # docker, cri-o, containerd
+    pod_network_cidr: "192.168.0.0/16"                   # Pod network CIDR
+    configure_firewalld: false                           # true / false (enable firewall rules - firewalld on RedHat, ufw on Debian/Ubuntu)
     # Docker proxy support
     setup_proxy: false                                   # Set to true to configure proxy
     proxy_server: "proxy.example.com:8080"               # Proxy server address and port
-    docker_proxy_exclude: "localhost,127.0.0.1"          # Adresses to exclude from proxy
+    docker_proxy_exclude: "localhost,127.0.0.1"          # Addresses to exclude from proxy
   roles:
     - kubernetes-bootstrap

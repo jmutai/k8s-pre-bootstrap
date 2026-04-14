@@ -24,7 +24,6 @@
     sysctl_set: yes
     state: present
     reload: yes
-  ignore_errors: True
   with_items:
     - {key: net.bridge.bridge-nf-call-ip6tables, value: 1}
     - {key: net.bridge.bridge-nf-call-iptables,  value: 1}

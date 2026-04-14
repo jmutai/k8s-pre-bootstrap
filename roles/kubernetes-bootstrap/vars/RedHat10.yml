@@ -1,0 +1,12 @@
+---
+basic_packages:
+  - vim
+  - bash-completion
+  - wget
+  - curl
+  - firewalld
+  - python3-firewall
+  - yum-utils
+  - lvm2
+  - device-mapper-persistent-data
+  - iproute-tc

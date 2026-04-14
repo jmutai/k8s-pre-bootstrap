@@ -1,33 +1,62 @@
 ---
-- name: Add docker repository
+# --- RedHat: Add Docker CE repo (provides containerd.io) ---
+- name: Add Docker CE repository (RedHat)
   ansible.builtin.get_url:
     url: https://download.docker.com/linux/centos/docker-ce.repo
-    dest: /etc/yum.repos.d/docer-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+  when: ansible_os_family == "RedHat"
 
+# --- Debian/Ubuntu: Add Docker CE repo (provides containerd.io) ---
+- name: Create keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  when: ansible_os_family == "Debian"
+
+- name: Add Docker GPG key (Debian)
+  ansible.builtin.shell: >
+    curl -fsSL https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg
+    -o /etc/apt/keyrings/docker.asc
+  args:
+    creates: /etc/apt/keyrings/docker.asc
+  when: ansible_os_family == "Debian"
+
+- name: Add Docker CE repository (Debian)
+  ansible.builtin.copy:
+    content: >
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc]
+      https://download.docker.com/linux/{{ ansible_distribution | lower }}
+      {{ ansible_distribution_release }} stable
+    dest: /etc/apt/sources.list.d/docker.list
+  when: ansible_os_family == "Debian"
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+# --- Install containerd (both families) ---
 - name: Install containerd
   ansible.builtin.package:
-    name: [containerd.io]
+    name: containerd.io
     state: present
 
-- name: Create containerd directories required
+- name: Create containerd config directory
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: /etc/containerd
     state: directory
-  with_items:
-    - /etc/containerd
 
-- name: Configure containerd
+- name: Generate default containerd configuration
   ansible.builtin.shell: containerd config default > /etc/containerd/config.toml
-  run_once: false
 
 - name: Set cgroup driver as systemd
   ansible.builtin.lineinfile:
     path: /etc/containerd/config.toml
-    regexp: SystemdCgroup = false
-    line: SystemdCgroup = true
+    regexp: 'SystemdCgroup = false'
+    line: '            SystemdCgroup = true'
     state: present
     backup: yes
-
 
 - name: Start and enable containerd service
   ansible.builtin.systemd:
